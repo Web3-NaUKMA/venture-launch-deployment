@@ -166,7 +166,7 @@ const AccountRegistrationPage: FC = () => {
           Sign in
         </Link>
       </span>
-      <img src='/solana-logo.png' className='w-40 mt-10' />
+      <img src='/solana-foundation-logo.png' className='w-40 mt-10' />
     </div>
   );
 };
