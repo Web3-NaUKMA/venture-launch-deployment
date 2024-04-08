@@ -82,7 +82,7 @@ These instructions will help you get a copy of the project up and running on you
   SESSION_SECRET=35a9b4ebdc2ff10403385de00d41ba9aa9afc76e4eade87cee1cea01703c9ad3
   SESSION_MAX_AGE=86400000
   
-  THIRDWEB_STORAGE_SECRET=tN8Lga7jrwGyY4HWIs4NCKb8NrQYzg5XBIiFc9v6LIeluJJfVI5FlpWkE1TTEpt1LuuDIlCjmjQ0oKlXQoHPPQ
+  THIRDWEB_STORAGE_SECRET= 'your IPFS secret'
   NFT_DEFAULT_IMAGE=https://i.imgur.com/sRhxBTu.png
   
   # Database environment variables
