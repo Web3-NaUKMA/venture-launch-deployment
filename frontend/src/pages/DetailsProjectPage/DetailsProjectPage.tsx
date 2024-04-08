@@ -268,7 +268,9 @@ const DetailsProjectPage: FC = () => {
               </div>
               <div className='flex justify-between items-start py-3 font-["Noto"] font-semibold text-gray-600 text-sm'>
                 <h3 className=' text-gray-600'>Description</h3>
-                <span className='w-1/2'>{project.projectLaunchDescription}</span>
+                <span className='w-1/2 whitespace-pre-wrap'>
+                  {project.projectLaunchDescription}
+                </span>
               </div>
               <div className='flex justify-between items-start py-3 font-["Noto"] font-semibold text-gray-600 text-sm'>
                 <h3 className='w-1/2'>Milestones number</h3>

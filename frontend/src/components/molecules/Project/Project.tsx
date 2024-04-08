@@ -252,7 +252,7 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch }) => {
                 )}
             </div>
           </div>
-          <div className='py-5 font-serif text-gray-700 border-b flex flex-1'>
+          <div className='py-5 font-serif text-gray-700 border-b flex flex-1 whitespace-pre-wrap'>
             {projectLaunch.description}
           </div>
           <div className='py-5 flex mb-5'>

@@ -290,7 +290,7 @@ const LaunchProjectModal: FC<ILaunchProjectModalProps> = ({ title, buttons, chil
         </label>
         <textarea
           id='launch_project_description'
-          className='border p-2 rounded-md mb-5 min-h-[150px]'
+          className='border p-2 rounded-md mb-5 min-h-[150px] whitespace-pre-wrap'
           defaultValue={state.data.description}
           placeholder='Project description'
           onChange={event =>
@@ -530,7 +530,7 @@ const LaunchProjectModal: FC<ILaunchProjectModalProps> = ({ title, buttons, chil
                   </label>
                   <textarea
                     id={`launch_project_team_${index}_bio`}
-                    className='border px-2 py-1 rounded-md h-[100px] resize-none'
+                    className='border px-2 py-1 rounded-md h-[100px] resize-none whitespace-pre-wrap'
                     defaultValue={member.bio}
                     placeholder='Web developer'
                     onChange={event =>
@@ -621,7 +621,7 @@ const LaunchProjectModal: FC<ILaunchProjectModalProps> = ({ title, buttons, chil
         </label>
         <textarea
           id='launch_project_business_model'
-          className='border p-2 rounded-md mb-5 min-h-[150px]'
+          className='border p-2 rounded-md mb-5 min-h-[150px] whitespace-pre-wrap'
           defaultValue={state.data.businessModel}
           placeholder='New project business model'
           onChange={event =>
@@ -640,7 +640,7 @@ const LaunchProjectModal: FC<ILaunchProjectModalProps> = ({ title, buttons, chil
         </label>
         <textarea
           id='launch_project_tokenomics'
-          className='border p-2 rounded-md mb-5 min-h-[150px]'
+          className='border p-2 rounded-md mb-5 min-h-[150px] whitespace-pre-wrap'
           defaultValue={state.data.tokenomics}
           placeholder='New project tokenomics'
           onChange={event =>

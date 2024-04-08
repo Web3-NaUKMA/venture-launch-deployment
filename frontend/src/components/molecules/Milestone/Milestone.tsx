@@ -139,11 +139,11 @@ const Milestone: FC<IMilestoneProps> = ({ milestone, projectLaunch }) => {
       {isWithdrawMilestoneModalVisible &&
         createPortal(
           <Modal
-            title='Submit milestone'
+            title='Withdraw milestone'
             buttons={[
               {
                 type: 'accept',
-                name: 'Submit',
+                name: 'Withdraw',
                 action: () => withdrawMilestone(),
               },
               {

@@ -110,9 +110,9 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
               </div>
             </div>
             <div className='w-full'>
-              <div className='w-full border border-gray-400 rounded-full h-[30px]'>
+              <div className='w-full border border-gray-400 rounded-full h-[30px] overflow-hidden'>
                 <div
-                  className={`flex justify-center items-center bg-neutral-500 text-white h-[30px] text-xs mt-[-1px] ms-[-1px] rounded-full overflow-hidden`}
+                  className={`flex justify-center items-center bg-neutral-500 text-white h-[30px] text-xs mt-[-1px] ms-[-1px] rounded-full`}
                   style={{
                     width: `calc(${Math.max(
                       0,
@@ -147,7 +147,7 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
         </div>
         <div className='mb-5'>
           <h3 className='font-bold font-serif text-xl mb-2 mt-5'>Description</h3>
-          <p className='font-serif'>{projectLaunch.description}</p>
+          <p className='font-serif whitespace-pre-wrap'>{projectLaunch.description}</p>
         </div>
         <hr />
         <div className='mb-5'>
@@ -178,7 +178,7 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
                   <h5 className='font-bold text-lg'>{member.name}</h5>
                   <p className='font-medium text-gray-500'>{member.position}</p>
                   <hr className='my-2' />
-                  <p className='text-gray-500 text-sm'>{member.bio}</p>
+                  <p className='text-gray-500 text-sm whitespace-pre-wrap'>{member.bio}</p>
                 </div>
               </div>
             ))}
@@ -220,12 +220,12 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
         <hr />
         <div className='mb-5'>
           <h3 className='font-bold font-serif text-xl mb-2 mt-5'>Business model</h3>
-          <p className='font-serif'>{projectLaunch.businessModel}</p>
+          <p className='font-serif whitespace-pre-wrap'>{projectLaunch.businessModel}</p>
         </div>
         <hr />
         <div className='mb-5'>
           <h3 className='font-bold font-serif text-xl mb-2 mt-5'>Tokenomics</h3>
-          <p className='font-serif'>{projectLaunch.tokenomics}</p>
+          <p className='font-serif whitespace-pre-wrap'>{projectLaunch.tokenomics}</p>
         </div>
         <hr />
         <div>
