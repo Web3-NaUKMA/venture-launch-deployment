@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile.dev
+    container_name: venture-launch-frontend
+    networks:
+      - venture-launch-network
+    env_file: ./.env.dev
+    ports:
+      - ${FRONTEND_PORT}:${FRONTEND_PORT}
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile.dev
+    container_name: venture-launch-backend
+    networks:
+      - venture-launch-network
+    env_file: ./.env.dev
+    ports:
+      - ${BACKEND_PORT}:${BACKEND_PORT}
+    volumes:
+      - ./backend/src:/app/src
+    depends_on:
+      - database
+
+  database:
+    image: postgres:latest
+    container_name: venture-launch-database
+    networks:
+      - venture-launch-network
+    env_file: ./.env.dev
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+    ports:
+      - ${DATABASE_PORT}:5432
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    restart: on-failure
+
+networks:
+  venture-launch-network:
+    driver: bridge
+
+volumes:
+  database_data:

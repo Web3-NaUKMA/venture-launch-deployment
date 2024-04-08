@@ -1,0 +1,151 @@
+import { FC, FormEvent, useEffect, useRef, useState } from 'react';
+import Modal, { IModalProps } from '../../molecules/Modal/Modal';
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
+import { useAuth } from '../../../hooks/auth.hooks';
+import { IProjectLaunch, IUpdateProjectLaunch } from '../../../types/project-launch.types';
+import {
+  selectErrors,
+  setError,
+  updateProjectLaunch,
+} from '../../../redux/slices/project-launch.slice';
+
+export interface IEditProjectModalProps extends IModalProps {
+  project: IProjectLaunch;
+}
+
+interface IEditProjectModalState {
+  data: {
+    name?: string;
+    description?: string;
+    authorId?: string;
+  };
+  error: string | null;
+}
+
+const initialState: IEditProjectModalState = {
+  data: {
+    name: undefined,
+    description: undefined,
+    authorId: undefined,
+  },
+  error: null,
+};
+
+const EditProjectModal: FC<IEditProjectModalProps> = ({ project, title, buttons, children }) => {
+  const { authenticatedUser } = useAuth();
+  const [state, setState] = useState({
+    ...initialState,
+    data: {
+      ...initialState.data,
+      name: project.name,
+      description: project.description,
+      authorId: authenticatedUser?.id,
+    },
+  });
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const dispatch = useAppDispatch();
+  const errors = useAppSelector(selectErrors);
+
+  useEffect(() => {
+    dispatch(setError({ updateProjectLaunch: null }));
+  }, []);
+
+  useEffect(() => {
+    setState({ ...state, error: errors.updateProjectLaunch });
+  }, [errors.updateProjectLaunch]);
+
+  useEffect(() => {
+    if (authenticatedUser) {
+      setState({ ...state, data: { ...state.data, authorId: authenticatedUser.id } });
+    }
+  }, [authenticatedUser]);
+
+  const isDataValid = (data: IEditProjectModalState['data']): boolean => {
+    if (!data.name?.trim()) {
+      setState({ ...state, error: 'Project name cannot be empty.' });
+      return false;
+    }
+
+    if (!data.description?.trim()) {
+      setState({ ...state, error: 'Project description cannot be empty.' });
+      return false;
+    }
+
+    return true;
+  };
+
+  const onSubmit = (event: FormEvent) => {
+    event.preventDefault();
+
+    if (isDataValid(state.data)) {
+      if (authenticatedUser) {
+        dispatch(
+          updateProjectLaunch(project.id, state.data as IUpdateProjectLaunch, {
+            onSuccess: () => buttons?.find(button => button.type === 'accept')?.action(),
+          }),
+        );
+      } else {
+        setState({ ...state, error: 'Cannot update a project. The user is unauthorized.' });
+      }
+    }
+  };
+
+  return (
+    <Modal
+      title={title}
+      buttons={buttons?.map(button =>
+        button.type === 'accept'
+          ? {
+              ...button,
+              action: () => {
+                if (formRef.current && formRef.current instanceof HTMLFormElement) {
+                  formRef.current.dispatchEvent(
+                    new Event('submit', { cancelable: true, bubbles: true }),
+                  );
+                }
+              },
+            }
+          : button,
+      )}
+      className='max-w-[768px]'
+    >
+      <form ref={formRef} className='flex flex-col' onSubmit={onSubmit}>
+        {state.error && (
+          <span className='bg-rose-100 border border-rose-200 p-2 rounded-md mb-5'>
+            {state.error}
+          </span>
+        )}
+        <label htmlFor='update_project_name' className='mb-1'>
+          Name:
+        </label>
+        <input
+          type='text'
+          id='update_project_name'
+          className='border p-2 rounded-md mb-5'
+          defaultValue={state.data.name}
+          onChange={event =>
+            setState({ ...state, data: { ...state.data, name: event.target.value }, error: null })
+          }
+        />
+        <label htmlFor='update_project_description' className='mb-1'>
+          Description:
+        </label>
+        <textarea
+          id='update_project_description'
+          className='border p-2 rounded-md mb-5 min-h-[150px]'
+          defaultValue={state.data.description}
+          onChange={event =>
+            setState({
+              ...state,
+              data: { ...state.data, description: event.target.value },
+              error: null,
+            })
+          }
+        />
+      </form>
+      {children}
+    </Modal>
+  );
+};
+
+export default EditProjectModal;
