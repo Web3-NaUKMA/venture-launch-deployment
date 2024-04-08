@@ -83,7 +83,7 @@ These instructions will help you get a copy of the project up and running on you
   SESSION_MAX_AGE=86400000
   
   THIRDWEB_STORAGE_SECRET=tN8Lga7jrwGyY4HWIs4NCKb8NrQYzg5XBIiFc9v6LIeluJJfVI5FlpWkE1TTEpt1LuuDIlCjmjQ0oKlXQoHPPQ
-  NFT_DEFAULT_IMAGE=https://i.kym-cdn.com/photos/images/original/001/271/320/5bb.jpg
+  NFT_DEFAULT_IMAGE=https://i.imgur.com/sRhxBTu.png
   
   # Database environment variables
   POSTGRES_USER=venture-launch
@@ -125,7 +125,7 @@ These instructions will help you get a copy of the project up and running on you
   SESSION_MAX_AGE=86400000
   
   THIRDWEB_STORAGE_SECRET=tN8Lga7jrwGyY4HWIs4NCKb8NrQYzg5XBIiFc9v6LIeluJJfVI5FlpWkE1TTEpt1LuuDIlCjmjQ0oKlXQoHPPQ
-  NFT_DEFAULT_IMAGE=https://i.kym-cdn.com/photos/images/original/001/271/320/5bb.jpg
+  NFT_DEFAULT_IMAGE=https://i.imgur.com/sRhxBTu.png
   
   # Database environment variables
   POSTGRES_USER=venture-launch
