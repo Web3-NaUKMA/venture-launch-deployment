@@ -175,8 +175,16 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch }) => {
           <div className='flex justify-between items-start pb-5 border-b'>
             <div className='flex items-center'>
               <img
-                src='/project-logo.png'
-                className='translate-x-[-30px] translate-y-[-30px] mb-[-60px] mr-[-60px]'
+                src={
+                  projectLaunch.logo
+                    ? `${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}${
+                        import.meta.env.VITE_BACKEND_PREFIX
+                          ? `/${import.meta.env.VITE_BACKEND_PREFIX}`
+                          : ``
+                      }/file?file=${projectLaunch.logo}`
+                    : '/project-logo.png'
+                }
+                className='w-[6em] aspect-square rounded-xl object-cover shadow-[0_0_7px_0px_silver]'
               />
               <h4 className='font-bold text-xl ms-5 text-gray-600 font-serif'>
                 {projectLaunch.name}
@@ -250,7 +258,7 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch }) => {
           <div className='py-5 flex mb-5'>
             <h4 className='text-gray-600 font-medium text-lg me-5'>Progress </h4>
             <div className='w-full'>
-              <div className='w-full border border-gray-400 rounded-full h-[30px]'>
+              <div className='w-full border border-gray-400 rounded-full h-[30px] overflow-hidden'>
                 <div
                   className={`flex justify-center items-center bg-neutral-500 text-white h-[30px] text-xs mt-[-1px] ms-[-1px] rounded-full`}
                   style={{
@@ -263,7 +271,7 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch }) => {
                     )}% + 2px)`,
                   }}
                 >
-                  <span className='font-medium bg-neutral-500 rounded-full'>
+                  <span className='absolute font-medium bg-neutral-500 rounded-full mx-1'>
                     {(
                       (projectLaunch.fundraiseProgress / projectLaunch.fundraiseAmount) *
                       100
@@ -285,7 +293,7 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch }) => {
             </div>
           </div>
         </div>
-        <div className='flex justify-between items-center w-full'>
+        <div className='flex flex-wrap justify-between items-center w-full'>
           {(!projectLaunch.isApproved || !projectLaunch.isFundraised) && (
             <div className='font-medium text-gray-700 text-lg'>
               <h4>

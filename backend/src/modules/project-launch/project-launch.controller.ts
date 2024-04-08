@@ -66,10 +66,14 @@ export const create = async (request: Request, response: Response) => {
       path: `/uploads/project-launches/${createdProjectLaunch.id}/${file.fieldname}`,
     }));
 
+    const teamFiles = files.filter(file => file.fieldname === 'team-images');
+
     team = team.map((member: any, index: number) => ({
       ...member,
-      image: files[index] ? `${files[index].path}/${files[index].originalname}` : null,
+      image: teamFiles[index] ? `${teamFiles[index].path}/${teamFiles[index].originalname}` : null,
     }));
+
+    const logoFile = files.find(file => file.fieldname === 'project-logo') ?? null;
 
     const projectDocuments = files
       .filter(file => file.fieldname === 'project-documents')
@@ -80,9 +84,10 @@ export const create = async (request: Request, response: Response) => {
     const projectLaunch = await projectLaunchService.update(createdProjectLaunch.id, {
       team,
       projectDocuments,
+      logo: logoFile
+        ? `/uploads/project-launches/${createdProjectLaunch.id}/${logoFile.fieldname}/${logoFile.originalname}`
+        : null,
     });
-
-    console.log(projectLaunch);
 
     return response.status(HttpStatusCode.Created).json(projectLaunch);
   } catch (error) {
@@ -113,9 +118,13 @@ export const update = async (request: Request, response: Response) => {
     }));
 
     if (team) {
+      const teamFiles = files.filter(file => file.fieldname === 'team-images');
+
       team = team.map((member: any, index: number) => ({
         ...member,
-        image: files[index] ? `${files[index].path}/${files[index].originalname}` : null,
+        image: teamFiles[index]
+          ? `${teamFiles[index].path}/${teamFiles[index].originalname}`
+          : null,
       }));
     }
 
@@ -136,9 +145,18 @@ export const update = async (request: Request, response: Response) => {
         .json({ message: 'The project launch with such id was not found.' });
     }
 
+    const logoFile = files.find(file => file.fieldname === 'project-logo') ?? null;
+
     let data = { ...request.body };
     if (team) data = { ...data, team };
-    if (files.length > 0) data = { ...data, projectDocuments };
+    if (files.length > 0)
+      data = {
+        ...data,
+        projectDocuments,
+        logo: logoFile
+          ? `/uploads/project-launches/${id}/${logoFile.fieldname}/${logoFile.originalname}`
+          : null,
+      };
 
     const projectLaunch = await projectLaunchService.update(id, data);
 

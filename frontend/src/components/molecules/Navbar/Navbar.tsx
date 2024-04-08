@@ -1,5 +1,5 @@
-import { NavLink, useNavigate } from 'react-router-dom';
-import { FC, useState } from 'react';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { FC, useEffect, useState } from 'react';
 import { INavbarLink } from '../../templates/PageWithNavigationTemplate';
 import { v4 as uuid } from 'uuid';
 import { AppRoutes } from '../../../types/enums/app-routes.enum';
@@ -41,8 +41,8 @@ const DesktopNavbar: FC<INavbarProps> = ({ links }) => {
               isActive
                 ? 'py-1.5 text-xl font-serif font-bold mx-4 transition-[0.3s_ease]'
                 : isPending
-                ? 'py-1.5 text-xl font-serif font-medium mx-4 transition-[0.3s_ease]'
-                : 'py-1.5 text-xl font-serif font-medium rounded-md mx-4 transition-[0.3s_ease]'
+                  ? 'py-1.5 text-xl font-serif font-medium mx-4 transition-[0.3s_ease]'
+                  : 'py-1.5 text-xl font-serif font-medium rounded-md mx-4 transition-[0.3s_ease]'
             }
           >
             {link.name}
@@ -102,6 +102,19 @@ const MobileNavbar: FC<INavbarProps> = ({ links }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const { authenticatedUser, signOut } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (isMenuVisible) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
+    }
+  }, [isMenuVisible]);
+
+  useEffect(() => {
+    setIsMenuVisible(false);
+  }, [location]);
 
   return (
     <>
@@ -113,7 +126,7 @@ const MobileNavbar: FC<INavbarProps> = ({ links }) => {
           <img src='/logo.png' className='w-40' />
         </NavLink>
         {isMenuVisible && (
-          <div className='absolute top-[calc(100%_+_0.75em_+_6px)] h-[calc(100vh_-_100%_-_1.5em_-_6px)] bg-white flex flex-col -left-3 w-screen p-4 justify-between'>
+          <div className='absolute top-[calc(100%_+_0.75em_+_6px)] h-[calc(100vh_-_100%_-_1.5em_-_6px)] bg-[#f5f5f5] flex flex-col -left-3 w-screen p-4 justify-between'>
             <div className='flex flex-col'>
               {links.map(link => (
                 <NavLink
@@ -123,8 +136,8 @@ const MobileNavbar: FC<INavbarProps> = ({ links }) => {
                     isActive
                       ? 'rounded-md text-lg text-white bg-black font-bold transition-[0.3s_ease] mb-2 p-3'
                       : isPending
-                      ? 'rounded-md text-lg font-medium transition-[0.3s_ease] hover:text-indigo-500 mb-2 p-3 border'
-                      : 'rounded-md text-lg font-medium transition-[0.3s_ease] hover:text-indigo-500 mb-2 p-3 border'
+                        ? 'rounded-md text-lg font-medium transition-[0.3s_ease] hover:text-indigo-500 mb-2 p-3 border'
+                        : 'rounded-md text-lg font-medium transition-[0.3s_ease] hover:text-indigo-500 mb-2 p-3 border'
                   }
                 >
                   {link.name}
@@ -143,8 +156,8 @@ const MobileNavbar: FC<INavbarProps> = ({ links }) => {
                       isActive
                         ? 'inline-flex items-center rounded-md text-white bg-indigo-600 font-bold transition-[0.3s_ease] mb-2 p-3'
                         : isPending
-                        ? 'inline-flex items-center rounded-md font-medium transition-[0.3s_ease] hover:text-indigo-500 mb-2 p-3 border'
-                        : 'inline-flex items-center rounded-md font-medium transition-[0.3s_ease] hover:text-indigo-500 mb-2 p-3 border'
+                          ? 'inline-flex items-center rounded-md font-medium transition-[0.3s_ease] hover:text-indigo-500 mb-2 p-3 border'
+                          : 'inline-flex items-center rounded-md font-medium transition-[0.3s_ease] hover:text-indigo-500 mb-2 p-3 border'
                     }
                   >
                     <UserCircleIcon className='size-5 me-2 w-[32px]' />

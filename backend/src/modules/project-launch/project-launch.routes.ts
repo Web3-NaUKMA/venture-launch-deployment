@@ -15,7 +15,7 @@ router.post(
     storage,
     fileFilter: (request: Request, file: Express.Multer.File, callback) => {
       if (
-        file.fieldname === 'team-images' &&
+        (file.fieldname === 'team-images' || file.fieldname === 'project-logo') &&
         !(
           file.mimetype === 'image/jpeg' ||
           file.mimetype === 'image/png' ||
@@ -30,7 +30,11 @@ router.post(
     limits: {
       fileSize: 10 * 2 ** 20, // 1 MB
     },
-  }).fields([{ name: 'team-images' }, { name: 'project-documents' }]),
+  }).fields([
+    { name: 'team-images' },
+    { name: 'project-documents' },
+    { name: 'project-logo', maxCount: 1 },
+  ]),
   auth(),
   projectLaunchController.create,
 );
@@ -40,7 +44,7 @@ router.put(
     storage,
     fileFilter: (request: Request, file: Express.Multer.File, callback) => {
       if (
-        file.fieldname === 'team-images' &&
+        (file.fieldname === 'team-images' || file.fieldname === 'project-logo') &&
         !(
           file.mimetype === 'image/jpeg' ||
           file.mimetype === 'image/png' ||
@@ -55,7 +59,11 @@ router.put(
     limits: {
       fileSize: 10 * 2 ** 20, // 10 MB
     },
-  }).fields([{ name: 'team-images' }, { name: 'project-documents' }]),
+  }).fields([
+    { name: 'team-images' },
+    { name: 'project-documents' },
+    { name: 'project-logo', maxCount: 1 },
+  ]),
   auth(),
   projectLaunchController.update,
 );

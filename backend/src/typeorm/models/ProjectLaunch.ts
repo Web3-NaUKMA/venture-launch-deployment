@@ -28,6 +28,9 @@ export class ProjectLaunch implements IProjectLaunch {
   @Column({ type: 'text' })
   description: string;
 
+  @Column({ type: 'text', default: null })
+  logo: string | null;
+
   @Column({ type: 'boolean', default: false })
   isFundraised: boolean;
 

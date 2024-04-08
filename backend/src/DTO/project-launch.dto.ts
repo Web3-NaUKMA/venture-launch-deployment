@@ -5,6 +5,7 @@ import { IFindProjectDto } from './project.dto';
 export interface ICreateProjectLaunchDto {
   name: string;
   description: string;
+  logo: string | null;
   fundraiseAmount: number;
   fundraiseDeadline: Date;
   projectDocuments: string[];
@@ -20,6 +21,7 @@ export interface ICreateProjectLaunchDto {
 export interface IUpdateProjectLaunchDto {
   name?: string;
   description?: string;
+  logo?: string | null;
   isFundraised?: boolean;
   isApproved?: boolean;
   fundraiseAmount?: number;

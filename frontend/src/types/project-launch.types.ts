@@ -6,6 +6,7 @@ export interface IProjectLaunch {
   id: string;
   name: string;
   description: string;
+  logo: string | null;
   isFundraised: boolean;
   isApproved: boolean;
   fundraiseAmount: number;

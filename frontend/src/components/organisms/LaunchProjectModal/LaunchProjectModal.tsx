@@ -12,7 +12,6 @@ import { RemoveIcon } from '../../atoms/Icons/Icons';
 import { UserRoleEnum } from '../../../types/enums/user-role.enum';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { USDC_MINT, createVaultTx, programId } from '../../../utils/venture-launch.utils';
-import { PublicKey } from '@solana/web3.js';
 
 export interface ILaunchProjectModalProps extends IModalProps {}
 
@@ -302,6 +301,20 @@ const LaunchProjectModal: FC<ILaunchProjectModalProps> = ({ title, buttons, chil
             })
           }
         />
+        <div className='flex flex-col mb-2'>
+          <label
+            htmlFor={`launch_project_logo`}
+            className='mb-0.5 font-medium text-sm text-gray-500'
+          >
+            Logo:{' '}
+          </label>
+          <input
+            type='file'
+            name='project-logo'
+            id={`launch_project_logo`}
+            className='border p-2 rounded-md mb-5'
+          />
+        </div>
         <label
           htmlFor='launch_project_milestones_number'
           className='mb-0.5 font-medium text-sm text-gray-500'

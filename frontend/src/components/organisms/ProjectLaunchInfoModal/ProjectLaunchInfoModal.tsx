@@ -39,8 +39,16 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
           <div className='flex flex-col'>
             <div className='flex items-center mb-5'>
               <img
-                src='/project-logo.png'
-                className='translate-x-[-32px] translate-y-[-32px] mb-[-64px] mr-[-64px]'
+                src={
+                  projectLaunch.logo
+                    ? `${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}${
+                        import.meta.env.VITE_BACKEND_PREFIX
+                          ? `/${import.meta.env.VITE_BACKEND_PREFIX}`
+                          : ``
+                      }/file?file=${projectLaunch.logo}`
+                    : '/project-logo.png'
+                }
+                className='w-[6em] aspect-square rounded-xl object-cover shadow-[0_0_7px_0px_silver]'
               />
               <h4 className='font-bold text-xl ms-5 text-gray-600 font-serif'>
                 {projectLaunch.name}
@@ -104,7 +112,7 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
             <div className='w-full'>
               <div className='w-full border border-gray-400 rounded-full h-[30px]'>
                 <div
-                  className={`flex justify-center items-center bg-neutral-500 text-white h-[30px] text-xs mt-[-1px] ms-[-1px] rounded-full`}
+                  className={`flex justify-center items-center bg-neutral-500 text-white h-[30px] text-xs mt-[-1px] ms-[-1px] rounded-full overflow-hidden`}
                   style={{
                     width: `calc(${Math.max(
                       0,
@@ -115,7 +123,7 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
                     )}% + 2px)`,
                   }}
                 >
-                  <span className='font-medium bg-neutral-500 rounded-full'>
+                  <span className='absolute font-medium bg-neutral-500 rounded-full'>
                     {(
                       (projectLaunch.fundraiseProgress / projectLaunch.fundraiseAmount) *
                       100
@@ -153,8 +161,10 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
             {projectLaunch.team.map((member: any, index: number) => (
               <div className='border rounded-xl p-3 flex justify-start' key={index}>
                 <img
-                  src={`${import.meta.env.VITE_BACKEND_HOST}:${
-                    import.meta.env.VITE_BACKEND_PORT
+                  src={`${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}${
+                    import.meta.env.VITE_BACKEND_PREFIX
+                      ? `/${import.meta.env.VITE_BACKEND_PREFIX}`
+                      : ``
                   }/file?file=${member.image}`}
                   style={{
                     width: '35%',
