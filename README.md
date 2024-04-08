@@ -141,3 +141,6 @@ These instructions will help you get a copy of the project up and running on you
 
 
 In summary, this README provides comprehensive instructions for setting up and utilizing the project. Whether you're a developer looking to contribute, a user seeking to understand how to use the application, or simply someone interested in exploring the project's capabilities, we hope this documentation serves as a helpful guide. Should you encounter any issues or have suggestions for improvement, please don't hesitate to reach out. Thank you for your interest and support!
+
+🤝***This README was developed by our team with [RateIT](https://rateit.expert).***
+
