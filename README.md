@@ -1,4 +1,5 @@
 # Venture Launch
+**Solana Program Repo: https://github.com/Web3-NaUKMA/VentureLaunch.git**
 
 ## Getting started
 These instructions will help you get a copy of the project up and running on your local machine for development and testing purposes.
