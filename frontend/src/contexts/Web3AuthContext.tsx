@@ -7,6 +7,7 @@ import {
   LedgerWalletAdapter,
   SolflareWalletAdapter,
   TorusWalletAdapter,
+  PhantomWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
 
 export interface IWeb3AuthContextProps {
@@ -20,6 +21,7 @@ const Web3AuthContext: FC<IWeb3AuthContextProps> = ({ children }) => {
   const wallets = useMemo(
     () => [
       new SolflareWalletAdapter({ network }),
+      new PhantomWalletAdapter(),
       new SolflareWalletAdapter(),
       new TorusWalletAdapter(),
       new LedgerWalletAdapter(),
