@@ -66,9 +66,12 @@ services:
       - frontend
       - backend
     restart: on-failure
-    
+
   certbot:
     image: certbot/certbot
+  volumes:
+    - ./data/certbot/conf:/etc/letsencrypt
+    - ./data/certbot/www:/var/www/certbot
 
 networks:
   venture-launch-network:
