@@ -18,9 +18,7 @@ import ProfilePage from './pages/ProfilePage/ProfilePage';
 import AboutPage from './pages/AboutPage/AboutPage';
 import PortfolioPage from './pages/PortfolioPage/PortfolioPage';
 
-axios.defaults.baseURL = `${import.meta.env.VITE_BACKEND_HOST}:${
-  import.meta.env.VITE_BACKEND_PORT || 8000
-}/${import.meta.env.VITE_BACKEND_PREFIX || ''}`;
+axios.defaults.baseURL = `${import.meta.env.VITE_BACKEND_URI}/${import.meta.env.VITE_BACKEND_PREFIX || ''}`;
 axios.defaults.withCredentials = true;
 
 const App = () => {

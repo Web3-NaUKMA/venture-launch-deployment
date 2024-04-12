@@ -177,7 +177,7 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch }) => {
               <img
                 src={
                   projectLaunch.logo
-                    ? `${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}${
+                    ? `${import.meta.env.VITE_BACKEND_URI}${
                         import.meta.env.VITE_BACKEND_PREFIX
                           ? `/${import.meta.env.VITE_BACKEND_PREFIX}`
                           : ``

@@ -41,7 +41,7 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
               <img
                 src={
                   projectLaunch.logo
-                    ? `${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}${
+                    ? `${import.meta.env.VITE_BACKEND_URI}${
                         import.meta.env.VITE_BACKEND_PREFIX
                           ? `/${import.meta.env.VITE_BACKEND_PREFIX}`
                           : ``
@@ -161,7 +161,7 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
             {projectLaunch.team.map((member: any, index: number) => (
               <div className='border rounded-xl p-3 flex justify-start' key={index}>
                 <img
-                  src={`${import.meta.env.VITE_BACKEND_HOST}:${import.meta.env.VITE_BACKEND_PORT}${
+                  src={`${import.meta.env.VITE_BACKEND_URI}${
                     import.meta.env.VITE_BACKEND_PREFIX
                       ? `/${import.meta.env.VITE_BACKEND_PREFIX}`
                       : ``

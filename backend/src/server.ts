@@ -34,7 +34,7 @@ app.use(
 
 app.use(
   cors({
-    origin: `${process.env.FRONTEND_HOST}`,
+    origin: `${process.env.FRONTEND_URI}`,
     credentials: true,
   }),
 );
