@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '../../../types/enums/app-routes.enum';
 import Button from '../../atoms/Button/Button';
-import { DotsIcon, EditIcon, RemoveIcon } from '../../atoms/Icons/Icons';
+import { DotsIcon, RemoveIcon } from '../../atoms/Icons/Icons';
 import { useOutsideClick } from '../../../hooks/dom.hooks';
 import Modal from '../Modal/Modal';
 import { useAppDispatch } from '../../../hooks/redux.hooks';

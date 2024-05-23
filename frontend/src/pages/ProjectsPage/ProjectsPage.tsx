@@ -10,7 +10,6 @@ import {
   selectProjectLaunches,
 } from '../../redux/slices/project-launch.slice';
 import LaunchProjectModal from '../../components/organisms/LaunchProjectModal/LaunchProjectModal';
-import { ProjectsViewEnum } from '../../types/enums/projects-view.enum';
 
 const ProjectsPage: FC = () => {
   const dispatch = useAppDispatch();

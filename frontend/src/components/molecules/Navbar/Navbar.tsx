@@ -3,13 +3,7 @@ import { FC, useEffect, useState } from 'react';
 import { INavbarLink } from '../../templates/PageWithNavigationTemplate';
 import { v4 as uuid } from 'uuid';
 import { AppRoutes } from '../../../types/enums/app-routes.enum';
-import {
-  BurgerMenuIcon,
-  CubeIcon,
-  ExitIcon,
-  IdentificationIcon,
-  UserCircleIcon,
-} from '../../atoms/Icons/Icons';
+import { BurgerMenuIcon, ExitIcon, UserCircleIcon } from '../../atoms/Icons/Icons';
 import { useAuth } from '../../../hooks/auth.hooks';
 import { useOutsideClick } from '../../../hooks/dom.hooks';
 import Button from '../../atoms/Button/Button';

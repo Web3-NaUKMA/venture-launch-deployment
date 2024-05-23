@@ -8,7 +8,7 @@ import {
   IProjectLaunchSliceStateErrors,
 } from '../../types/redux/project-launch.types';
 import axios from 'axios';
-import { IUpdateProjectLaunch, IProjectLaunch } from '../../types/project-launch.types';
+import { IProjectLaunch } from '../../types/project-launch.types';
 import { IRequestQueryParams } from '../../types/app.types';
 import { serializeQueryParams } from '../../utils/request.utils';
 import { createProject } from './project.slice';

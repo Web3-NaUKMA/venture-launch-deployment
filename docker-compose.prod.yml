@@ -1,0 +1,115 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile.prod
+      args:
+        VITE_FRONTEND_PORT: ${VITE_FRONTEND_PORT}
+        VITE_BACKEND_URI: ${VITE_BACKEND_URI}
+        VITE_BACKEND_PREFIX: ${VITE_BACKEND_PREFIX}
+        VITE_FRONTEND_URI: ${VITE_FRONTEND_URI}
+        VITE_BACKEND_PORT: ${VITE_BACKEND_PORT}
+        VITE_AUTH_MESSAGE: ${VITE_AUTH_MESSAGE}
+        VITE_AUTH_TOKEN_NAME: ${VITE_AUTH_TOKEN_NAME}
+        VITE_NFT_GENERATOR_PROGRAM_ID: ${VITE_NFT_GENERATOR_PROGRAM_ID}
+        VITE_TOKEN_METADATA_PROGRAM_ID: ${VITE_TOKEN_METADATA_PROGRAM_ID}
+        VITE_NGINX_PORT: ${VITE_NGINX_PORT}
+    container_name: venture-launch-frontend
+    networks:
+      - venture-launch-network
+    env_file: ./.env.prod
+    ports:
+      - ${INTERNAL_FRONTEND_PORT}:3000
+    volumes:
+      - ./frontend/src:/app/src
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile.prod
+      args:
+        FRONTEND_PORT: ${FRONTEND_PORT}
+        BACKEND_PORT: ${BACKEND_PORT}
+        FRONTEND_URI: ${FRONTEND_URI}
+        AUTH_MESSAGE: ${AUTH_MESSAGE}
+        AUTH_TOKEN_NAME: ${AUTH_TOKEN_NAME}
+        SESSION_SECRET: ${SESSION_SECRET}
+        SESSION_MAX_AGE: ${SESSION_MAX_AGE}
+        THIRDWEB_STORAGE_SECRET: ${THIRDWEB_STORAGE_SECRET}
+        NFT_DEFAULT_IMAGE: ${NFT_DEFAULT_IMAGE}
+        POSTGRES_USER: ${POSTGRES_USER}
+        POSTGRES_DATABASE: ${POSTGRES_DATABASE}
+        POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+        DATABASE_PORT: ${DATABASE_PORT}
+        DATABASE_HOST: ${DATABASE_HOST}
+    container_name: venture-launch-backend
+    networks:
+      - venture-launch-network
+    env_file: ./.env.prod
+    ports:
+      - ${INTERNAL_BACKEND_PORT}:8000
+    volumes:
+      - ./backend/src:/app/src
+    depends_on:
+      - database
+
+  database:
+    image: postgres:latest
+    container_name: venture-launch-database
+    networks:
+      - venture-launch-network
+    env_file: ./.env.prod
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DATABASE}
+    expose:
+      - ${INTERNAL_DATABASE_PORT}
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    restart: on-failure
+
+  nginx:
+    image: nginx:latest
+    container_name: venture-launch-nginx
+    networks:
+      - venture-launch-network
+    env_file: ./.env.prod
+    ports:
+      - ${INTERNAL_NGINX_PORT}:80
+      - ${INTERNAL_SSL_NGINX_PORT}:443
+    volumes:
+      - ./nginx/default.prod.conf:/etc/nginx/conf.d/default.conf
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    expose:
+      - ${INTERNAL_NGINX_PORT}
+      - ${INTERNAL_SSL_NGINX_PORT}
+    depends_on:
+      - frontend
+      - backend
+    restart: unless-stopped
+    command:
+      '/bin/sh -c ''while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g "daemon
+      off;"'''
+
+  certbot:
+    image: certbot/certbot
+    container_name: venture-launch-certbot
+    networks:
+      - venture-launch-network
+    volumes:
+      - ./data/certbot/conf:/etc/letsencrypt
+      - ./data/certbot/www:/var/www/certbot
+    restart: unless-stopped
+    entrypoint:
+      "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:
+  venture-launch-network:
+    driver: bridge
+
+volumes:
+  database_data:

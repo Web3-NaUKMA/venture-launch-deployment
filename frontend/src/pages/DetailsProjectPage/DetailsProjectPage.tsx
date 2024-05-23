@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 import { MilestonesGrid } from '../../components/organisms/MilestonesGrid/MilestonesGrid';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux.hooks';
 import {
   fetchProject,

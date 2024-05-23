@@ -2,7 +2,7 @@ import { FC, FormEvent, useEffect, useRef, useState } from 'react';
 import Modal, { IModalProps } from '../../molecules/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
 import { useAuth } from '../../../hooks/auth.hooks';
-import { IProjectLaunch, IUpdateProjectLaunch } from '../../../types/project-launch.types';
+import { IProjectLaunch } from '../../../types/project-launch.types';
 import {
   selectErrors,
   setError,
@@ -79,8 +79,15 @@ const EditProjectModal: FC<IEditProjectModalProps> = ({ project, title, buttons,
 
     if (isDataValid(state.data)) {
       if (authenticatedUser) {
+        const formData = new FormData();
+        Object.entries(state.data).forEach(([key, value]) => {
+          if (value !== undefined) {
+            formData.append(key, value);
+          }
+        });
+
         dispatch(
-          updateProjectLaunch(project.id, state.data as IUpdateProjectLaunch, {
+          updateProjectLaunch(project.id, formData, {
             onSuccess: () => buttons?.find(button => button.type === 'accept')?.action(),
           }),
         );

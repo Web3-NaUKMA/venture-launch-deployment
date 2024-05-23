@@ -7,13 +7,15 @@
   "scripts": {
     "dev": "vite",
     "dev:docker": "CHOKIDAR_USEPOLLING=true vite",
-    "build": "tsc && vite build",
+    "build": "npx tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview --port=${VITE_FRONTEND_PORT} --host"
   },
   "author": "Venture Launch",
   "license": "UNLICENSED",
   "dependencies": {
+    "@esbuild-plugins/node-globals-polyfill": "^0.2.3",
+    "@esbuild-plugins/node-modules-polyfill": "^0.2.2",
     "@reduxjs/toolkit": "^2.2.1",
     "@solana/spl-token": "^0.4.1",
     "@solana/wallet-adapter-base": "^0.9.23",
@@ -35,6 +37,7 @@
     "react-router-dom": "^6.22.3",
     "redux": "^5.0.1",
     "redux-thunk": "^3.1.0",
+    "rollup-plugin-node-polyfills": "^0.2.1",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

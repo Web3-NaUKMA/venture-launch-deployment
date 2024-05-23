@@ -4,7 +4,7 @@
   "description": "Venture Launch application backend",
   "scripts": {
     "dev": "ts-node ./src/server.ts",
-    "dev:prod": "npm run build && node ./dist/src/server.js",
+    "prod": "node ./dist/server.js",
     "dev:nodemon": "./node_modules/nodemon/bin/nodemon.js",
     "build": "npx tsc"
   },

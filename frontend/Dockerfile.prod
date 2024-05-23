@@ -1,0 +1,46 @@
+FROM node:lts-alpine as build
+
+ARG VITE_FRONTEND_PORT
+ARG VITE_BACKEND_URI
+ARG VITE_BACKEND_PREFIX
+ARG VITE_FRONTEND_URI
+ARG VITE_BACKEND_PORT
+ARG VITE_AUTH_MESSAGE
+ARG VITE_AUTH_TOKEN_NAME
+ARG VITE_NFT_GENERATOR_PROGRAM_ID
+ARG VITE_TOKEN_METADATA_PROGRAM_ID
+ARG VITE_NGINX_PORT
+
+ENV VITE_FRONTEND_PORT=${VITE_FRONTEND_PORT}
+ENV VITE_BACKEND_URI=${VITE_BACKEND_URI}
+ENV VITE_BACKEND_PREFIX=${VITE_BACKEND_PREFIX}
+ENV VITE_FRONTEND_URI=${VITE_FRONTEND_URI}
+ENV VITE_BACKEND_PORT=${VITE_BACKEND_PORT}
+ENV VITE_AUTH_MESSAGE=${VITE_AUTH_MESSAGE}
+ENV VITE_AUTH_TOKEN_NAME=${VITE_AUTH_TOKEN_NAME}
+ENV VITE_NFT_GENERATOR_PROGRAM_ID=${VITE_NFT_GENERATOR_PROGRAM_ID}
+ENV VITE_TOKEN_METADATA_PROGRAM_ID=${VITE_TOKEN_METADATA_PROGRAM_ID}
+ENV VITE_NGINX_PORT=${VITE_NGINX_PORT}
+
+WORKDIR /app
+COPY package*.json ./ 
+RUN apk --no-cache add --virtual native-deps \
+  g++ linux-headers make python3 eudev-dev && \
+  npm install --quiet typescript vite &&\
+  npm install --quiet && \
+  apk del native-deps
+
+COPY . .
+RUN npm run build
+
+
+FROM node:lts-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/dist /app/dist
+COPY --from=build /app/node_modules /app/node_modules
+COPY --from=build /app/package.json /app/package.json
+
+EXPOSE 3000
+CMD npm run preview

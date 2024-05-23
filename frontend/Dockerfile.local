@@ -1,10 +1,10 @@
-FROM node:latest
+FROM node:lts-alpine
 
 WORKDIR /app
-
-
-COPY . .
+COPY package*.json ./ 
 RUN npm install
 
-EXPOSE 3001
+COPY . .
+
+EXPOSE 3000
 CMD npm run dev:docker
