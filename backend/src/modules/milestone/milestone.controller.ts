@@ -1,90 +1,50 @@
 import { Request, Response } from 'express';
-import * as milestoneService from './milestone.service';
+import milestoneService from './milestone.service';
 import { HttpStatusCode } from 'axios';
 import { IFindMilestoneDto } from '../../DTO/milestone.dto';
+import { Controller } from '../../decorators/app.decorators';
 
-export const findMany = async (request: Request, response: Response) => {
-  try {
+@Controller()
+export class MilestoneController {
+  async findMany(request: Request, response: Response) {
     const milestones = await milestoneService.findMany(request.query as IFindMilestoneDto, {
       createdAt: 'DESC',
     });
-    return response.status(HttpStatusCode.Ok).json(milestones);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
-  }
-};
 
-export const findOne = async (request: Request, response: Response) => {
-  try {
+    return response.status(HttpStatusCode.Ok).json(milestones);
+  }
+
+  async findOne(request: Request, response: Response) {
     const { id } = request.params as any;
     const milestone = await milestoneService.findOne({
       ...(request.query as IFindMilestoneDto),
       id,
     });
 
-    if (!milestone) {
-      return response
-        .status(HttpStatusCode.NotFound)
-        .json({ message: 'The milestone with such id was not found.' });
-    }
-
     return response.status(HttpStatusCode.Ok).json(milestone);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
   }
-};
 
-export const create = async (request: Request, response: Response) => {
-  try {
+  async create(request: Request, response: Response) {
     const milestone = await milestoneService.create(request.body);
+
     return response.status(HttpStatusCode.Created).json(milestone);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
   }
-};
 
-export const update = async (request: Request, response: Response) => {
-  try {
+  async update(request: Request, response: Response) {
     const { id } = request.params as any;
-    const milestoneToUpdate = await milestoneService.findOne({ id });
-
-    if (!milestoneToUpdate) {
-      return response
-        .status(HttpStatusCode.NotFound)
-        .json({ message: 'The milestone with such id was not found.' });
-    }
-
+    await milestoneService.findOne({ id });
     const milestone = await milestoneService.update(id, request.body);
-    return response.status(HttpStatusCode.Ok).json(milestone);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
-  }
-};
 
-export const remove = async (request: Request, response: Response) => {
-  try {
+    return response.status(HttpStatusCode.Ok).json(milestone);
+  }
+
+  async remove(request: Request, response: Response) {
     const { id } = request.params as any;
-    const milestoneToRemove = await milestoneService.findOne({ id });
-
-    if (!milestoneToRemove) {
-      return response
-        .status(HttpStatusCode.NotFound)
-        .json({ message: 'The milestone with such id was not found.' });
-    }
-
+    await milestoneService.findOne({ id });
     const milestone = await milestoneService.remove(id);
+
     return response.status(HttpStatusCode.Ok).json(milestone);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
   }
-};
+}
+
+export default new MilestoneController();

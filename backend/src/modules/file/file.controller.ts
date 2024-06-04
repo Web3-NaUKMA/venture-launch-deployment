@@ -1,16 +1,22 @@
-import { HttpStatusCode } from 'axios';
 import { Request, Response } from 'express';
 import path from 'path';
+import { Controller } from '../../decorators/app.decorators';
+import { ForbiddenException } from '../../utils/exceptions/exceptions.utils';
 
-export const getFile = async (request: Request, response: Response) => {
-  if (
-    ['../', '..\\', './', '.\\', '~/', '~\\'].find(item =>
-      (request.query.file ?? '').toString().includes(item),
-    )
-  ) {
-    return response.status(HttpStatusCode.Forbidden).json({ message: 'This action is forbidden!' });
+@Controller()
+export class FileController {
+  async getFile(request: Request, response: Response) {
+    if (
+      ['../', '..\\', './', '.\\', '~/', '~\\'].find(item =>
+        (request.query.file ?? '').toString().includes(item),
+      )
+    ) {
+      throw new ForbiddenException('This action is forbidden to perform');
+    }
+
+    const file = path.join(`./src/public/`, request.query.file?.toString() ?? '');
+    return response.download(file);
   }
+}
 
-  const file = path.join(`./src/public/`, request.query.file?.toString() ?? '');
-  return response.download(file);
-};
+export default new FileController();

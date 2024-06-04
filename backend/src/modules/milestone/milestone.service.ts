@@ -5,48 +5,89 @@ import {
   IUpdateMilestoneDto,
 } from '../../DTO/milestone.dto';
 import { Milestone } from '../../typeorm/models/Milestone';
-import { FindOptionsOrder } from 'typeorm';
+import { EntityNotFoundError, FindOptionsOrder } from 'typeorm';
+import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
 
-export const findMany = async (
-  options: IFindMilestoneDto,
-  order?: FindOptionsOrder<Milestone>,
-): Promise<Milestone[]> => {
-  return AppDataSource.getRepository(Milestone).find({
-    relations: { project: true },
-    where: options,
-    order,
-  });
-};
+export class MilestoneService {
+  async findMany(
+    options: IFindMilestoneDto,
+    order?: FindOptionsOrder<Milestone>,
+  ): Promise<Milestone[]> {
+    try {
+      return await AppDataSource.getRepository(Milestone).find({
+        relations: { project: true },
+        where: options,
+        order,
+      });
+    } catch (error: any) {
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
 
-export const findOne = async (options: IFindMilestoneDto): Promise<Milestone> => {
-  return AppDataSource.getRepository(Milestone).findOneOrFail({
-    relations: { project: true },
-    where: options,
-  });
-};
+  async findOne(options: IFindMilestoneDto): Promise<Milestone> {
+    try {
+      return await AppDataSource.getRepository(Milestone).findOneOrFail({
+        relations: { project: true },
+        where: options,
+      });
+    } catch (error: any) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException('The milestone with provided params does not exist');
+      }
 
-export const create = async (data: ICreateMilestoneDto): Promise<Milestone> => {
-  return AppDataSource.getRepository(Milestone).save({
-    ...data,
-    project: { id: data.projectId },
-  });
-};
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
 
-export const update = async (id: string, data: IUpdateMilestoneDto): Promise<Milestone> => {
-  await AppDataSource.getRepository(Milestone).update({ id }, data);
+  async create(data: ICreateMilestoneDto): Promise<Milestone> {
+    try {
+      return await AppDataSource.getRepository(Milestone).save({
+        ...data,
+        project: { id: data.projectId },
+      });
+    } catch (error: any) {
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
 
-  return AppDataSource.getRepository(Milestone).findOneOrFail({
-    relations: { project: true },
-    where: { id },
-  });
-};
+  async update(id: string, data: IUpdateMilestoneDto): Promise<Milestone> {
+    try {
+      await AppDataSource.getRepository(Milestone).update({ id }, data);
 
-export const remove = async (id: string): Promise<Milestone> => {
-  const milestone = await AppDataSource.getRepository(Milestone).findOneOrFail({
-    relations: { project: true },
-    where: { id },
-  });
+      return await AppDataSource.getRepository(Milestone).findOneOrFail({
+        relations: { project: true },
+        where: { id },
+      });
+    } catch (error: any) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException(
+          'Cannot update the milestone. The milestone with provided id does not exist',
+        );
+      }
 
-  await AppDataSource.getRepository(Milestone).remove(structuredClone(milestone));
-  return milestone;
-};
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
+
+  async remove(id: string): Promise<Milestone> {
+    try {
+      const milestone = await AppDataSource.getRepository(Milestone).findOneOrFail({
+        relations: { project: true },
+        where: { id },
+      });
+
+      await AppDataSource.getRepository(Milestone).remove(structuredClone(milestone));
+      return milestone;
+    } catch (error: any) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException(
+          'Cannot remove the milestone. The milestone with provided id does not exist',
+        );
+      }
+
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
+}
+
+export default new MilestoneService();

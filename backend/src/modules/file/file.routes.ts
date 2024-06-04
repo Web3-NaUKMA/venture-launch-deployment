@@ -1,5 +1,5 @@
 import express from 'express';
-import * as fileController from './file.controller';
+import fileController from './file.controller';
 import { auth } from '../../middleware/auth.middleware';
 
 const router = express.Router();

@@ -9,6 +9,8 @@ import cookieParser from 'cookie-parser';
 
 import * as dotenv from 'dotenv';
 import path from 'path';
+import { applicationLogger } from './middleware/logging.middleware';
+import { exceptionsFilter } from './middleware/exceptions.middleware';
 
 dotenv.config();
 
@@ -17,6 +19,7 @@ const app = express();
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(applicationLogger);
 
 app.use(express.static(path.join(__dirname, '/public')));
 
@@ -34,12 +37,13 @@ app.use(
 
 app.use(
   cors({
-    origin: `${process.env.FRONTEND_URI}`,
+    origin: (process.env.ALLOWED_ORIGINS || '').split(', '),
     credentials: true,
   }),
 );
 
 app.use(routes);
+app.use(exceptionsFilter);
 
 app.listen(port, () => {
   console.log(`Application started on port ${port}!`);

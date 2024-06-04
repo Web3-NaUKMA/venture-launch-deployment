@@ -1,5 +1,5 @@
 import express from 'express';
-import * as milestoneController from './milestone.controller';
+import milestoneController from './milestone.controller';
 import { auth } from '../../middleware/auth.middleware';
 
 const router = express.Router();
