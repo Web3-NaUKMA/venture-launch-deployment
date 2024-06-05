@@ -1,13 +1,16 @@
 import { Request, Response } from 'express';
-import * as projectService from './project.service';
+import projectService from './project.service';
 import { HttpStatusCode } from 'axios';
 import { IFindProjectDto } from '../../DTO/project.dto';
+import { Controller } from '../../decorators/app.decorators';
 
-export const findMany = async (request: Request, response: Response) => {
-  try {
+@Controller()
+export class ProjectController {
+  async findMany(request: Request, response: Response) {
     const { ownerId, memberId } = request.query;
 
     let query: IFindProjectDto = {};
+
     if (ownerId) query.projectLaunch = { author: { id: ownerId.toString() } };
     if (memberId) query.userToProjects = { userId: memberId as string };
 
@@ -17,16 +20,11 @@ export const findMany = async (request: Request, response: Response) => {
         createdAt: 'DESC',
       },
     });
-    return response.status(HttpStatusCode.Ok).json(projects);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
-  }
-};
 
-export const findOne = async (request: Request, response: Response) => {
-  try {
+    return response.status(HttpStatusCode.Ok).json(projects);
+  }
+
+  async findOne(request: Request, response: Response) {
     const { id } = request.params as any;
     const project = await projectService.findOne(
       { ...(request.query as IFindProjectDto), id },
@@ -37,78 +35,36 @@ export const findOne = async (request: Request, response: Response) => {
       },
     );
 
-    if (!project) {
-      return response
-        .status(HttpStatusCode.NotFound)
-        .json({ message: 'The project with such id was not found.' });
-    }
-
     return response.status(HttpStatusCode.Ok).json(project);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
   }
-};
 
-export const create = async (request: Request, response: Response) => {
-  try {
+  async create(request: Request, response: Response) {
     const project = await projectService.create(request.body);
+
     return response.status(HttpStatusCode.Created).json(project);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
   }
-};
 
-export const update = async (request: Request, response: Response) => {
-  try {
+  async update(request: Request, response: Response) {
     const { id } = request.params as any;
-    const projectToUpdate = await projectService.findOne({ id });
-
-    if (!projectToUpdate) {
-      return response
-        .status(HttpStatusCode.NotFound)
-        .json({ message: 'The project with such id was not found.' });
-    }
-
+    await projectService.findOne({ id });
     const project = await projectService.update(id, request.body);
-    return response.status(HttpStatusCode.Ok).json(project);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
-  }
-};
 
-export const remove = async (request: Request, response: Response) => {
-  try {
+    return response.status(HttpStatusCode.Ok).json(project);
+  }
+
+  async remove(request: Request, response: Response) {
     const { id } = request.params as any;
-    const projectToRemove = await projectService.findOne({ id });
-
-    if (!projectToRemove) {
-      return response
-        .status(HttpStatusCode.NotFound)
-        .json({ message: 'The project with such id was not found.' });
-    }
-
+    await projectService.findOne({ id });
     const project = await projectService.remove(id);
-    return response.status(HttpStatusCode.Ok).json(project);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
-  }
-};
 
-export const prepareNftMetadata = async (request: Request, response: Response) => {
-  try {
-    const ipfsURL = await projectService.prepareNftMetadata(request.body);
-    return response.status(HttpStatusCode.Created).json({ ipfsURL });
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error' });
+    return response.status(HttpStatusCode.Ok).json(project);
   }
-};
+
+  async prepareNftMetadata(request: Request, response: Response) {
+    const ipfsURL = await projectService.prepareNftMetadata(request.body);
+
+    return response.status(HttpStatusCode.Created).json({ ipfsURL });
+  }
+}
+
+export default new ProjectController();

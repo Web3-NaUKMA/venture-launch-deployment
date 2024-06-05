@@ -1,88 +1,48 @@
 import { Request, Response } from 'express';
-import * as dataAccountService from './data-account.service';
+import dataAccountService from './data-account.service';
 import { HttpStatusCode } from 'axios';
 import { IFindDataAccountDto } from '../../DTO/data-account.dto';
+import { Controller } from '../../decorators/app.decorators';
 
-export const findMany = async (request: Request, response: Response) => {
-  try {
+@Controller()
+export class DataAccountController {
+  async findMany(request: Request, response: Response) {
     const dataAccounts = await dataAccountService.findMany(request.query as IFindDataAccountDto);
-    return response.status(HttpStatusCode.Ok).json(dataAccounts);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
-  }
-};
 
-export const findOne = async (request: Request, response: Response) => {
-  try {
+    return response.status(HttpStatusCode.Ok).json(dataAccounts);
+  }
+
+  async findOne(request: Request, response: Response) {
     const { id } = request.params as any;
     const dataAccount = await dataAccountService.findOne({
       ...(request.query as IFindDataAccountDto),
       id,
     });
 
-    if (!dataAccount) {
-      return response
-        .status(HttpStatusCode.NotFound)
-        .json({ message: 'The data account with such id was not found.' });
-    }
-
     return response.status(HttpStatusCode.Ok).json(dataAccount);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
   }
-};
 
-export const create = async (request: Request, response: Response) => {
-  try {
+  async create(request: Request, response: Response) {
     const dataAccount = await dataAccountService.create(request.body);
+
     return response.status(HttpStatusCode.Created).json(dataAccount);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
   }
-};
 
-export const update = async (request: Request, response: Response) => {
-  try {
+  async update(request: Request, response: Response) {
     const { id } = request.params as any;
-    const dataAccountToUpdate = await dataAccountService.findOne({ id });
-
-    if (!dataAccountToUpdate) {
-      return response
-        .status(HttpStatusCode.NotFound)
-        .json({ message: 'The data account with such id was not found.' });
-    }
-
+    await dataAccountService.findOne({ id });
     const dataAccount = await dataAccountService.update(id, request.body);
-    return response.status(HttpStatusCode.Ok).json(dataAccount);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
-  }
-};
 
-export const remove = async (request: Request, response: Response) => {
-  try {
+    return response.status(HttpStatusCode.Ok).json(dataAccount);
+  }
+
+  async remove(request: Request, response: Response) {
     const { id } = request.params as any;
-    const dataAccountToRemove = await dataAccountService.findOne({ id });
-
-    if (!dataAccountToRemove) {
-      return response
-        .status(HttpStatusCode.NotFound)
-        .json({ message: 'The data account with such id was not found.' });
-    }
-
+    await dataAccountService.findOne({ id });
     const dataAccount = await dataAccountService.remove(id);
+
     return response.status(HttpStatusCode.Ok).json(dataAccount);
-  } catch (error) {
-    return response
-      .status(HttpStatusCode.InternalServerError)
-      .json({ message: 'Internal server error.' });
   }
-};
+}
+
+export default new DataAccountController();

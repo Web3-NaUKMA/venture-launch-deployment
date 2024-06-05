@@ -5,43 +5,87 @@ import {
   IUpdateDataAccountDto,
 } from '../../DTO/data-account.dto';
 import { DataAccount } from '../../typeorm/models/DataAccount';
+import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
+import { EntityNotFoundError } from 'typeorm';
 
-export const findMany = async (options: IFindDataAccountDto): Promise<DataAccount[]> => {
-  return AppDataSource.getRepository(DataAccount).find({
-    relations: { project: true },
-    where: options,
-  });
-};
+export class DataAccountService {
+  async findMany(options: IFindDataAccountDto): Promise<DataAccount[]> {
+    try {
+      return await AppDataSource.getRepository(DataAccount).find({
+        relations: { project: true },
+        where: options,
+      });
+    } catch (error: any) {
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
 
-export const findOne = async (options: IFindDataAccountDto): Promise<DataAccount> => {
-  return AppDataSource.getRepository(DataAccount).findOneOrFail({
-    relations: { project: true },
-    where: options,
-  });
-};
+  async findOne(options: IFindDataAccountDto): Promise<DataAccount> {
+    try {
+      return await AppDataSource.getRepository(DataAccount).findOneOrFail({
+        relations: { project: true },
+        where: options,
+      });
+    } catch (error: any) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException('The data account with provided params does not exist', error);
+      }
 
-export const create = async (data: ICreateDataAccountDto): Promise<DataAccount> => {
-  return AppDataSource.getRepository(DataAccount).save({
-    ...data,
-    project: { id: data.projectId },
-  });
-};
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
 
-export const update = async (id: string, data: IUpdateDataAccountDto): Promise<DataAccount> => {
-  await AppDataSource.getRepository(DataAccount).update({ id }, data);
+  async create(data: ICreateDataAccountDto): Promise<DataAccount> {
+    try {
+      return await AppDataSource.getRepository(DataAccount).save({
+        ...data,
+        project: { id: data.projectId },
+      });
+    } catch (error: any) {
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
 
-  return AppDataSource.getRepository(DataAccount).findOneOrFail({
-    relations: { project: true },
-    where: { id },
-  });
-};
+  async update(id: string, data: IUpdateDataAccountDto): Promise<DataAccount> {
+    try {
+      await AppDataSource.getRepository(DataAccount).update({ id }, data);
 
-export const remove = async (id: string): Promise<DataAccount> => {
-  const dataAccount = await AppDataSource.getRepository(DataAccount).findOneOrFail({
-    relations: { project: true },
-    where: { id },
-  });
+      return await AppDataSource.getRepository(DataAccount).findOneOrFail({
+        relations: { project: true },
+        where: { id },
+      });
+    } catch (error: any) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException(
+          'Cannot update data account. The data account with provided id does not exist',
+          error,
+        );
+      }
 
-  await AppDataSource.getRepository(DataAccount).remove(structuredClone(dataAccount));
-  return dataAccount;
-};
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
+
+  async remove(id: string): Promise<DataAccount> {
+    try {
+      const dataAccount = await AppDataSource.getRepository(DataAccount).findOneOrFail({
+        relations: { project: true },
+        where: { id },
+      });
+
+      await AppDataSource.getRepository(DataAccount).remove(structuredClone(dataAccount));
+      return dataAccount;
+    } catch (error: any) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException(
+          'Cannot remove data account. The data account with provided id does not exist',
+          error,
+        );
+      }
+
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
+}
+
+export default new DataAccountService();

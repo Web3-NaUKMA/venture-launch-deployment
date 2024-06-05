@@ -1,5 +1,5 @@
 import express, { Request } from 'express';
-import * as projectLaunchController from './project-launch.controller';
+import projectLaunchController from './project-launch.controller';
 import { auth } from '../../middleware/auth.middleware';
 import multer from 'multer';
 import { storage } from '../../utils/core/multer.config';
@@ -28,7 +28,7 @@ router.post(
       }
     },
     limits: {
-      fileSize: 10 * 2 ** 20, // 1 MB
+      fileSize: 10 * 2 ** 20, // 10 MB
     },
   }).fields([
     { name: 'team-images' },

@@ -2,6 +2,11 @@ FROM node:lts-alpine
 
 WORKDIR /app
 COPY package*.json ./ 
+RUN apk --no-cache add --virtual native-deps \
+  g++ linux-headers make python3 eudev-dev && \
+  npm install --quiet typescript vite &&\
+  npm install --quiet && \
+  apk del native-deps
 RUN npm install
 
 COPY . .

@@ -1,5 +1,5 @@
 import express from 'express';
-import * as dataAccountController from './data-account.controller';
+import dataAccountController from './data-account.controller';
 import { auth } from '../../middleware/auth.middleware';
 
 const router = express.Router();
