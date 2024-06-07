@@ -16,32 +16,9 @@ const ProjectsPage: FC = () => {
   const projects = useAppSelector(selectProjectLaunches);
   const [isLaunchProjectModalVisible, setIsLaunchProjectModalVisible] = useState(false);
   const { authenticatedUser } = useAuth();
-  // const [projectsView, setProjectsView] = useState(ProjectsViewEnum.AllProjects);
 
   useEffect(() => {
     if (authenticatedUser) {
-      // switch (projectsView) {
-      //   case ProjectsViewEnum.AllProjects:
-      //     if (authenticatedUser.role.includes(UserRoleEnum.BusinessAnalyst)) {
-      //       dispatch(fetchAllProjectLaunches());
-      //     } else {
-      //       dispatch(fetchAllProjectLaunches({ isApproved: true, isFundraised: false }));
-      //     }
-      //     break;
-      //   case ProjectsViewEnum.MyInvestments:
-      //     dispatch(fetchAllProjectLaunches({ investorId: authenticatedUser.id }));
-      //     break;
-      //   case ProjectsViewEnum.MyProjects:
-      //     dispatch(fetchAllProjectLaunches({ ownerId: authenticatedUser.id }));
-      //     break;
-      //   default:
-      //     if (authenticatedUser.role.includes(UserRoleEnum.BusinessAnalyst)) {
-      //       dispatch(fetchAllProjectLaunches());
-      //     } else {
-      //       dispatch(fetchAllProjectLaunches({ isApproved: true, isFundraised: false }));
-      //     }
-      // }
-
       if (authenticatedUser.role.includes(UserRoleEnum.BusinessAnalyst)) {
         dispatch(fetchAllProjectLaunches());
       } else {
@@ -56,70 +33,23 @@ const ProjectsPage: FC = () => {
         createPortal(
           <LaunchProjectModal
             title='Launch new project'
-            buttons={[
-              { type: 'close', name: 'Close', action: () => setIsLaunchProjectModalVisible(false) },
-              {
-                type: 'accept',
-                name: 'Launch',
-                action: () => setIsLaunchProjectModalVisible(false),
-              },
-            ]}
+            onClose={() => setIsLaunchProjectModalVisible(false)}
           />,
           document.getElementById('root')!,
         )}
       <div className='flex flex-col py-5 px-6 flex-1'>
-        <div className='flex justify-between items-center'>
-          <h3 className='font-medium text-2xl'>Projects</h3>
+        <div className='flex justify-between items-center mb-5'>
+          <h3 className='px-2 text-3xl font-serif'>Projects</h3>
           {projects.length > 0 && authenticatedUser?.role.includes(UserRoleEnum.Startup) && (
             <Button
               onClick={() => setIsLaunchProjectModalVisible(true)}
-              className='border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white font-medium px-5 py-1 transition-[0.3s_ease] rounded-full'
+              className='border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white font-medium px-10 text-lg py-1.5 transition-[0.3s_ease] rounded-full'
             >
               Launch project
             </Button>
           )}
         </div>
         <div className='flex flex-col flex-1'>
-          {/* <div className='flex mt-3'>
-            <div className='flex bg-zinc-900 p-1 rounded-full gap-2'>
-              <span
-                className={`text-white font-medium text-xs w-[110px] rounded-full py-1 text-center cursor-pointer transition-[0.3s_ease] ${
-                  projectsView === ProjectsViewEnum.AllProjects
-                    ? `bg-zinc-600`
-                    : 'hover:bg-zinc-600'
-                }`}
-                onClick={() => setProjectsView(ProjectsViewEnum.AllProjects)}
-              >
-                All projects
-              </span>
-              {authenticatedUser?.role.includes(UserRoleEnum.Startup) && (
-                <span
-                  className={`text-white font-medium text-xs w-[110px] rounded-full py-1 text-center cursor-pointer transition-[0.3s_ease] ${
-                    projectsView === ProjectsViewEnum.MyProjects
-                      ? `bg-zinc-600`
-                      : 'hover:bg-zinc-600'
-                  }`}
-                  onClick={() => setProjectsView(ProjectsViewEnum.MyProjects)}
-                >
-                  My projects
-                </span>
-              )}
-              {authenticatedUser?.role.find(
-                role => role === UserRoleEnum.Investor || role === UserRoleEnum.Startup,
-              ) && (
-                <span
-                  className={`text-white font-medium text-xs w-[110px] rounded-full py-1 text-center cursor-pointer transition-[0.3s_ease] ${
-                    projectsView === ProjectsViewEnum.MyInvestments
-                      ? `bg-zinc-600`
-                      : 'hover:bg-zinc-600'
-                  }`}
-                  onClick={() => setProjectsView(ProjectsViewEnum.MyInvestments)}
-                >
-                  My investments
-                </span>
-              )}
-            </div>
-          </div> */}
           {!projects.length ? (
             <div className='flex mt-5 flex-1'>
               <div className='flex flex-col border-[3px] rounded-xl flex-1 border-dashed items-center justify-center'>

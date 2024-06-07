@@ -17,6 +17,7 @@ export interface IUser {
   street?: string;
   zipCode?: string;
   phone?: string;
+  image?: string;
 }
 
 export interface ICreateUser {
