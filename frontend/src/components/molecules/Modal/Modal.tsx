@@ -1,22 +1,17 @@
 import { FC, HTMLAttributes, ReactNode, useEffect } from 'react';
 import Button from '../../atoms/Button/Button';
 import { useOutsideClick } from '../../../hooks/dom.hooks';
+import { CloseIcon } from '../../atoms/Icons/Icons';
 
 export interface IModalProps extends HTMLAttributes<HTMLElement> {
   title: string;
-  buttons?: {
-    type: 'accept' | 'close';
-    name: string;
-    action: (...args: any[]) => any;
-    variant?: 'secondary' | 'primary' | 'danger';
-  }[];
+  onClose?: (...args: any[]) => any;
+  onProcess?: (...args: any[]) => any;
   children?: ReactNode | ReactNode[];
 }
 
-const Modal: FC<IModalProps> = ({ children, title, buttons, className }) => {
-  const acceptButton = buttons?.find(button => button.type === 'accept');
-  const closeButton = buttons?.find(button => button.type === 'close');
-  const modalRef = useOutsideClick(() => closeButton?.action?.());
+const Modal: FC<IModalProps> = ({ children, title, onClose, className }) => {
+  const modalRef = useOutsideClick(() => onClose?.());
 
   useEffect(() => {
     const body = document.querySelector('body');
@@ -36,69 +31,23 @@ const Modal: FC<IModalProps> = ({ children, title, buttons, className }) => {
     >
       <div
         ref={modalRef}
-        className={`modal left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 relative p-4 w-full ${className}`}
+        className={`modal left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 relative py-10 flex flex-1 w-full ${className}`}
       >
-        <div className='relative bg-white rounded-lg shadow'>
-          <div className='flex items-center justify-between p-4 md:p-5 border-b rounded-t'>
-            <h3 className='text-xl font-semibold text-gray-900'>{title}</h3>
+        <div className='max-h-[calc(100vh-2.5rem)] w-full flex flex-col relative bg-white rounded-lg shadow m-5'>
+          <div className='flex items-center justify-between px-10 py-6 border-b rounded-t border-neutral-300'>
+            <h3 className={`text-[22px] sm:text-[26px] font-medium text-gray-900 font-serif`}>
+              {title}
+            </h3>
             <Button
               type='button'
-              className='text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg w-8 h-8 ms-auto inline-flex justify-center items-center'
-              onClick={closeButton?.action}
+              className='text-neutral-600 bg-transparent rounded-lg ms-auto inline-flex justify-center p-2 hover:bg-gray-100 hover:text-gray-900 items-center'
+              onClick={onClose}
             >
-              <svg
-                className='w-3 h-3'
-                aria-hidden='true'
-                xmlns='http://www.w3.org/2000/svg'
-                fill='none'
-                viewBox='0 0 14 14'
-              >
-                <path
-                  stroke='currentColor'
-                  strokeLinecap='round'
-                  strokeLinejoin='round'
-                  strokeWidth='2'
-                  d='m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6'
-                />
-              </svg>
+              <CloseIcon className='stroke-2 size-4' />
               <span className='sr-only'>Close modal</span>
             </Button>
           </div>
-          <div className='p-4 md:p-5 space-y-4 overflow-y-auto relative max-h-[80vh] with-scrollbar'>
-            {children}
-          </div>
-          <div className='flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b '>
-            {acceptButton && (
-              <Button
-                onClick={acceptButton.action}
-                type='button'
-                className={`me-3 focus:ring-4 focus:z-10 focus:outline-none font-medium rounded-full px-5 py-2 text-center transition-[0.3s_ease] ${
-                  acceptButton.variant === 'secondary'
-                    ? 'border text-gray-900 bg-white border-gray-200 hover:bg-gray-100 hover:text-black-500 focus:ring-gray-100'
-                    : acceptButton.variant === 'danger'
-                    ? 'text-white focus:ring-red-400 bg-red-500 hover:bg-red-600'
-                    : 'text-white focus:ring-dark-300 bg-black hover:bg-zinc-700'
-                }`}
-              >
-                {acceptButton.name}
-              </Button>
-            )}
-            {closeButton && (
-              <Button
-                onClick={closeButton.action}
-                type='button'
-                className={`focus:ring-4 focus:z-10 focus:outline-none font-medium rounded-full px-5 py-2 text-center transition-[0.3s_ease] ${
-                  closeButton.variant === 'primary'
-                    ? 'text-white focus:ring-indigo-300 bg-black hover:bg-zinc-600'
-                    : closeButton.variant === 'danger'
-                    ? 'text-white focus:ring-red-400 bg-red-500 hover:bg-red-600'
-                    : 'border text-gray-900 bg-white border-gray-200 hover:bg-gray-100 hover:text-black-500 focus:ring-gray-100'
-                }`}
-              >
-                {closeButton.name}
-              </Button>
-            )}
-          </div>
+          <div className='space-y-4 overflow-y-auto relative with-scrollbar'>{children}</div>
         </div>
       </div>
     </div>

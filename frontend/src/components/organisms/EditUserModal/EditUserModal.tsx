@@ -24,7 +24,7 @@ const initialState: IEditUserModalState = {
   error: null,
 };
 
-const EditUserModal: FC<IEditUserModalProps> = ({ user, title, buttons, children }) => {
+const EditUserModal: FC<IEditUserModalProps> = ({ user, title, onClose, onProcess, children }) => {
   const [state, setState] = useState({
     ...initialState,
     data: {
@@ -65,69 +65,79 @@ const EditUserModal: FC<IEditUserModalProps> = ({ user, title, buttons, children
     if (isDataValid(state.data)) {
       dispatch(
         updateUser(user.id, state.data as IUpdateUser, {
-          onSuccess: () => buttons?.find(button => button.type === 'accept')?.action(),
+          onSuccess: () => onProcess?.(),
         }),
       );
     }
   };
 
   return (
-    <Modal
-      title={title}
-      buttons={buttons?.map(button =>
-        button.type === 'accept'
-          ? {
-              ...button,
-              action: () => {
-                if (formRef.current && formRef.current instanceof HTMLFormElement) {
-                  formRef.current.dispatchEvent(
-                    new Event('submit', { cancelable: true, bubbles: true }),
-                  );
-                }
-              },
-            }
-          : button,
-      )}
-      className='max-w-[768px]'
-    >
-      <form ref={formRef} className='flex flex-col' onSubmit={onSubmit}>
+    <Modal title={title} onClose={onClose} className='max-w-[768px]'>
+      <form ref={formRef} className='flex flex-col px-10 py-8 gap-5' onSubmit={onSubmit}>
         {state.error && (
-          <span className='bg-rose-100 border border-rose-200 p-2 rounded-md mb-5'>
+          <span className='bg-rose-100 border border-rose-200 p-2 rounded-md mb-3 font-mono text-sm'>
             {state.error}
           </span>
         )}
-        <label htmlFor='update_user_username' className='mb-1'>
-          Username:
-        </label>
-        <input
-          type='text'
-          id='update_user_username'
-          className='border p-2 rounded-md mb-5'
-          defaultValue={state.data.username}
-          onChange={event =>
-            setState({
-              ...state,
-              data: { ...state.data, username: event.target.value },
-              error: null,
-            })
-          }
-        />
-        <label htmlFor='update_user_email' className='mb-1'>
-          Email:
-        </label>
-        <input
-          id='update_user_email'
-          type='email'
-          className='border p-2 rounded-md'
-          defaultValue={state.data.email}
-          onChange={event =>
-            setState({
-              ...state,
-              data: { ...state.data, email: event.target.value },
-              error: null,
-            })
-          }
-        />
+        <div className='flex flex-col'>
+          <label
+            htmlFor='update_user_username'
+            className='mb-1.5 font-sans font-semibold text-zinc-900 text-lg mx-0.5'
+          >
+            Username
+          </label>
+          <input
+            type='text'
+            id='update_user_username'
+            placeholder='username'
+            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+            defaultValue={state.data.username}
+            onChange={event =>
+              setState({
+                ...state,
+                data: { ...state.data, username: event.target.value },
+                error: null,
+              })
+            }
+          />
+        </div>
+        <div className='flex flex-col'>
+          <label
+            htmlFor='update_user_email'
+            className='mb-1.5 font-sans font-semibold text-zinc-900 text-lg mx-0.5'
+          >
+            Email
+          </label>
+          <input
+            id='update_user_email'
+            type='email'
+            placeholder='aboba@gmail.com'
+            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+            defaultValue={state.data.email}
+            onChange={event =>
+              setState({
+                ...state,
+                data: { ...state.data, email: event.target.value },
+                error: null,
+              })
+            }
+          />
+        </div>
+        <div className='mt-9 flex gap-4'>
+          <button
+            type='submit'
+            className='inline-flex text-center justify-center items-center bg-zinc-900 border-2 border-transparent hover:border-zinc-900 hover:bg-transparent hover:text-zinc-900 text-white rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+          >
+            Save changes
+          </button>
+          <button
+            type='button'
+            className='inline-flex text-center justify-center items-center text-zinc-700 border-2 border-zinc-900 hover:text-zinc-900 hover:bg-slate-100 rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+            onClick={onClose}
+          >
+            Cancel
+          </button>
+        </div>
       </form>
       {children}
     </Modal>

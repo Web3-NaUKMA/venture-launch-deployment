@@ -20,10 +20,8 @@ export const PortfolioPage: FC = () => {
 
   return (
     <div className='flex p-6 flex-col justify-start align-center'>
-      <div className='mt-10'>
-        <h4 className='text-gray-700 text-2xl font-semibold'>My investments</h4>
-        <ProjectGrid projects={projects} />
-      </div>
+      <h4 className='px-2 text-3xl font-serif mb-6'>My investments</h4>
+      <ProjectGrid projects={projects} />
     </div>
   );
 };

@@ -39,7 +39,8 @@ const initialState: ICreateInvestmentModalState = {
 const CreateInvestmentModal: FC<ICreateInvestmentModalProps> = ({
   projectLaunch,
   title,
-  buttons,
+  onClose,
+  onProcess,
   children,
 }) => {
   const [state, setState] = useState(initialState);
@@ -95,7 +96,7 @@ const CreateInvestmentModal: FC<ICreateInvestmentModalProps> = ({
             investorId: authenticatedUser.id,
           } as ICreateProjectLaunchInvestment,
           {
-            onSuccess: () => buttons?.find(button => button.type === 'accept')?.action(),
+            onSuccess: () => onProcess?.(),
           },
         ),
       );
@@ -103,38 +104,18 @@ const CreateInvestmentModal: FC<ICreateInvestmentModalProps> = ({
   };
 
   return (
-    <Modal
-      title={title}
-      buttons={buttons?.map(button =>
-        button.type === 'accept'
-          ? {
-              ...button,
-              action: () => {
-                if (formRef.current && formRef.current instanceof HTMLFormElement) {
-                  formRef.current.dispatchEvent(
-                    new Event('submit', { cancelable: true, bubbles: true }),
-                  );
-                }
-              },
-            }
-          : button,
-      )}
-      className='max-w-[768px]'
-    >
-      <form ref={formRef} className='flex flex-col' onSubmit={onSubmit}>
+    <Modal title={title} onClose={onClose} className='max-w-[492px]'>
+      <form ref={formRef} className='flex flex-col py-8 px-10 w-full' onSubmit={onSubmit}>
         {state.error && (
-          <span className='bg-rose-100 border border-rose-200 p-2 rounded-md mb-5'>
+          <span className='bg-rose-100 border border-rose-200 p-2 rounded-md mb-8 font-mono text-sm'>
             {state.error}
           </span>
         )}
-        <label htmlFor='create_project_launch_investment_amount' className='mb-1'>
-          Amount (in USD):
-        </label>
         <input
           type='number'
           id='create_project_launch_investment_amount'
-          className='border p-2 rounded-md mb-5'
-          placeholder='100'
+          className='border border-stone-400 p-3 rounded-lg text-stone-800 text-center placeholder:text-stone-600 placeholder:text-center font-mono'
+          placeholder='Amount'
           defaultValue={state.data.amount}
           onChange={event =>
             setState({
@@ -147,6 +128,20 @@ const CreateInvestmentModal: FC<ICreateInvestmentModalProps> = ({
             })
           }
         />
+        <div className='flex flex-col mt-8 gap-4'>
+          <button
+            type='submit'
+            className='inline-flex text-center justify-center items-center bg-zinc-900 text-white font-mono rounded-full py-2.5 text-lg w-full hover:bg-zinc-700 transition-all duration-300'
+          >
+            SAFT/SAFE
+          </button>
+          <button
+            type='submit'
+            className='inline-flex text-center justify-center items-center bg-zinc-900 text-white font-mono rounded-full py-2.5 text-lg w-full hover:bg-zinc-700 transition-all duration-300'
+          >
+            INVEST
+          </button>
+        </div>
       </form>
       {children}
     </Modal>

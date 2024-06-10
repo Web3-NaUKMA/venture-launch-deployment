@@ -116,23 +116,31 @@ const Milestone: FC<IMilestoneProps> = ({ milestone, projectLaunch }) => {
         createPortal(
           <Modal
             title='Delete milestone'
-            buttons={[
-              {
-                variant: 'danger',
-                type: 'accept',
-                name: 'Delete',
-                action: () => deleteMilestone(),
-              },
-              {
-                type: 'close',
-                name: 'Cancel',
-                action: () => setIsRemoveMilestoneModalVisible(false),
-              },
-            ]}
+            onClose={() => setIsRemoveMilestoneModalVisible(false)}
             className='max-w-[596px]'
           >
-            Are you sure you want to delete this milestone? You will not be able to restore the
-            milestone after performing this operation.
+            <div className='px-10 py-8 flex flex-col'>
+              <p className='font-mono'>
+                Are you sure you want to delete this milestone? You will not be able to restore the
+                milestone after performing this operation.
+              </p>
+              <div className='mt-8 flex gap-4'>
+                <button
+                  type='button'
+                  className='inline-flex text-center justify-center items-center bg-red-500 hover:bg-red-400 text-white rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                  onClick={() => deleteMilestone()}
+                >
+                  Delete
+                </button>
+                <button
+                  type='button'
+                  className='inline-flex text-center justify-center items-center text-zinc-700 border-2 border-zinc-900 hover:text-zinc-900 hover:bg-slate-100 rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                  onClick={() => setIsRemoveMilestoneModalVisible(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </Modal>,
           document.getElementById('root')!,
         )}
@@ -140,21 +148,30 @@ const Milestone: FC<IMilestoneProps> = ({ milestone, projectLaunch }) => {
         createPortal(
           <Modal
             title='Withdraw milestone'
-            buttons={[
-              {
-                type: 'accept',
-                name: 'Withdraw',
-                action: () => withdrawMilestone(),
-              },
-              {
-                type: 'close',
-                name: 'Cancel',
-                action: () => setIsWithdrawMilestoneModalVisible(false),
-              },
-            ]}
+            onClose={() => setIsWithdrawMilestoneModalVisible(false)}
             className='max-w-[596px]'
           >
-            Are you sure you want to withdraw money from this milestone?
+            <div className='px-10 py-8 flex flex-col'>
+              <p className='font-mono'>
+                Are you sure you want to withdraw money from this milestone?
+              </p>
+              <div className='mt-8 flex gap-4'>
+                <button
+                  type='button'
+                  className='inline-flex text-center justify-center items-center border-2 border-transparent bg-zinc-900 hover:bg-transparent hover:border-zinc-900 hover:text-zinc-900 text-white rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                  onClick={() => withdrawMilestone()}
+                >
+                  Withdraw
+                </button>
+                <button
+                  type='button'
+                  className='inline-flex text-center justify-center items-center text-zinc-700 border-2 border-zinc-900 hover:text-zinc-900 hover:bg-slate-100 rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                  onClick={() => setIsWithdrawMilestoneModalVisible(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </Modal>,
           document.getElementById('root')!,
         )}
@@ -162,21 +179,28 @@ const Milestone: FC<IMilestoneProps> = ({ milestone, projectLaunch }) => {
         createPortal(
           <Modal
             title='Approve milestone'
-            buttons={[
-              {
-                type: 'accept',
-                name: 'Approve',
-                action: () => submitMilestone(),
-              },
-              {
-                type: 'close',
-                name: 'Cancel',
-                action: () => setIsApproveMilestoneModalVisible(false),
-              },
-            ]}
+            onClose={() => setIsApproveMilestoneModalVisible(false)}
             className='max-w-[596px]'
           >
-            Are you sure you want to approve this milestone?
+            <div className='px-10 py-8 flex flex-col'>
+              <p className='font-mono'>Are you sure you want to approve this milestone?</p>
+              <div className='mt-8 flex gap-4'>
+                <button
+                  type='button'
+                  className='inline-flex text-center justify-center items-center border-2 border-transparent bg-zinc-900 hover:bg-transparent hover:border-zinc-900 hover:text-zinc-900 text-white rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                  onClick={() => submitMilestone()}
+                >
+                  Approve
+                </button>
+                <button
+                  type='button'
+                  className='inline-flex text-center justify-center items-center text-zinc-700 border-2 border-zinc-900 hover:text-zinc-900 hover:bg-slate-100 rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                  onClick={() => setIsApproveMilestoneModalVisible(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </Modal>,
           document.getElementById('root')!,
         )}
@@ -184,60 +208,62 @@ const Milestone: FC<IMilestoneProps> = ({ milestone, projectLaunch }) => {
         createPortal(
           <EditMilestoneModal
             title='Edit milestone'
-            buttons={[
-              {
-                type: 'accept',
-                name: 'Save changes',
-                action: () => {
-                  setIsEditMilestoneModalVisible(false);
-                  if (id) dispatch(fetchProject(id));
-                },
-              },
-              { type: 'close', name: 'Close', action: () => setIsEditMilestoneModalVisible(false) },
-            ]}
+            onClose={() => setIsEditMilestoneModalVisible(false)}
+            onProcess={() => {
+              setIsEditMilestoneModalVisible(false);
+              if (id) dispatch(fetchProject(id));
+            }}
             className='max-w-[596px]'
             milestone={milestone}
           />,
           document.getElementById('root')!,
         )}
       <div className='flex p-4 border rounded-md items-start justify-between'>
-        <div className='flex w-full flex-col text-sm gap-y-1 text-gray-500'>
-          <span className='font-["Noto"] font-semibold'>Milestone ID: {milestone.id}</span>
-          <span className='font-["Noto"] font-semibold'>
-            Merged pull request URL:{' '}
-            <a
-              href={milestone.mergedPullRequestUrl}
-              target='_blank'
-              className='text-blue-600 border-b border-blue-600 hover:border-none transition-[0.3s_ease]'
-            >
-              {milestone.mergedPullRequestUrl}
-            </a>
-          </span>
-          <span className='flex font-["Noto"] font-semibold'>
-            <span className='whitespace-nowrap'>Aproval transaction hash: </span>
-            <span className='ms-1 overflow-x-auto with-scrollbar-sm'>
+        <div className='flex w-full flex-col gap-y-1'>
+          <div className='flex gap-1'>
+            <span className='font-sans font-semibold'>Milestone ID:</span>
+            <span className='font-mono'>{milestone.id}</span>
+          </div>
+          <div className='flex gap-1'>
+            <span className='font-sans font-semibold whitespace-nowrap'>
+              Merged pull request URL:
+            </span>
+            <span className='font-mono'>
+              <a
+                href={milestone.mergedPullRequestUrl}
+                target='_blank'
+                className='text-blue-600 border-b border-blue-600 hover:border-none transition-[0.3s_ease]'
+              >
+                {milestone.mergedPullRequestUrl}
+              </a>
+            </span>
+          </div>
+          <div className='flex gap-1'>
+            <span className='font-sans font-semibold whitespace-nowrap'>
+              Aproval transaction hash:
+            </span>
+            <span className='font-mono overflow-x-auto with-scrollbar-sm'>
               {milestone.transactionApprovalHash ? milestone.transactionApprovalHash : '—'}
             </span>
-          </span>
-          <span className='flex items-center'>
-            <span className='me-2 font-["Noto"] font-semibold'>Status:</span>
+          </div>
+          <div className='flex gap-1'>
+            <span className='font-sans font-semibold'>Status:</span>
             {!milestone.isFinal ? (
-              <span className='text-xs font-medium text-white rounded-xl bg-yellow-500 px-1'>
+              <span className='font-medium text-white rounded-xl bg-yellow-500 px-3'>
                 Under review
               </span>
             ) : milestone.isFinal && !milestone.isWithdrawn ? (
-              <span className='text-xs font-medium text-white rounded-xl bg-blue-500 px-1'>
-                Approved
-              </span>
+              <span className='font-medium text-white rounded-xl bg-blue-500 px-3'>Approved</span>
             ) : (
-              <span className='text-xs font-medium text-white rounded-xl bg-emerald-500 px-1'>
+              <span className='font-medium text-white rounded-xl bg-emerald-500 px-3'>
                 Withdrawn
               </span>
             )}
-          </span>
-          <span className='font-["Noto"] font-semibold'>
-            Created at: {new Date(milestone.createdAt).toLocaleString()}
-          </span>
+          </div>
+          <div className='flex gap-1'>
+            <span className='font-sans font-semibold'>Created at:</span>
+            <span className='font-mono'>{new Date(milestone.createdAt).toLocaleString()}</span>
+          </div>
         </div>
         <div className='flex gap-2'>
           {authenticatedUser?.role.includes(UserRoleEnum.Startup) &&
@@ -245,7 +271,7 @@ const Milestone: FC<IMilestoneProps> = ({ milestone, projectLaunch }) => {
             milestone.isFinal &&
             !milestone.isWithdrawn && (
               <Button
-                className='inline-flex border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-1 transition-[0.3s_ease] rounded-full text-sm font-medium'
+                className='inline-flex border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
                 onClick={() => setIsWithdrawMilestoneModalVisible(true)}
               >
                 Withdraw
@@ -253,7 +279,7 @@ const Milestone: FC<IMilestoneProps> = ({ milestone, projectLaunch }) => {
             )}
           {authenticatedUser?.role.includes(UserRoleEnum.BusinessAnalyst) && !milestone.isFinal && (
             <Button
-              className='inline-flex border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-1 transition-[0.3s_ease] rounded-full text-sm font-medium'
+              className='inline-flex border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
               onClick={() => setIsApproveMilestoneModalVisible(true)}
             >
               Approve
