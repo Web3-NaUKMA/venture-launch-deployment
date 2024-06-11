@@ -82,4 +82,7 @@ export class ProjectLaunch implements IProjectLaunch {
     projectLaunchInvestment => projectLaunchInvestment.projectLaunch,
   )
   projectLaunchInvestments?: IProjectLaunchInvestment[] | undefined;
+
+  @Column({ type: 'text', default: null })
+  businessAnalystReview: string | null;
 }

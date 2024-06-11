@@ -154,8 +154,9 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
             />
           </div>
         </div>
-        <h3 className='font-serif font-semibold text-2xl my-10'>Backers & Partners</h3>
-        <div className='grid sm:grid-cols-2 md:grid-cols-3 gap-4'>
+        {/* TODO: Replace hidden to grid when partners logic will be implemented */}
+        <h3 className='hidden font-serif font-semibold text-2xl my-10'>Backers & Partners</h3>
+        <div className='hidden sm:grid-cols-2 md:grid-cols-3 gap-4'>
           {Array.from({ length: 6 }).map((_, index) => (
             <div key={index} className='border rounded-2xl p-5 text-sm relative'>
               <div className='w-3/4 h-[40px] rounded-lg bg-neutral-200 mb-3 flex justify-center items-center'>
@@ -171,9 +172,20 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
             </div>
           ))}
         </div>
-        <h3 className='font-serif font-semibold text-2xl my-10'>3X Capital Review</h3>
+        <h3 className='font-serif font-semibold text-2xl my-10'>Description</h3>
         <div className='mb-10'>
           <p className='font-serif whitespace-pre-wrap'>{projectLaunch.description}</p>
+        </div>
+        <hr />
+        <h3 className='font-serif font-semibold text-2xl my-10'>3x Capital Review</h3>
+        <div className='mb-10'>
+          {projectLaunch.businessAnalystReview ? (
+            <p className='font-serif whitespace-pre-wrap'>{projectLaunch.businessAnalystReview}</p>
+          ) : (
+            <p className='font-mono text-stone-500 text-sm font-medium'>
+              Business analyst has not given the review for this project launch yet
+            </p>
+          )}
         </div>
         <hr />
         <h3 className='font-serif font-semibold text-2xl my-10'>Team</h3>

@@ -23,4 +23,5 @@ export interface IProjectLaunch {
   createdAt: Date;
   vaultTokenAccount: string;
   cryptoTrackerAccount: string;
+  businessAnalystReview: string | null;
 }

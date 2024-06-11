@@ -34,6 +34,7 @@ export interface IUpdateProjectLaunchDto {
   roundDetails?: JSON;
   vaultTokenAccount?: string;
   cryptoTrackerAccount?: string;
+  businessAnalystReview?: string | null;
 }
 
 export interface IFindProjectLaunchDto {
