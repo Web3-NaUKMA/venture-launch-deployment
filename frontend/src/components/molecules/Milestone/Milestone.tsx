@@ -17,6 +17,7 @@ import { USDC_MINT, createWithdrawTx, programId } from '../../../utils/venture-l
 import { IProjectLaunch } from '../../../types/project-launch.types';
 import { useAuth } from '../../../hooks/auth.hooks';
 import { UserRoleEnum } from '../../../types/enums/user-role.enum';
+import useWeb3Auth from '../../../hooks/web3auth.hooks';
 
 export interface IMilestoneProps {
   milestone: IMilestone;
@@ -34,37 +35,42 @@ const Milestone: FC<IMilestoneProps> = ({ milestone, projectLaunch }) => {
   const [isApproveMilestoneModalVisible, setIsApproveMilestoneModalVisible] = useState(false);
   const [isEditMilestoneModalVisible, setIsEditMilestoneModalVisible] = useState(false);
   const milestoneAccount = Keypair.generate();
-
-  const transaction = new Transaction();
-  if (publicKey) {
-    transaction.add(
-      SystemProgram.transfer({
-        fromPubkey: publicKey,
-        toPubkey: milestoneAccount.publicKey,
-        lamports: 1_000_000,
-      }),
-      new web3.TransactionInstruction({
-        keys: [{ pubkey: publicKey, isSigner: true, isWritable: false }],
-        data: Buffer.from(milestone.mergedPullRequestUrl, 'utf-8'),
-        programId: new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'),
-      }),
-    );
-  }
+  const { connectWallet } = useWeb3Auth();
 
   const submitMilestone = async () => {
-    const transactionHash = await sendTransaction(transaction, connection);
-    dispatch(
-      updateMilestone(
-        milestone.id,
-        { isFinal: true, transactionApprovalHash: transactionHash },
-        {
-          onSuccess: () => {
-            setIsApproveMilestoneModalVisible(false);
-            if (id) dispatch(fetchProject(id));
+    const transaction = new Transaction();
+
+    if (publicKey && signTransaction && sendTransaction) {
+      transaction.add(
+        SystemProgram.transfer({
+          fromPubkey: publicKey,
+          toPubkey: milestoneAccount.publicKey,
+          lamports: 1_000_000,
+        }),
+        new web3.TransactionInstruction({
+          keys: [{ pubkey: publicKey, isSigner: true, isWritable: false }],
+          data: Buffer.from(milestone.mergedPullRequestUrl, 'utf-8'),
+          programId: new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'),
+        }),
+      );
+
+      const transactionHash = await sendTransaction(transaction, connection);
+
+      dispatch(
+        updateMilestone(
+          milestone.id,
+          { isFinal: true, transactionApprovalHash: transactionHash },
+          {
+            onSuccess: () => {
+              setIsApproveMilestoneModalVisible(false);
+              if (id) dispatch(fetchProject(id));
+            },
           },
-        },
-      ),
-    );
+        ),
+      );
+    } else {
+      connectWallet();
+    }
   };
 
   const withdrawMilestone = async () => {
@@ -96,6 +102,8 @@ const Milestone: FC<IMilestoneProps> = ({ milestone, projectLaunch }) => {
           },
         ),
       );
+    } else {
+      connectWallet();
     }
   };
 

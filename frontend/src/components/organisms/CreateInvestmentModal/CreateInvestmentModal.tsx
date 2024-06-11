@@ -17,6 +17,7 @@ import {
   programId,
 } from '../../../utils/venture-launch.utils';
 import { PublicKey } from '@solana/web3.js';
+import useWeb3Auth from '../../../hooks/web3auth.hooks';
 
 export interface ICreateInvestmentModalProps extends IModalProps {
   projectLaunch: IProjectLaunch;
@@ -50,6 +51,7 @@ const CreateInvestmentModal: FC<ICreateInvestmentModalProps> = ({
   const errors = useAppSelector(selectErrors);
   const { publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
+  const { connectWallet } = useWeb3Auth();
 
   useEffect(() => {
     dispatch(setError({ createProjectLaunchInvestment: null }));
@@ -100,6 +102,8 @@ const CreateInvestmentModal: FC<ICreateInvestmentModalProps> = ({
           },
         ),
       );
+    } else if (!publicKey || !signTransaction) {
+      connectWallet();
     }
   };
 
