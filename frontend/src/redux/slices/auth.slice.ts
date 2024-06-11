@@ -7,9 +7,9 @@ import {
 import { IUser } from '../../types/user.types';
 import { AppDispatch, RootState } from '../store';
 import { HttpStatusCode } from 'axios';
-import { IActionCreatorOptions } from '../../types/redux/store.types';
+import { ActionCreatorOptions } from '../../types/redux/store.types';
 import { WalletContextState } from '@solana/wallet-adapter-react';
-import { IAccountRegistrationData } from '../../types/app.types';
+import { AccountRegistrationData } from '../../types/auth.types';
 import bs58 from 'bs58';
 import axios from 'axios';
 
@@ -45,9 +45,8 @@ const authSlice = createSlice({
   },
 });
 
-export const login =
-  (wallet: WalletContextState, options?: IActionCreatorOptions) =>
-  async (dispatch: AppDispatch) => {
+export const loginWithWallet =
+  (wallet: WalletContextState, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(authSlice.actions.setError({ login: null }));
 
     try {
@@ -64,7 +63,50 @@ export const login =
       const signature = bs58.encode(signMessageResponse);
       const token = `${bs58encodedPublicKey}.${bs58encodedPayload}.${signature}`;
 
-      const response = await axios.post(`auth/login`, { publicKey, token });
+      const response = await axios.post(`auth/login/wallet`, { publicKey, token });
+
+      if (response.status === HttpStatusCode.Created) {
+        options?.onSuccess?.(response.data);
+        return dispatch(authSlice.actions.setAuthenticatedUser(response.data));
+      }
+    } catch (error) {
+      options?.onError?.(error);
+      dispatch(authSlice.actions.setError({ login: 'The user is unauthorized.' }));
+    }
+  };
+
+export const loginWithGoogle =
+  (googleAccessToken: string, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
+    dispatch(authSlice.actions.setError({ login: null }));
+
+    try {
+      if (!googleAccessToken) {
+        throw new Error('The google access token is missing. Cannot authorize the user.');
+      }
+
+      const response = await axios.post(`auth/login/google`, { googleAccessToken });
+
+      if (response.status === HttpStatusCode.Created) {
+        options?.onSuccess?.(response.data);
+        return dispatch(authSlice.actions.setAuthenticatedUser(response.data));
+      }
+    } catch (error) {
+      options?.onError?.(error);
+      dispatch(authSlice.actions.setError({ login: 'The user is unauthorized.' }));
+    }
+  };
+
+export const loginWithCredentials =
+  (email: string, password: string, options?: ActionCreatorOptions) =>
+  async (dispatch: AppDispatch) => {
+    dispatch(authSlice.actions.setError({ login: null }));
+
+    try {
+      if (!email || !password) {
+        throw new Error('The email or password is missing. Cannot authorize the user.');
+      }
+
+      const response = await axios.post(`auth/login/credentials`, { email, password });
 
       if (response.status === HttpStatusCode.Created) {
         options?.onSuccess?.(response.data);
@@ -77,14 +119,14 @@ export const login =
   };
 
 export const register =
-  (wallet: WalletContextState, data: IAccountRegistrationData, options?: IActionCreatorOptions) =>
+  (wallet: WalletContextState, data: AccountRegistrationData, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(authSlice.actions.setError({ register: null }));
     try {
       const response = await axios.post(`auth/register`, data);
 
       if (response.status === HttpStatusCode.Created) {
-        return dispatch(login(wallet, options));
+        return dispatch(loginWithWallet(wallet, options));
       }
     } catch (error) {
       options?.onError?.(error);
@@ -97,7 +139,7 @@ export const register =
   };
 
 export const fetchAuthenticatedUser =
-  (options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(authSlice.actions.setError({ fetchAuthenticatedUser: null }));
 
     try {
@@ -118,7 +160,7 @@ export const fetchAuthenticatedUser =
     }
   };
 
-export const logout = (options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+export const logout = (options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
   dispatch(authSlice.actions.setError({ logout: null }));
 
   try {

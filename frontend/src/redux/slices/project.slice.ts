@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { AppDispatch, RootState } from '../store';
 import { HttpStatusCode } from 'axios';
-import { IActionCreatorOptions } from '../../types/redux/store.types';
+import { ActionCreatorOptions } from '../../types/redux/store.types';
 import {
   IProjectSliceState,
   IProjectSliceStateError,
@@ -9,7 +9,7 @@ import {
 } from '../../types/redux/project.types';
 import axios from 'axios';
 import { ICreateProject, IUpdateProject, IProject } from '../../types/project.types';
-import { IRequestQueryParams } from '../../types/app.types';
+import { RequestQueryParams } from '../../types/app.types';
 import { serializeQueryParams } from '../../utils/request.utils';
 
 const initialState: IProjectSliceState = {
@@ -76,7 +76,7 @@ const projectSlice = createSlice({
 });
 
 export const fetchAllProjects =
-  (queryParams?: IRequestQueryParams, options?: IActionCreatorOptions) =>
+  (queryParams?: RequestQueryParams, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(projectSlice.actions.setError({ fetchAllProjects: null }));
 
@@ -97,7 +97,7 @@ export const fetchAllProjects =
   };
 
 export const fetchProject =
-  (id: string, options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (id: string, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(projectSlice.actions.setError({ fetchProject: null }));
 
     try {
@@ -118,7 +118,7 @@ export const fetchProject =
   };
 
 export const createProject =
-  (project: ICreateProject, options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (project: ICreateProject, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(projectSlice.actions.setError({ createProject: null }));
 
     try {
@@ -139,7 +139,7 @@ export const createProject =
   };
 
 export const updateProject =
-  (id: string, project: IUpdateProject, options?: IActionCreatorOptions) =>
+  (id: string, project: IUpdateProject, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(projectSlice.actions.setError({ updateProject: null }));
 
@@ -161,7 +161,7 @@ export const updateProject =
   };
 
 export const removeProject =
-  (id: string, options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (id: string, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(projectSlice.actions.setError({ removeProject: null }));
 
     try {

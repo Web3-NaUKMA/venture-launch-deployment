@@ -1,8 +1,8 @@
 import React, { FC } from 'react';
 
-export interface IIconProps extends React.SVGAttributes<HTMLElement> {}
+export interface IconProps extends React.SVGAttributes<SVGElement> {}
 
-export const CubeIcon: FC<IIconProps> = props => {
+export const CubeIcon: FC<IconProps> = props => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -22,7 +22,7 @@ export const CubeIcon: FC<IIconProps> = props => {
   );
 };
 
-export const IdentificationIcon: FC<IIconProps> = props => {
+export const IdentificationIcon: FC<IconProps> = props => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -42,7 +42,7 @@ export const IdentificationIcon: FC<IIconProps> = props => {
   );
 };
 
-export const ExitIcon: FC<IIconProps> = props => {
+export const ExitIcon: FC<IconProps> = props => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -62,7 +62,7 @@ export const ExitIcon: FC<IIconProps> = props => {
   );
 };
 
-export const UserCircleIcon: FC<IIconProps> = props => {
+export const UserCircleIcon: FC<IconProps> = props => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -82,7 +82,7 @@ export const UserCircleIcon: FC<IIconProps> = props => {
   );
 };
 
-export const BurgerMenuIcon: FC<IIconProps> = props => {
+export const BurgerMenuIcon: FC<IconProps> = props => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -102,7 +102,7 @@ export const BurgerMenuIcon: FC<IIconProps> = props => {
   );
 };
 
-export const DotsIcon: FC<IIconProps> = props => {
+export const DotsIcon: FC<IconProps> = props => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -122,7 +122,7 @@ export const DotsIcon: FC<IIconProps> = props => {
   );
 };
 
-export const EditIcon: FC<IIconProps> = props => {
+export const EditIcon: FC<IconProps> = props => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -142,7 +142,7 @@ export const EditIcon: FC<IIconProps> = props => {
   );
 };
 
-export const RemoveIcon: FC<IIconProps> = props => {
+export const RemoveIcon: FC<IconProps> = props => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -158,6 +158,43 @@ export const RemoveIcon: FC<IIconProps> = props => {
         strokeLinejoin='round'
         d='m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0'
       />
+    </svg>
+  );
+};
+
+export const GoogleIcon: FC<IconProps> = props => {
+  return (
+    <svg
+      width='48'
+      height='48'
+      viewBox='0 0 48 48'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+      {...props}
+    >
+      <g clipPath='url(#clip0_17_40)'>
+        <path
+          d='M23.9996 19.6363V28.9309H36.916C36.3488 31.9199 34.6468 34.4509 32.0941 36.1527L39.8831 42.1964C44.4213 38.0075 47.0395 31.8547 47.0395 24.5456C47.0395 22.8438 46.8868 21.2073 46.6031 19.6366L23.9996 19.6363Z'
+          fill='#4285F4'
+        />
+        <path
+          d='M10.5494 28.568L8.79263 29.9128L2.57434 34.7564C6.52342 42.589 14.6174 48 23.9991 48C30.4789 48 35.9116 45.8618 39.8826 42.1964L32.0936 36.1528C29.9554 37.5927 27.2281 38.4656 23.9991 38.4656C17.7591 38.4656 12.4575 34.2547 10.5592 28.5819L10.5494 28.568Z'
+          fill='#34A853'
+        />
+        <path
+          d='M2.57436 13.2436C0.938084 16.4726 0 20.1163 0 23.9999C0 27.8834 0.938084 31.5271 2.57436 34.7561C2.57436 34.7777 10.5599 28.5597 10.5599 28.5597C10.08 27.1197 9.79624 25.5925 9.79624 23.9996C9.79624 22.4067 10.08 20.8795 10.5599 19.4395L2.57436 13.2436Z'
+          fill='#FBBC05'
+        />
+        <path
+          d='M23.9996 9.55636C27.5342 9.55636 30.676 10.7781 33.1851 13.1345L40.0577 6.2619C35.8904 2.37833 30.4797 0 23.9996 0C14.6179 0 6.52342 5.38908 2.57434 13.2437L10.5597 19.44C12.4578 13.7672 17.7596 9.55636 23.9996 9.55636Z'
+          fill='#EA4335'
+        />
+      </g>
+      <defs>
+        <clipPath id='clip0_17_40'>
+          <rect width='48' height='48' fill='white' />
+        </clipPath>
+      </defs>
     </svg>
   );
 };

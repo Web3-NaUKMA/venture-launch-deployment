@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { AppDispatch, RootState } from '../store';
 import { HttpStatusCode } from 'axios';
-import { IActionCreatorOptions } from '../../types/redux/store.types';
+import { ActionCreatorOptions } from '../../types/redux/store.types';
 import {
   IProjectLaunchSliceState,
   IProjectLaunchSliceStateError,
@@ -9,7 +9,7 @@ import {
 } from '../../types/redux/project-launch.types';
 import axios from 'axios';
 import { IProjectLaunch } from '../../types/project-launch.types';
-import { IRequestQueryParams } from '../../types/app.types';
+import { RequestQueryParams } from '../../types/app.types';
 import { serializeQueryParams } from '../../utils/request.utils';
 import { createProject } from './project.slice';
 import { ICreateProject } from '../../types/project.types';
@@ -124,7 +124,7 @@ const projectLaunchSlice = createSlice({
 });
 
 export const fetchAllProjectLaunches =
-  (queryParams?: IRequestQueryParams, options?: IActionCreatorOptions) =>
+  (queryParams?: RequestQueryParams, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(projectLaunchSlice.actions.setError({ fetchAllProjectLaunches: null }));
 
@@ -147,7 +147,7 @@ export const fetchAllProjectLaunches =
   };
 
 export const fetchProjectLaunch =
-  (id: string, options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (id: string, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(projectLaunchSlice.actions.setError({ fetchProjectLaunch: null }));
 
     try {
@@ -168,7 +168,7 @@ export const fetchProjectLaunch =
   };
 
 export const createProjectLaunch =
-  (formData: FormData, options?: IActionCreatorOptions, addToReduxState: boolean = true) =>
+  (formData: FormData, options?: ActionCreatorOptions, addToReduxState: boolean = true) =>
   async (dispatch: AppDispatch) => {
     dispatch(projectLaunchSlice.actions.setError({ createProjectLaunch: null }));
 
@@ -209,7 +209,7 @@ export const createProjectLaunch =
   };
 
 export const updateProjectLaunch =
-  (id: string, formData: FormData, options?: IActionCreatorOptions) =>
+  (id: string, formData: FormData, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(projectLaunchSlice.actions.setError({ updateProjectLaunch: null }));
 
@@ -236,7 +236,7 @@ export const updateProjectLaunch =
   };
 
 export const removeProjectLaunch =
-  (id: string, options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (id: string, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(projectLaunchSlice.actions.setError({ removeProjectLaunch: null }));
 
     try {
@@ -257,7 +257,7 @@ export const removeProjectLaunch =
   };
 
 export const createProjectLaunchInvestment =
-  (investment: ICreateProjectLaunchInvestment, options?: IActionCreatorOptions) =>
+  (investment: ICreateProjectLaunchInvestment, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(projectLaunchSlice.actions.setError({ createProjectLaunchInvestment: null }));
 
@@ -293,7 +293,7 @@ export const updateProjectLaunchInvestment =
     id: string,
     investorId: string,
     investment: IUpdateProjectLaunchInvestment,
-    options?: IActionCreatorOptions,
+    options?: ActionCreatorOptions,
   ) =>
   async (dispatch: AppDispatch) => {
     dispatch(projectLaunchSlice.actions.setError({ updateProjectLaunchInvestment: null }));

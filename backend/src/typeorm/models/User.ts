@@ -28,6 +28,12 @@ export class User implements IUser {
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
+  @Column({ type: 'varchar', default: null })
+  password: string | null;
+
+  @Column({ type: 'text', default: null })
+  avatar: string | null;
+
   @Column({ type: 'varchar', length: 50, nullable: true })
   firstName?: string;
 

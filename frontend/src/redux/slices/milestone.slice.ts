@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { AppDispatch, RootState } from '../store';
 import { HttpStatusCode } from 'axios';
-import { IActionCreatorOptions } from '../../types/redux/store.types';
+import { ActionCreatorOptions } from '../../types/redux/store.types';
 import axios from 'axios';
 import {
   IMilestoneSliceState,
@@ -74,7 +74,7 @@ const milestoneSlice = createSlice({
 });
 
 export const fetchAllMilestones =
-  (options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(milestoneSlice.actions.setError({ fetchAllMilestones: null }));
 
     try {
@@ -95,7 +95,7 @@ export const fetchAllMilestones =
   };
 
 export const fetchMilestone =
-  (id: string, options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (id: string, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(milestoneSlice.actions.setError({ fetchMilestone: null }));
 
     try {
@@ -116,7 +116,7 @@ export const fetchMilestone =
   };
 
 export const createMilestone =
-  (milestone: ICreateMilestone, options?: IActionCreatorOptions) =>
+  (milestone: ICreateMilestone, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(milestoneSlice.actions.setError({ createMilestone: null }));
 
@@ -138,7 +138,7 @@ export const createMilestone =
   };
 
 export const updateMilestone =
-  (id: string, milestone: IUpdateMilestone, options?: IActionCreatorOptions) =>
+  (id: string, milestone: IUpdateMilestone, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(milestoneSlice.actions.setError({ updateMilestone: null }));
 
@@ -161,7 +161,7 @@ export const updateMilestone =
   };
 
 export const removeMilestone =
-  (id: string, options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (id: string, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(milestoneSlice.actions.setError({ removeMilestone: null }));
 
     try {

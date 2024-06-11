@@ -1,12 +1,3 @@
-import { UserRoleEnum } from './enums/user-role.enum';
-
-export interface IAccountRegistrationData {
-  walletId: string;
-  username: string;
-  email: string;
-  role: UserRoleEnum[];
-}
-
-export interface IRequestQueryParams {
+export interface RequestQueryParams {
   [key: string]: string | number | boolean | (string | number | boolean)[];
 }
