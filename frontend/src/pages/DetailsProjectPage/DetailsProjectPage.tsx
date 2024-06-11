@@ -4,7 +4,6 @@ import { useParams } from 'react-router';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux.hooks';
 import {
   fetchProject,
-  // removeProject,
   selectProject,
   setProject,
   updateProject,
@@ -13,7 +12,6 @@ import Button from '../../components/atoms/Button/Button';
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '../../types/enums/app-routes.enum';
 import Modal from '../../components/molecules/Modal/Modal';
-// import EditProjectModal from '../../components/organisms/EditProjectModal/EditProjectModal';
 import { createPortal } from 'react-dom';
 import CreateMilestoneModal from '../../components/organisms/CreateMilestoneModal/CreateMilestoneModal';
 import { useAuth } from '../../hooks/auth.hooks';
@@ -27,12 +25,9 @@ import ProjectLaunchInfoModal from '../../components/organisms/ProjectLaunchInfo
 const DetailsProjectPage: FC = () => {
   const { id } = useParams();
   const dispatch = useAppDispatch();
-  // const navigate = useNavigate();
   const project = useAppSelector(selectProject);
   const [notFound, setNotFound] = useState(false);
   const [isSubmitProjectModalVisible, setIsSubmitProjectModalVisible] = useState(false);
-  // const [isRemoveProjectModalVisible, setIsRemoveProjectModalVisible] = useState(false);
-  // const [isEditProjectModalVisible, setIsEditProjectModalVisible] = useState(false);
   const [isShowProjectLaunchInfoModalVisible, setIsShowProjectLaunchInfoModalVisible] =
     useState(false);
   const [isCreateMilestoneModalVisible, setIsCreateMilestoneModalVisible] = useState(false);
@@ -76,16 +71,6 @@ const DetailsProjectPage: FC = () => {
     }
   };
 
-  // const deleteProject = () => {
-  //   if (id) {
-  //     dispatch(
-  //       removeProject(id, {
-  //         onSuccess: () => navigate(AppRoutes.Projects),
-  //       }),
-  //     );
-  //   }
-  // };
-
   return notFound ? (
     <NotFoundPage />
   ) : (
@@ -95,112 +80,61 @@ const DetailsProjectPage: FC = () => {
           createPortal(
             <Modal
               title='Submit project'
-              buttons={[
-                {
-                  type: 'accept',
-                  name: 'Submit',
-                  action: () => submitProject(),
-                },
-                {
-                  type: 'close',
-                  name: 'Cancel',
-                  action: () => setIsSubmitProjectModalVisible(false),
-                },
-              ]}
+              onClose={() => setIsSubmitProjectModalVisible(false)}
               className='max-w-[596px]'
             >
-              Are you sure you want to submit this submit? You will not be able to cancel this
-              operation.
+              <div className='px-10 py-8 flex flex-col'>
+                <p className='font-mono'>
+                  Are you sure you want to submit this submit? You will not be able to cancel this
+                  operation.
+                </p>
+                <div className='mt-8 flex gap-4'>
+                  <button
+                    type='button'
+                    className='inline-flex text-center justify-center items-center border-2 bg-emerald-500 hover:bg-emerald-600 border-transparent text-white rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                    onClick={() => submitProject()}
+                  >
+                    Submit
+                  </button>
+                  <button
+                    type='button'
+                    className='inline-flex text-center justify-center items-center text-zinc-700 border-2 border-zinc-900 hover:text-zinc-900 hover:bg-slate-100 rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                    onClick={() => setIsSubmitProjectModalVisible(false)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </Modal>,
             document.getElementById('root')!,
           )}
         {isShowProjectLaunchInfoModalVisible &&
           createPortal(
             <ProjectLaunchInfoModal
-              title=''
-              buttons={[
-                {
-                  type: 'close',
-                  name: 'Close',
-                  action: () => setIsShowProjectLaunchInfoModalVisible(false),
-                },
-              ]}
+              title='Project launch info'
+              onClose={() => setIsShowProjectLaunchInfoModalVisible(false)}
               projectLaunch={project.projectLaunch}
               setIsCreateProjectLaunchInvestmentModalVisible={() => {}}
             />,
             document.getElementById('root')!,
           )}
-        {/* {isRemoveProjectModalVisible &&
-          createPortal(
-            <Modal
-              title='Delete project'
-              buttons={[
-                {
-                  variant: 'danger',
-                  type: 'accept',
-                  name: 'Delete',
-                  action: () => deleteProject(),
-                },
-                {
-                  type: 'close',
-                  name: 'Cancel',
-                  action: () => setIsRemoveProjectModalVisible(false),
-                },
-              ]}
-              className='max-w-[596px]'
-            >
-              Are you sure you want to delete this project? You will not be able to restore the
-              project after performing this operation.
-            </Modal>,
-            document.getElementById('root')!,
-          )} */}
-        {/* {isEditProjectModalVisible &&
-          createPortal(
-            <EditProjectModal
-              title='Edit project'
-              buttons={[
-                {
-                  type: 'accept',
-                  name: 'Save changes',
-                  action: () => {
-                    setIsEditProjectModalVisible(false);
-                    dispatch(fetchProject(project.id));
-                  },
-                },
-                { type: 'close', name: 'Close', action: () => setIsEditProjectModalVisible(false) },
-              ]}
-              className='max-w-[596px]'
-              project={project}
-            />,
-            document.getElementById('root')!,
-          )} */}
         {isCreateMilestoneModalVisible &&
           createPortal(
             <CreateMilestoneModal
               title='Create milestone'
-              buttons={[
-                {
-                  type: 'close',
-                  name: 'Close',
-                  action: () => setIsCreateMilestoneModalVisible(false),
-                },
-                {
-                  type: 'accept',
-                  name: 'Create',
-                  action: () => {
-                    setIsCreateMilestoneModalVisible(false);
-                    dispatch(fetchProject(project.id));
-                  },
-                },
-              ]}
+              onClose={() => setIsCreateMilestoneModalVisible(false)}
+              onProcess={() => {
+                setIsCreateMilestoneModalVisible(false);
+                dispatch(fetchProject(project.id));
+              }}
               project={project}
             />,
             document.getElementById('root')!,
           )}
-        <div className='flex flex-col items-center justify-center p-6'>
-          <div className='shadow-[0_0_30px_-15px_silver] w-full max-w-[1440px] p-5 rounded-xl bg-white'>
-            <div className='flex justify-between items-center'>
-              <h3 className='font-bold text-xl font-["Noto"]'>Project details</h3>
+        <div className='flex flex-col items-center justify-center px-6 py-10'>
+          <div className='shadow-[0_0_15px_-7px_gray] w-full max-w-[1440px] rounded-xl bg-white'>
+            <div className='flex justify-between items-center px-10 py-8'>
+              <h3 className='font-serif text-2xl'>Project details</h3>
               <div className='flex items-center'>
                 {authenticatedUser?.id === project.projectLaunch.author.id &&
                   authenticatedUser.role.includes(UserRoleEnum.Startup) && (
@@ -211,97 +145,86 @@ const DetailsProjectPage: FC = () => {
                             {project.milestones.filter(milestone => milestone.isFinal).length ===
                             project.milestoneNumber ? (
                               <Button
-                                className='me-2 text-sm bg-emerald-500 hover:bg-emerald-600 inline-flex border-transparent border-2 text-white px-5 py-1 transition-[0.3s_ease] rounded-full font-medium'
+                                className='me-2 bg-emerald-500 hover:bg-emerald-600 inline-flex border-transparent border-2 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
                                 onClick={() => setIsSubmitProjectModalVisible(true)}
                               >
                                 Submit project
                               </Button>
                             ) : (
                               <Button
-                                className='me-2 text-sm bg-emerald-500 inline-flex border-transparent border-2 text-white px-5 py-1 transition-[0.3s_ease] rounded-full font-medium opacity-30'
+                                className='me-2 bg-emerald-500 inline-flex border-transparent border-2 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium opacity-30'
                                 disabled
                                 title='Submission of the project is not yet possible, as not all milestones have been submitted'
                               >
                                 Submit project
                               </Button>
                             )}
-                            {/* <Button
-                            className='me-2 text-sm bg-indigo-500 hover:bg-indigo-600 text-white font-medium px-5 py-1.5 rounded-md transition-[0.3s_ease]'
-                            onClick={() => setIsEditProjectModalVisible(true)}
-                          >
-                            Edit
-                          </Button> */}
-                            {/* <Button
-                            className='text-sm bg-red-500 hover:bg-red-600 text-white font-medium px-5 py-1.5 rounded-md transition-[0.3s_ease]'
-                            onClick={() => setIsRemoveProjectModalVisible(true)}
-                          >
-                            Delete
-                          </Button>
-                          <div className='h-[1.75rem] mx-4 bg-gray-300 w-[2px] rounded-md'></div> */}
                           </>
                         )}
                     </>
                   )}
                 <Button
-                  className='inline-flex text-sm me-4 font-medium border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-1 transition-[0.3s_ease] rounded-full'
+                  className='inline-flex me-4 font-medium border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 font-sans rounded-full'
                   onClick={() => setIsShowProjectLaunchInfoModalVisible(true)}
                 >
                   Launch info
                 </Button>
                 <Link
                   to={AppRoutes.Projects}
-                  className='inline-flex border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-1 transition-[0.3s_ease] rounded-full text-sm font-medium'
+                  className='inline-flex border-transparent bg-stone-400 hover:bg-transparent border-2 hover:border-stone-600 hover:text-stone-600 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
                 >
                   Back
                 </Link>
               </div>
             </div>
-            <hr className='mt-5' />
-            <div className='divide-y divide-gray-50'>
-              <div className='flex justify-between items-center py-3 font-["Noto"] font-semibold text-gray-600 text-sm'>
-                <h3 className='w-1/2'>Project ID</h3>
-                <span className='w-1/2'>{project.id}</span>
-              </div>
-              <div className='flex justify-between items-center py-3 font-["Noto"] font-semibold text-gray-600 text-sm'>
-                <h3 className='w-1/2'>Project name</h3>
-                <span className='w-1/2'>{project.projectLaunchName}</span>
-              </div>
-              <div className='flex justify-between items-start py-3 font-["Noto"] font-semibold text-gray-600 text-sm'>
-                <h3 className=' text-gray-600'>Description</h3>
-                <span className='w-1/2 whitespace-pre-wrap'>
-                  {project.projectLaunchDescription}
-                </span>
-              </div>
-              <div className='flex justify-between items-start py-3 font-["Noto"] font-semibold text-gray-600 text-sm'>
-                <h3 className='w-1/2'>Milestones number</h3>
-                <span className='w-1/2'>{project.milestoneNumber}</span>
-              </div>
-              <div className='flex justify-between items-start py-3 font-medium text-gray-600 text-sm'>
-                <h3 className='w-1/2 font-["Noto"] font-semibold'>Status</h3>
-                <span className='w-1/2'>
-                  {project.isFinal ? (
-                    <span className='text-xs font-medium text-white rounded-xl bg-emerald-500 px-2 py-0.5'>
-                      Submitted
-                    </span>
-                  ) : (
-                    <span className='text-xs font-medium text-white rounded-xl bg-yellow-500 px-2 py-0.5'>
-                      In process
-                    </span>
-                  )}
-                </span>
-              </div>
-              {project.dataAccount?.accountHash && (
-                <div className='flex justify-between items-start py-3 font-["Noto"] font-semibold text-gray-600 text-sm'>
-                  <h3 className='w-1/2'>Data account hash</h3>
-                  <span className='w-1/2 overflow-x-auto with-scrollbar-sm'>
-                    {project.dataAccount.accountHash}
+            <hr />
+            <div className='px-10 py-5'>
+              <h3 className='font-sans font-semibold text-xl mb-1.5'>Project ID</h3>
+              <span className='font-mono'>{project.id}</span>
+            </div>
+            <hr />
+            <div className='px-10 py-5'>
+              <h3 className='font-sans font-semibold text-xl mb-1.5'>Project name</h3>
+              <span className='font-mono'>{project.projectLaunchName}</span>
+            </div>
+            <hr />
+            <div className='px-10 py-5'>
+              <h3 className='font-sans font-semibold text-xl mb-1.5'>Description</h3>
+              <span className='font-mono'>{project.projectLaunchDescription}</span>
+            </div>
+            <hr />
+            <div className='px-10 py-5'>
+              <h3 className='font-sans font-semibold text-xl mb-1.5'>Milestones number</h3>
+              <span className='font-mono'>{project.milestoneNumber}</span>
+            </div>
+            <hr />
+            <div className='px-10 py-5'>
+              <h3 className='font-sans font-semibold text-xl mb-1.5'>Status</h3>
+              <span className='font-sans inline-flex'>
+                {project.isFinal ? (
+                  <span className='font-medium text-white rounded-full bg-emerald-500 px-5 py-1.5'>
+                    Submitted
                   </span>
+                ) : (
+                  <span className='font-medium text-white rounded-full bg-yellow-500 px-5 py-1.5'>
+                    In process
+                  </span>
+                )}
+              </span>
+            </div>
+            <hr />
+            {project.dataAccount?.accountHash && (
+              <>
+                <div className='px-10 py-5'>
+                  <h3 className='font-sans font-semibold text-xl mb-1.5'>Data account hash</h3>
+                  <span className='font-mono'>{project.dataAccount.accountHash}</span>
                 </div>
-              )}
-              <div className='flex justify-between items-start py-3 pb-0 font-["Noto"] font-semibold text-gray-600 text-sm'>
-                <h3 className='w-1/2'>Created at</h3>
-                <span className='w-1/2'>{new Date(project.createdAt).toLocaleString()}</span>
-              </div>
+                <hr />
+              </>
+            )}
+            <div className='px-10 py-5'>
+              <h3 className='font-sans font-semibold text-xl mb-1.5'>Created at</h3>
+              <span className='font-mono'>{new Date(project.createdAt).toLocaleString()}</span>
             </div>
           </div>
           <MilestonesGrid

@@ -120,7 +120,7 @@ const SignInPage: FC = () => {
   }, [wallet.publicKey]);
 
   return (
-    <div className='flex flex-col h-screen'>
+    <div className='flex flex-col min-h-screen'>
       <div className='flex flex-col items-center justify-center flex-1 py-10'>
         <div className='flex-1 flex flex-col items-center justify-center w-full'>
           <img src='/logo.png' className='w-[10em] mb-12' />
@@ -131,15 +131,15 @@ const SignInPage: FC = () => {
             <h3 className='w-full font-bold text-2xl text-zinc-900 mb-1'>
               Sign in to your account
             </h3>
-            <p className='text mb-8 text-neutral-500 font-medium'>
+            <p className='text mb-4 text-neutral-500 font-medium'>
               Enter with email and password or continue with Google or Wallet
             </p>
             {state.error && (
-              <span className='flex mb-8 p-2 bg-rose-100 border border-rose-200 rounded-md'>
+              <span className='p-2 mb-2 bg-rose-100 border border-rose-200 rounded-md font-mono text-sm inline-flex'>
                 {state.error}
               </span>
             )}
-            <div className='flex flex-col gap-4 mb-8'>
+            <div className='flex flex-col gap-4 my-4'>
               <input
                 className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
                 type='email'
@@ -171,7 +171,7 @@ const SignInPage: FC = () => {
             </div>
             <button
               type='submit'
-              className='inline-flex text-center justify-center items-center border-2 border-transparent hover:border-zinc-900 hover:bg-transparent hover:text-zinc-900 bg-zinc-900 text-white transition-all duration-300 rounded-full px-10 py-3 font-medium'
+              className='mt-4 text-lg inline-flex text-center justify-center items-center border-2 border-transparent hover:border-zinc-900 hover:bg-transparent hover:text-zinc-900 bg-zinc-900 text-white transition-all duration-300 rounded-full px-10 py-3 font-medium'
             >
               Sign in
             </button>
@@ -181,10 +181,12 @@ const SignInPage: FC = () => {
               </span>
             </div>
             <div className='flex flex-col gap-3'>
-              <WalletMultiButton>Continue with Solana Wallet</WalletMultiButton>
+              <WalletMultiButton style={{ fontSize: '1.125rem', lineHeight: '1.75rem' }}>
+                Continue with Solana Wallet
+              </WalletMultiButton>
               <button
                 type='button'
-                className='inline-flex text-center justify-center items-center border-2 border-zinc-900 text-zinc-900 hover:bg-zinc-900 hover:text-white transition-all duration-300 rounded-full px-10 py-3 font-medium'
+                className='text-lg inline-flex text-center justify-center items-center border-2 border-zinc-900 text-zinc-900 hover:bg-zinc-900 hover:text-white transition-all duration-300 rounded-full px-10 py-3 font-medium'
                 onClick={handleSignInWithGoogle}
               >
                 <GoogleIcon className='size-5 me-2' />

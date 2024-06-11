@@ -1,12 +1,11 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '../../../types/enums/app-routes.enum';
 import Button from '../../atoms/Button/Button';
-import { DotsIcon, RemoveIcon } from '../../atoms/Icons/Icons';
+import { DotsIcon, EmptyLogoIcon, RemoveIcon, ShareIcon, StarIcon } from '../../atoms/Icons/Icons';
 import { useOutsideClick } from '../../../hooks/dom.hooks';
 import Modal from '../Modal/Modal';
 import { useAppDispatch } from '../../../hooks/redux.hooks';
-import EditProjectModal from '../../organisms/EditProjectModal/EditProjectModal';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../../../hooks/auth.hooks';
 import { UserRoleEnum } from '../../../types/enums/user-role.enum';
@@ -18,18 +17,20 @@ import {
 } from '../../../redux/slices/project-launch.slice';
 import CreateInvestmentModal from '../../organisms/CreateInvestmentModal/CreateInvestmentModal';
 import ProjectLaunchInfoModal from '../../organisms/ProjectLaunchInfoModal/ProjectLaunchInfoModal';
+import ProgressBar from '../ProgressBar/ProgressBar';
+import { resolveImage } from '../../../utils/file.utils';
 
 export interface IProjectProps {
   project: IProjectLaunch;
+  variant?: 'extended' | 'short';
 }
 
-export const Project: FC<IProjectProps> = ({ project: projectLaunch }) => {
+export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = 'extended' }) => {
   const dispatch = useAppDispatch();
   const [isSettingsDropdownVisible, setIsSettingsDropdownVisible] = useState(false);
   const [isRemoveProjectModalVisible, setIsRemoveProjectModalVisible] = useState(false);
   const [isApproveProjectLaunchModalVisible, setIsApproveProjectLaunchModalVisible] =
     useState(false);
-  const [isEditProjectModalVisible, setIsEditProjectModalVisible] = useState(false);
   const [
     isCreateProjectLaunchInvestmentModalVisible,
     setIsCreateProjectLaunchInvestmentModalVisible,
@@ -38,7 +39,6 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch }) => {
     useState(false);
   const settingsDropdownRef = useOutsideClick(() => setIsSettingsDropdownVisible(false));
   const { authenticatedUser } = useAuth();
-  const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0 });
 
   const deleteProject = () => {
     dispatch(
@@ -59,38 +59,37 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch }) => {
     );
   };
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const difference = new Date(projectLaunch.fundraiseDeadline).getTime() - Date.now();
-      setTimeLeft({
-        days: Math.floor(difference / (24 * 60 * 60 * 1000)),
-        hours: Math.floor((difference % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000)),
-        minutes: Math.floor((difference % (60 * 60 * 1000)) / (60 * 1000)),
-      });
-    }, 1000);
-    return () => {
-      clearInterval(interval);
-    };
-  }, []);
-
   return (
     <>
       {isRemoveProjectModalVisible &&
         createPortal(
           <Modal
             title='Delete project'
-            buttons={[
-              { variant: 'danger', type: 'accept', name: 'Delete', action: () => deleteProject() },
-              {
-                type: 'close',
-                name: 'Cancel',
-                action: () => setIsRemoveProjectModalVisible(false),
-              },
-            ]}
+            onClose={() => setIsRemoveProjectModalVisible(false)}
             className='max-w-[596px]'
           >
-            Are you sure you want to delete this project? You will not be able to restore the
-            project after performing this operation.
+            <div className='px-10 py-8 flex flex-col'>
+              <p className='font-mono'>
+                Are you sure you want to delete this project? You will not be able to restore the
+                project after performing this operation.
+              </p>
+              <div className='mt-8 flex gap-4'>
+                <button
+                  type='button'
+                  className='inline-flex text-center justify-center items-center bg-red-500 hover:bg-red-400 text-white rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                  onClick={() => deleteProject()}
+                >
+                  Delete
+                </button>
+                <button
+                  type='button'
+                  className='inline-flex text-center justify-center items-center text-zinc-700 border-2 border-zinc-900 hover:text-zinc-900 hover:bg-slate-100 rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                  onClick={() => setIsRemoveProjectModalVisible(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </Modal>,
           document.getElementById('root')!,
         )}
@@ -98,56 +97,40 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch }) => {
         createPortal(
           <Modal
             title='Approve project launch'
-            buttons={[
-              { type: 'accept', name: 'Approve', action: () => approveProjectLaunch() },
-              {
-                type: 'close',
-                name: 'Cancel',
-                action: () => setIsApproveProjectLaunchModalVisible(false),
-              },
-            ]}
+            onClose={() => setIsApproveProjectLaunchModalVisible(false)}
             className='max-w-[596px]'
           >
-            Are you sure you want to approve this project launch?
+            <div className='flex flex-col px-10 py-8'>
+              <p className='font-mono'>Are you sure you want to approve this project launch?</p>
+              <div className='flex gap-4 mt-8'>
+                <button
+                  type='button'
+                  className='inline-flex text-center justify-center items-center border-2 border-transparent bg-zinc-900 hover:border-zinc-900 hover:bg-transparent hover:text-zinc-900 text-white rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                  onClick={() => approveProjectLaunch()}
+                >
+                  Approve
+                </button>
+                <button
+                  type='button'
+                  className='inline-flex text-center justify-center items-center text-zinc-700 border-2 border-zinc-900 hover:text-zinc-900 hover:bg-slate-100 rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                  onClick={() => setIsApproveProjectLaunchModalVisible(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
           </Modal>,
-          document.getElementById('root')!,
-        )}
-      {isEditProjectModalVisible &&
-        createPortal(
-          <EditProjectModal
-            title='Edit project'
-            buttons={[
-              {
-                type: 'accept',
-                name: 'Save changes',
-                action: () => setIsEditProjectModalVisible(false),
-              },
-              { type: 'close', name: 'Close', action: () => setIsEditProjectModalVisible(false) },
-            ]}
-            className='max-w-[596px]'
-            project={projectLaunch}
-          />,
           document.getElementById('root')!,
         )}
       {isCreateProjectLaunchInvestmentModalVisible &&
         createPortal(
           <CreateInvestmentModal
-            title='Create investment'
-            buttons={[
-              {
-                type: 'close',
-                name: 'Close',
-                action: () => setIsCreateProjectLaunchInvestmentModalVisible(false),
-              },
-              {
-                type: 'accept',
-                name: 'Create',
-                action: () => {
-                  dispatch(fetchAllProjectLaunches());
-                  setIsCreateProjectLaunchInvestmentModalVisible(false);
-                },
-              },
-            ]}
+            title='Proceed with investment'
+            onClose={() => setIsCreateProjectLaunchInvestmentModalVisible(false)}
+            onProcess={() => {
+              dispatch(fetchAllProjectLaunches());
+              setIsCreateProjectLaunchInvestmentModalVisible(false);
+            }}
             projectLaunch={projectLaunch}
           />,
           document.getElementById('root')!,
@@ -155,14 +138,8 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch }) => {
       {isShowProjectLaunchInfoModalVisible &&
         createPortal(
           <ProjectLaunchInfoModal
-            title=''
-            buttons={[
-              {
-                type: 'close',
-                name: 'Close',
-                action: () => setIsShowProjectLaunchInfoModalVisible(false),
-              },
-            ]}
+            title='Project launch info'
+            onClose={() => setIsShowProjectLaunchInfoModalVisible(false)}
             projectLaunch={projectLaunch}
             setIsCreateProjectLaunchInvestmentModalVisible={
               setIsCreateProjectLaunchInvestmentModalVisible
@@ -170,186 +147,267 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch }) => {
           />,
           document.getElementById('root')!,
         )}
-      <div className='flex flex-col justify-between items-start bg-white py-7 px-14 rounded-xl shadow-[0_0_30px_-5px_#d5d5d5]'>
+      <div className='flex flex-col justify-between items-start bg-white py-7 px-14 rounded-xl shadow-[0_0_15px_-7px_gray]'>
         <div className='flex flex-col w-full flex-1'>
-          <div className='flex justify-between items-start pb-5 border-b'>
-            <div className='flex items-center'>
+          <div className='flex justify-between items-start pb-5'>
+            <div className='flex items-center w-full'>
               <img
-                src={
-                  projectLaunch.logo
-                    ? `${import.meta.env.VITE_BACKEND_URI}${
-                        import.meta.env.VITE_BACKEND_PREFIX
-                          ? `/${import.meta.env.VITE_BACKEND_PREFIX}`
-                          : ``
-                      }/file?file=${projectLaunch.logo}`
-                    : '/project-logo.png'
-                }
-                className='w-[6em] aspect-square rounded-xl object-cover shadow-[0_0_7px_0px_silver]'
+                src={resolveImage(projectLaunch.logo || '')}
+                onError={({ currentTarget }) => {
+                  currentTarget.onerror = null;
+                  currentTarget.src = '/logo.png';
+                }}
+                className='w-[6em] aspect-square rounded-xl object-cover'
               />
-              <h4 className='font-bold text-xl ms-5 text-gray-600 font-serif'>
-                {projectLaunch.name}
-              </h4>
-            </div>
-            <div className='flex items-center'>
-              {projectLaunch.isApproved && !projectLaunch.isFundraised ? (
-                <span className='font-medium text-white bg-red rounded-full text-xs bg-blue-500 px-2 py-0.5'>
-                  Approved
-                </span>
-              ) : projectLaunch.isApproved &&
-                projectLaunch.isFundraised &&
-                projectLaunch.project?.isFinal ? (
-                <span className='font-medium text-white bg-red rounded-full text-xs bg-emerald-500 px-2 py-0.5'>
-                  Submitted
-                </span>
-              ) : projectLaunch.isApproved && projectLaunch.isFundraised ? (
-                <span className='font-medium text-white bg-red rounded-full text-xs bg-orange-500 px-2 py-0.5'>
-                  Funds raised
-                </span>
-              ) : (
-                <span className='font-medium text-white bg-red rounded-full text-xs bg-slate-500 px-2 py-0.5'>
-                  Under review
-                </span>
-              )}
-
-              {authenticatedUser?.id ===
-                (projectLaunch.author?.id ?? projectLaunch.authorId ?? '') &&
-                authenticatedUser.role.includes(UserRoleEnum.Startup) && (
-                  <div className='relative ms-2'>
-                    <Button
-                      className='rounded-full p-1 hover:bg-neutral-100 transition-[0.3s_ease]'
-                      onClick={() => setIsSettingsDropdownVisible(true)}
-                    >
-                      <DotsIcon className='size-6' />
-                    </Button>
-                    {isSettingsDropdownVisible && (
-                      <div
-                        ref={settingsDropdownRef}
-                        className='absolute bg-white mt-1 right-0 shadow p-1 rounded-md flex flex-col z-50'
-                      >
-                        {/* <Button
-                        className='inline-flex items-center text-sm hover:bg-neutral-100 px-2 py-1 rounded-md font-medium text-gray-700 mb-1'
-                        onClick={() => {
-                          setIsEditProjectModalVisible(true);
-                          setIsSettingsDropdownVisible(false);
-                        }}
-                      >
-                        <EditIcon className='size-3.5 me-2' />
-                        Edit
-                      </Button> */}
-                        <Button
-                          className='inline-flex items-center text-sm hover:bg-neutral-100 px-2 py-1 rounded-md font-medium text-gray-700'
-                          onClick={() => {
-                            setIsRemoveProjectModalVisible(true);
-                            setIsSettingsDropdownVisible(false);
-                          }}
-                        >
-                          <RemoveIcon className='size-3.5 me-2' />
-                          Remove
-                        </Button>
-                      </div>
+              <div className='flex flex-col ms-5 w-full'>
+                <h4 className='font-semibold text-2xl'>{projectLaunch.name}</h4>
+                {variant === 'short' && (
+                  <div className='flex items-center gap-0.5 mt-3'>
+                    {projectLaunch.isApproved && !projectLaunch.isFundraised ? (
+                      <span className='font-medium text-white bg-red rounded-full text-xs bg-blue-500 px-2 py-0.5'>
+                        Approved
+                      </span>
+                    ) : projectLaunch.isApproved &&
+                      projectLaunch.isFundraised &&
+                      projectLaunch.project?.isFinal ? (
+                      <span className='font-medium text-white bg-red rounded-full text-xs bg-emerald-500 px-2 py-0.5'>
+                        Submitted
+                      </span>
+                    ) : projectLaunch.isApproved && projectLaunch.isFundraised ? (
+                      <span className='font-medium text-white bg-red rounded-full text-xs bg-orange-500 px-2 py-0.5'>
+                        Funds raised
+                      </span>
+                    ) : (
+                      <span className='font-medium text-white bg-red rounded-full text-xs bg-slate-500 px-2 py-0.5'>
+                        Under review
+                      </span>
                     )}
+                    <button
+                      type='button'
+                      className='ms-2 h-full rounded-full hover:bg-neutral-100 transition-all duration-300 aspect-square w-[32px] inline-flex items-center justify-center'
+                    >
+                      <StarIcon className='size-5' />
+                    </button>
+                    <button
+                      type='button'
+                      className='rounded-full hover:bg-neutral-100 transition-all duration-300 aspect-square w-[32px] inline-flex items-center justify-center'
+                    >
+                      <ShareIcon className='size-5' />
+                    </button>
+                    {authenticatedUser?.id ===
+                      (projectLaunch.author?.id ?? projectLaunch.authorId ?? '') &&
+                      authenticatedUser.role.includes(UserRoleEnum.Startup) && (
+                        <div className='relative'>
+                          <Button
+                            className='rounded-full hover:bg-neutral-100 transition-all duration-300 aspect-square w-[32px] inline-flex items-center justify-center'
+                            onClick={() => setIsSettingsDropdownVisible(true)}
+                          >
+                            <DotsIcon className='size-6' />
+                          </Button>
+                          {isSettingsDropdownVisible && (
+                            <div
+                              ref={settingsDropdownRef}
+                              className='absolute bg-white mt-1 right-0 shadow p-1 rounded-md flex flex-col z-50'
+                            >
+                              <Button
+                                className='inline-flex items-center hover:bg-neutral-100 px-2 py-1 rounded-md font-medium'
+                                onClick={() => {
+                                  setIsRemoveProjectModalVisible(true);
+                                  setIsSettingsDropdownVisible(false);
+                                }}
+                              >
+                                <RemoveIcon className='size-4 me-2' />
+                                Remove
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                   </div>
                 )}
-            </div>
-          </div>
-          <div className='py-5 font-serif text-gray-700 border-b flex flex-1 whitespace-pre-wrap'>
-            {projectLaunch.description}
-          </div>
-          <div className='py-5 flex mb-5'>
-            <h4 className='text-gray-600 font-medium text-lg me-5'>Progress </h4>
-            <div className='w-full'>
-              <div className='w-full border border-gray-400 rounded-full h-[30px] overflow-hidden'>
-                <div
-                  className={`flex justify-center items-center bg-neutral-500 text-white h-[30px] text-xs mt-[-1px] ms-[-1px] rounded-full`}
-                  style={{
-                    width: `calc(${Math.max(
-                      0,
-                      Math.min(
-                        100,
-                        (projectLaunch.fundraiseProgress / projectLaunch.fundraiseAmount) * 100,
-                      ),
-                    )}% + 2px)`,
-                  }}
-                >
-                  <span className='absolute font-medium bg-neutral-500 rounded-full mx-1'>
-                    {(
-                      (projectLaunch.fundraiseProgress / projectLaunch.fundraiseAmount) *
-                      100
-                    ).toFixed(2)}
-                    %
-                  </span>
+              </div>
+              {variant === 'short' && (
+                <div className='grid auto-cols-max gap-2'>
+                  {projectLaunch.isFundraised &&
+                    projectLaunch.isApproved &&
+                    projectLaunch.project && (
+                      <Link
+                        to={AppRoutes.DetailsProject.replace(':id', projectLaunch.project.id)}
+                        className='inline-flex text-center justify-center items-center font-medium font-sans text-lg hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white px-10 py-1 transition-all duration-300 rounded-full'
+                      >
+                        Details
+                      </Link>
+                    )}
+                  <Button
+                    className='inline-flex text-center justify-center items-center font-medium font-sans text-lg hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white px-10 py-1 transition-all duration-300 rounded-full'
+                    onClick={() => setIsShowProjectLaunchInfoModalVisible(true)}
+                  >
+                    Launch info
+                  </Button>
+                  {!projectLaunch.isFundraised && (
+                    <>
+                      {!projectLaunch.isApproved &&
+                        authenticatedUser?.role.find(
+                          role => role === UserRoleEnum.BusinessAnalyst,
+                        ) && (
+                          <Button
+                            className='inline-flex text-center justify-center items-center font-medium font-sans text-lg border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1 transition-all duration-300 rounded-full'
+                            onClick={() => setIsApproveProjectLaunchModalVisible(true)}
+                          >
+                            Approve
+                          </Button>
+                        )}
+                      {authenticatedUser?.role.find(
+                        role => role === UserRoleEnum.Investor || role === UserRoleEnum.Startup,
+                      ) &&
+                        projectLaunch.isApproved && (
+                          <Button
+                            className='inline-flex text-center justify-center items-center font-medium font-sans text-lg border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1 transition-all duration-300 rounded-full'
+                            onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}
+                          >
+                            Invest now
+                          </Button>
+                        )}
+                    </>
+                  )}
                 </div>
-              </div>
-              <div className='flex items-center justify-between font-semibold mt-1'>
-                <span>
-                  <span className='me-2'>Raised</span> <span className='me-[2px]'>$</span>
-                  {projectLaunch.fundraiseProgress}
-                </span>
-                <span>
-                  <span className='me-[2px]'>$</span>
-                  {projectLaunch.fundraiseAmount}
-                </span>
-              </div>
+              )}
             </div>
+            {variant === 'extended' && (
+              <div className='flex items-center gap-0.5'>
+                {projectLaunch.isApproved && !projectLaunch.isFundraised ? (
+                  <span className='font-medium text-white bg-red rounded-full text-xs bg-blue-500 px-2 py-0.5'>
+                    Approved
+                  </span>
+                ) : projectLaunch.isApproved &&
+                  projectLaunch.isFundraised &&
+                  projectLaunch.project?.isFinal ? (
+                  <span className='font-medium text-white bg-red rounded-full text-xs bg-emerald-500 px-2 py-0.5'>
+                    Submitted
+                  </span>
+                ) : projectLaunch.isApproved && projectLaunch.isFundraised ? (
+                  <span className='whitespace-nowrap font-medium text-white bg-red rounded-full text-xs bg-orange-500 px-2 py-0.5'>
+                    Funds raised
+                  </span>
+                ) : (
+                  <span className='font-medium text-white bg-red rounded-full text-xs bg-slate-500 px-2 py-0.5'>
+                    Under review
+                  </span>
+                )}
+                <button
+                  type='button'
+                  className='ms-2 h-full rounded-full hover:bg-neutral-100 transition-all duration-300 aspect-square w-[32px] inline-flex items-center justify-center'
+                >
+                  <StarIcon className='size-5' />
+                </button>
+                <button
+                  type='button'
+                  className='rounded-full hover:bg-neutral-100 transition-all duration-300 aspect-square w-[32px] inline-flex items-center justify-center'
+                >
+                  <ShareIcon className='size-5' />
+                </button>
+                {authenticatedUser?.id ===
+                  (projectLaunch.author?.id ?? projectLaunch.authorId ?? '') &&
+                  authenticatedUser.role.includes(UserRoleEnum.Startup) && (
+                    <div className='relative'>
+                      <Button
+                        className='rounded-full hover:bg-neutral-100 transition-all duration-300 aspect-square w-[32px] inline-flex items-center justify-center'
+                        onClick={() => setIsSettingsDropdownVisible(true)}
+                      >
+                        <DotsIcon className='size-6' />
+                      </Button>
+                      {isSettingsDropdownVisible && (
+                        <div
+                          ref={settingsDropdownRef}
+                          className='absolute bg-white mt-1 right-0 shadow p-1 rounded-md flex flex-col z-50'
+                        >
+                          <Button
+                            className='inline-flex items-center hover:bg-neutral-100 px-2 py-1 rounded-md font-medium'
+                            onClick={() => {
+                              setIsRemoveProjectModalVisible(true);
+                              setIsSettingsDropdownVisible(false);
+                            }}
+                          >
+                            <RemoveIcon className='size-4 me-2' />
+                            Remove
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+              </div>
+            )}
+          </div>
+          {variant === 'extended' && (
+            <>
+              <hr />
+              <div className='py-5 font-serif text-gray-700 flex flex-1 whitespace-pre-wrap'>
+                {projectLaunch.description}
+              </div>
+              <hr />
+              <div className='grid sm:grid-cols-2 md:grid-cols-3 gap-4 mt-5'>
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index} className='border rounded p-5 relative'>
+                    <div className='w-full h-[40px] rounded bg-neutral-200 mb-3 flex justify-center items-center'>
+                      <EmptyLogoIcon className='size-5 text-neutral-400' />
+                    </div>
+                    <h4 className='font-sans font-bold text-xs'>Mocked Technology partner</h4>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+          <div className='py-5 flex'>
+            <ProgressBar
+              className='w-full'
+              progress={projectLaunch.fundraiseProgress}
+              goal={projectLaunch.fundraiseAmount}
+              deadline={new Date(projectLaunch.fundraiseDeadline)}
+            />
           </div>
         </div>
-        <div className='flex flex-wrap justify-between items-center w-full'>
-          {(!projectLaunch.isApproved || !projectLaunch.isFundraised) && (
-            <div className='font-medium text-gray-700 text-lg'>
-              <h4>
-                Time left{' '}
-                <span className='ms-4'>
-                  {timeLeft.days < 10 && '0'}
-                  {timeLeft.days}d • {timeLeft.hours < 10 && '0'}
-                  {timeLeft.hours}h • {timeLeft.minutes < 10 && '0'}
-                  {timeLeft.minutes}m
-                </span>
-              </h4>
-            </div>
-          )}
-          <div className='flex'>
+        {variant === 'extended' && (
+          <div className='grid w-full gap-2 grid-flow-col auto-cols-fr'>
             {projectLaunch.isFundraised && projectLaunch.isApproved && projectLaunch.project && (
               <Link
                 to={AppRoutes.DetailsProject.replace(':id', projectLaunch.project.id)}
-                className='inline-flex border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-1 transition-[0.3s_ease] rounded-full'
+                className='inline-flex text-center justify-center items-center font-medium font-sans text-lg hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white px-10 py-1 transition-all duration-300 rounded-full'
               >
                 Details
               </Link>
             )}
-            <div className='flex'>
-              <Button
-                className='inline-flex ms-2 border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-1 transition-[0.3s_ease] rounded-full'
-                onClick={() => setIsShowProjectLaunchInfoModalVisible(true)}
-              >
-                Launch info
-              </Button>
-              {!projectLaunch.isFundraised && (
-                <>
-                  {!projectLaunch.isApproved &&
-                    authenticatedUser?.role.find(role => role === UserRoleEnum.BusinessAnalyst) && (
-                      <Button
-                        className='inline-flex ms-2 border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-1 transition-[0.3s_ease] rounded-full'
-                        onClick={() => setIsApproveProjectLaunchModalVisible(true)}
-                      >
-                        Approve
-                      </Button>
-                    )}
-                  {authenticatedUser?.role.find(
-                    role => role === UserRoleEnum.Investor || role === UserRoleEnum.Startup,
-                  ) &&
-                    projectLaunch.isApproved && (
-                      <Button
-                        className='inline-flex ms-2 border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-1 transition-[0.3s_ease] rounded-full'
-                        onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}
-                      >
-                        Invest now
-                      </Button>
-                    )}
-                </>
-              )}
-            </div>
+            <Button
+              className='inline-flex text-center justify-center items-center font-medium font-sans text-lg hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white px-10 py-1 transition-all duration-300 rounded-full'
+              onClick={() => setIsShowProjectLaunchInfoModalVisible(true)}
+            >
+              Launch info
+            </Button>
+            {!projectLaunch.isFundraised && (
+              <>
+                {!projectLaunch.isApproved &&
+                  authenticatedUser?.role.find(role => role === UserRoleEnum.BusinessAnalyst) && (
+                    <Button
+                      className='inline-flex text-center justify-center items-center font-medium font-sans text-lg border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1 transition-all duration-300 rounded-full'
+                      onClick={() => setIsApproveProjectLaunchModalVisible(true)}
+                    >
+                      Approve
+                    </Button>
+                  )}
+                {authenticatedUser?.role.find(
+                  role => role === UserRoleEnum.Investor || role === UserRoleEnum.Startup,
+                ) &&
+                  projectLaunch.isApproved && (
+                    <Button
+                      className='inline-flex text-center justify-center items-center font-medium font-sans text-lg border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1 transition-all duration-300 rounded-full'
+                      onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}
+                    >
+                      Invest now
+                    </Button>
+                  )}
+              </>
+            )}
           </div>
-        </div>
+        )}
       </div>
     </>
   );
