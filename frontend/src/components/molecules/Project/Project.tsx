@@ -345,7 +345,8 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = '
                 {projectLaunch.description}
               </div>
               <hr />
-              <div className='grid sm:grid-cols-2 md:grid-cols-3 gap-4 mt-5'>
+              {/* TODO: Replace hidden to grid when partners logic will be implemented */}
+              <div className='hidden sm:grid-cols-2 md:grid-cols-3 gap-4 mt-5'>
                 {Array.from({ length: 3 }).map((_, index) => (
                   <div key={index} className='border rounded p-5 relative'>
                     <div className='w-full h-[40px] rounded bg-neutral-200 mb-3 flex justify-center items-center'>
