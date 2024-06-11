@@ -1,4 +1,4 @@
-import Web3AuthContext from './contexts/Web3AuthContext';
+import Web3AuthProvider from './providers/Web3AuthProvider';
 import { Provider as ReduxProvider } from 'react-redux';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppRoutes } from './types/enums/app-routes.enum';
@@ -24,9 +24,9 @@ axios.defaults.withCredentials = true;
 const App = () => {
   return (
     <ReduxProvider store={store}>
-      <Web3AuthContext>
+      <Web3AuthProvider>
         <Content />
-      </Web3AuthContext>
+      </Web3AuthProvider>
     </ReduxProvider>
   );
 };

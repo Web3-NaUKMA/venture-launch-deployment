@@ -20,6 +20,7 @@ import {
 import { UserRoleEnum } from '../../../types/enums/user-role.enum';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { USDC_MINT, createVaultTx, programId } from '../../../utils/venture-launch.utils';
+import useWeb3Auth from '../../../hooks/web3auth.hooks';
 
 export interface ILaunchProjectModalProps extends IModalProps {}
 
@@ -93,6 +94,7 @@ const LaunchProjectModal: FC<ILaunchProjectModalProps> = ({ title, onClose, chil
   const errors = useAppSelector(selectErrors);
   const { publicKey, signTransaction } = useWallet();
   const { connection } = useConnection();
+  const { connectWallet } = useWeb3Auth();
 
   useEffect(() => {
     dispatch(setError({ createProjectLaunch: null }));
@@ -256,7 +258,7 @@ const LaunchProjectModal: FC<ILaunchProjectModalProps> = ({ title, onClose, chil
           ),
         );
       } else {
-        setState({ ...state, error: 'Cannot launch a project. The user is unauthorized.' });
+        connectWallet();
       }
     }
   };

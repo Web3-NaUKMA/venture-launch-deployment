@@ -1,41 +1,11 @@
-import { FC, ReactNode, useMemo } from 'react';
-import { WalletAdapterNetwork } from '@solana/wallet-adapter-base';
-import { clusterApiUrl } from '@solana/web3.js';
-import { ConnectionProvider, WalletProvider } from '@solana/wallet-adapter-react';
-import { WalletModalProvider } from '@solana/wallet-adapter-react-ui';
-import {
-  LedgerWalletAdapter,
-  SolflareWalletAdapter,
-  TorusWalletAdapter,
-  PhantomWalletAdapter,
-} from '@solana/wallet-adapter-wallets';
+import { createContext } from 'react';
 
-export interface IWeb3AuthContextProps {
-  children: ReactNode;
+export interface Web3AuthContextValueType {
+  connectWallet: () => void;
 }
 
-const Web3AuthContext: FC<IWeb3AuthContextProps> = ({ children }) => {
-  const network = WalletAdapterNetwork.Devnet;
-  const endpoint = useMemo(() => clusterApiUrl(network), [network]);
-
-  const wallets = useMemo(
-    () => [
-      new SolflareWalletAdapter({ network }),
-      new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
-      new TorusWalletAdapter(),
-      new LedgerWalletAdapter(),
-    ],
-    [network],
-  );
-
-  return (
-    <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>{children}</WalletModalProvider>
-      </WalletProvider>
-    </ConnectionProvider>
-  );
-};
+const Web3AuthContext = createContext<Web3AuthContextValueType>({
+  connectWallet: () => {},
+});
 
 export default Web3AuthContext;

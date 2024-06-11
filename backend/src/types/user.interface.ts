@@ -9,6 +9,8 @@ export interface IUser {
   email: string;
   role: UserRoleEnum[];
   createdAt: Date;
+  password?: string | null;
+  avatar?: string | null;
   firstName?: string;
   lastName?: string;
   birthDate?: Date;

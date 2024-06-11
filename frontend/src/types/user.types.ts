@@ -6,6 +6,7 @@ export interface IUser {
   username: string;
   email: string;
   role: UserRoleEnum[];
+  avatar?: string | null;
   createdAt?: Date;
   firstName?: string;
   lastName?: string;
@@ -23,6 +24,7 @@ export interface IUser {
 export interface ICreateUser {
   walletId: string;
   username: string;
+  password?: string | null;
   email: string;
   role: UserRoleEnum[];
 }
@@ -31,6 +33,8 @@ export interface IUpdateUser {
   username?: string;
   email?: string;
   role?: UserRoleEnum;
+  password?: string | null;
+  avatar?: string | null;
   firstName?: string;
   lastName?: string;
   birthDate?: Date;

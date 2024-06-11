@@ -4,9 +4,13 @@ import authController from './auth.controller';
 
 const router = express.Router();
 
-router.post('/auth/login', authController.login);
+router.get('/auth/user', auth(), authController.user);
+router.get('/oauth/callback/google', authController.generateGoogleOAuth2Token);
+router.post('/oauth/google', authController.generateGoogleOAuth2Url);
+router.post('/auth/login/wallet', authController.loginWithWallet);
+router.post('/auth/login/google', authController.loginWithGoogle);
+router.post('/auth/login/credentials', authController.loginWithCredentials);
 router.post('/auth/register', authController.register);
 router.post('/auth/logout', authController.logout);
-router.get('/auth/user', auth(), authController.user);
 
 export default router;

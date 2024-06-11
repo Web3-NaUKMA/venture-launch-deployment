@@ -21,6 +21,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { createNftTransaction, getIPFSUrlForProject } from '../../utils/nft.utils';
 import * as web3 from '@solana/web3.js';
 import ProjectLaunchInfoModal from '../../components/organisms/ProjectLaunchInfoModal/ProjectLaunchInfoModal';
+import useWeb3Auth from '../../hooks/web3auth.hooks';
 
 const DetailsProjectPage: FC = () => {
   const { id } = useParams();
@@ -34,6 +35,7 @@ const DetailsProjectPage: FC = () => {
   const { authenticatedUser } = useAuth();
   const wallet = useWallet();
   const { connection } = useConnection();
+  const { connectWallet } = useWeb3Auth();
 
   useEffect(() => {
     if (id) dispatch(fetchProject(id, { onError: () => setNotFound(true) }));
@@ -68,6 +70,8 @@ const DetailsProjectPage: FC = () => {
           },
         ),
       );
+    } else if (!wallet.publicKey || !wallet.signTransaction) {
+      connectWallet();
     }
   };
 

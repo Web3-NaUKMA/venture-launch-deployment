@@ -1,7 +1,7 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import { AppDispatch, RootState } from '../store';
 import { HttpStatusCode } from 'axios';
-import { IActionCreatorOptions } from '../../types/redux/store.types';
+import { ActionCreatorOptions } from '../../types/redux/store.types';
 import {
   IUserSliceState,
   IUserSliceStateError,
@@ -9,7 +9,7 @@ import {
 } from '../../types/redux/user.types';
 import axios from 'axios';
 import { ICreateUser, IUpdateUser, IUser } from '../../types/user.types';
-import { IRequestQueryParams } from '../../types/app.types';
+import { RequestQueryParams } from '../../types/app.types';
 import { serializeQueryParams } from '../../utils/request.utils';
 
 const initialState: IUserSliceState = {
@@ -59,7 +59,7 @@ const userSlice = createSlice({
 });
 
 export const fetchAllUsers =
-  (queryParams?: IRequestQueryParams, options?: IActionCreatorOptions) =>
+  (queryParams?: RequestQueryParams, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(userSlice.actions.setError({ fetchAllUsers: null }));
 
@@ -78,7 +78,7 @@ export const fetchAllUsers =
   };
 
 export const fetchUser =
-  (id: string, options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (id: string, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(userSlice.actions.setError({ fetchUser: null }));
 
     try {
@@ -99,7 +99,7 @@ export const fetchUser =
   };
 
 export const createUser =
-  (User: ICreateUser, options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (User: ICreateUser, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(userSlice.actions.setError({ createUser: null }));
 
     try {
@@ -120,7 +120,7 @@ export const createUser =
   };
 
 export const updateUser =
-  (id: string, User: IUpdateUser, options?: IActionCreatorOptions) =>
+  (id: string, User: IUpdateUser, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(userSlice.actions.setError({ updateUser: null }));
 
@@ -142,7 +142,7 @@ export const updateUser =
   };
 
 export const removeUser =
-  (id: string, options?: IActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (id: string, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(userSlice.actions.setError({ removeUser: null }));
 
     try {

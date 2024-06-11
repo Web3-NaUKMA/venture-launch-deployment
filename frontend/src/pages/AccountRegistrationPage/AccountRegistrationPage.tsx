@@ -10,22 +10,26 @@ import { UserRoleEnum } from '../../types/enums/user-role.enum';
 import Button from '../../components/atoms/Button/Button';
 import { v4 as uuid } from 'uuid';
 
-interface IAccountRegistrationPageState {
+interface AccountRegistrationPageState {
   data: {
     walletId: string;
     email: string;
     username: string;
     role: UserRoleEnum;
+    password?: string;
+    firstName?: string;
+    lastName?: string;
   };
   error: string | null;
 }
 
-const initialState: IAccountRegistrationPageState = {
+const initialState: AccountRegistrationPageState = {
   data: {
     walletId: '',
     email: '',
     username: '',
     role: UserRoleEnum.Startup,
+    password: undefined,
   },
   error: null,
 };
@@ -82,8 +86,8 @@ const AccountRegistrationPage: FC = () => {
         className='flex flex-col max-w-[768px] w-full bg-white p-5 rounded-xl shadow-[0_0_30px_-15px_silver]'
         onSubmit={onSubmit}
       >
-        <h3 className='w-full mb-1 font-bold text-2xl text-neutral-500'>Create account</h3>
-        <p className='text mb-8'>
+        <h3 className='w-full font-bold text-2xl text-zinc-900 mb-1'>Create account</h3>
+        <p className='text mb-8 text-neutral-500 font-medium'>
           Fill in all the fields to complete the new account registration process
         </p>
         {state.error && (
@@ -115,6 +119,23 @@ const AccountRegistrationPage: FC = () => {
             setState({
               ...state,
               data: { ...state.data, username: event.target.value },
+              error: null,
+            })
+          }
+        />
+        <label htmlFor='create_account_username' className='mb-1'>
+          Password:
+        </label>
+        <input
+          className='border mb-4 p-2 rounded-md'
+          type='password'
+          id='create_account_password'
+          defaultValue={state.data.password}
+          placeholder='Password'
+          onChange={event =>
+            setState({
+              ...state,
+              data: { ...state.data, password: event.target.value },
               error: null,
             })
           }

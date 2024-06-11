@@ -6,12 +6,43 @@ import authService from './auth.service';
 
 @Controller()
 export class AuthController {
-  async login(request: Request, response: Response) {
+  async loginWithWallet(request: Request, response: Response) {
     const { token, publicKey } = request.body;
-    request.session.user = await authService.login(token, publicKey, request.sessionID);
+    request.session.user = await authService.loginWithWallet(token, publicKey, request.sessionID);
 
     return response
       .setHeader(`Set-Cookie`, `${process.env.AUTH_TOKEN_NAME}=${token}; path=/; HttpOnly`)
+      .status(HttpStatusCode.Created)
+      .json(request.session.user);
+  }
+
+  async loginWithGoogle(request: Request, response: Response) {
+    const { googleAccessToken } = request.body;
+    const { user, accessToken } = await authService.loginWithGoogle(
+      googleAccessToken,
+      request.sessionID,
+    );
+
+    request.session.user = user;
+
+    return response
+      .setHeader(`Set-Cookie`, `${process.env.AUTH_TOKEN_NAME}=${accessToken}; path=/; HttpOnly`)
+      .status(HttpStatusCode.Created)
+      .json(request.session.user);
+  }
+
+  async loginWithCredentials(request: Request, response: Response) {
+    const { email, password } = request.body;
+    const { user, accessToken } = await authService.loginWithCredentials(
+      email,
+      password,
+      request.sessionID,
+    );
+
+    request.session.user = user;
+
+    return response
+      .setHeader(`Set-Cookie`, `${process.env.AUTH_TOKEN_NAME}=${accessToken}; path=/; HttpOnly`)
       .status(HttpStatusCode.Created)
       .json(request.session.user);
   }
@@ -57,6 +88,21 @@ export class AuthController {
         .status(HttpStatusCode.Created)
         .json({ message: 'The user was successfully logged out' });
     });
+  }
+
+  async generateGoogleOAuth2Url(request: Request, response: Response) {
+    const url = await authService.generateGoogleOAuth2Url(request.body);
+
+    return response.status(HttpStatusCode.Created).json({ url });
+  }
+
+  async generateGoogleOAuth2Token(request: Request, response: Response) {
+    const state = JSON.parse((request.query as any).state);
+    const code = (request.query as any).code;
+
+    const { token } = await authService.generateGoogleOAuth2Token(code, state);
+
+    return response.setHeader(`Set-Cookie`, `auth.token=${token}; path=/;`).redirect(state.referer);
   }
 }
 
