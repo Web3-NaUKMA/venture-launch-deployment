@@ -34,9 +34,6 @@ export class ProjectLaunch implements IProjectLaunch {
   @Column({ type: 'boolean', default: false })
   isFundraised: boolean;
 
-  @Column({ type: 'boolean', default: false })
-  isApproved: boolean;
-
   @Column({ type: 'int8' })
   fundraiseAmount: number;
 
@@ -85,4 +82,10 @@ export class ProjectLaunch implements IProjectLaunch {
 
   @Column({ type: 'text', default: null })
   businessAnalystReview: string | null;
+
+  @ManyToOne(() => User, user => user.approvedProjectLaunches, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  approver: IUser;
 }

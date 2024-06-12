@@ -52,15 +52,15 @@ const ProjectsPage: FC = () => {
         <div className='flex flex-col flex-1'>
           {!projects.length ? (
             <div className='flex mt-5 flex-1'>
-              <div className='flex flex-col border-[3px] rounded-xl flex-1 border-dashed items-center justify-center'>
+              <div className='flex flex-col border-[3px] border-stone-200 rounded-2xl flex-1 border-dashed items-center justify-center'>
                 {authenticatedUser?.role.includes(UserRoleEnum.Startup) ? (
                   <>
-                    <h4 className='font-medium mb-4 text-gray-400 text-lg'>
+                    <h4 className='font-medium mb-4 text-stone-400 text-xl font-mono'>
                       No projects have been launched yet
                     </h4>
                     <Button
                       onClick={() => setIsLaunchProjectModalVisible(true)}
-                      className='inline-flex border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white font-medium px-5 py-1 transition-[0.3s_ease] rounded-full'
+                      className='border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white font-medium px-10 text-lg py-1.5 transition-[0.3s_ease] rounded-full'
                     >
                       Launch a new project
                     </Button>

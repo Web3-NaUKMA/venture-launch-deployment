@@ -8,7 +8,6 @@ export interface IProjectLaunch {
   description: string;
   logo: string | null;
   isFundraised: boolean;
-  isApproved: boolean;
   fundraiseAmount: number;
   fundraiseProgress: number;
   fundraiseDeadline: Date;
@@ -19,6 +18,7 @@ export interface IProjectLaunch {
   roundDetails: JSON;
   project: IProject | null;
   author: IUser;
+  approver: IUser;
   projectLaunchInvestments?: IProjectLaunchInvestment[];
   createdAt: Date;
   vaultTokenAccount: string;

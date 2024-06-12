@@ -81,7 +81,7 @@ const CreateMilestoneModal: FC<ICreateMilestoneModalProps> = ({
         <input
           type='text'
           id='create_milestone_merged_pull_request_url'
-          className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+          className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
           placeholder='https://github.com/project/pull/1'
           defaultValue={state.data.mergedPullRequestUrl}
           onChange={event =>

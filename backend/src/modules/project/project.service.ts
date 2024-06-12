@@ -22,7 +22,7 @@ export class ProjectService {
 
       return await AppDataSource.getRepository(Project).find({
         relations: {
-          projectLaunch: { author: true, projectLaunchInvestments: true },
+          projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
           dataAccount: true,
           milestones: true,
           userToProjects: { project: true },
@@ -41,7 +41,7 @@ export class ProjectService {
 
       return await AppDataSource.getRepository(Project).findOneOrFail({
         relations: {
-          projectLaunch: { author: true, projectLaunchInvestments: true },
+          projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
           dataAccount: true,
           milestones: true,
           userToProjects: { project: true },
@@ -94,7 +94,9 @@ export class ProjectService {
 
       return await AppDataSource.getRepository(Project).findOneOrFail({
         where: { id: project.id },
-        relations: { projectLaunch: { author: true, projectLaunchInvestments: true } },
+        relations: {
+          projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
+        },
       });
     } catch (error: any) {
       if (error instanceof ConflictException) {
@@ -134,7 +136,7 @@ export class ProjectService {
 
       return await AppDataSource.getRepository(Project).findOneOrFail({
         relations: {
-          projectLaunch: { author: true, projectLaunchInvestments: true },
+          projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
           dataAccount: true,
           milestones: true,
           userToProjects: { project: true },
@@ -157,7 +159,7 @@ export class ProjectService {
     try {
       const project = await AppDataSource.getRepository(Project).findOneOrFail({
         relations: {
-          projectLaunch: { author: true, projectLaunchInvestments: true },
+          projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
           dataAccount: true,
           milestones: true,
           userToProjects: { project: true },

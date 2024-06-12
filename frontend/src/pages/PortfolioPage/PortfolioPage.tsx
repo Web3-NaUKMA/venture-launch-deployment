@@ -19,9 +19,17 @@ export const PortfolioPage: FC = () => {
   }, [authenticatedUser]);
 
   return (
-    <div className='flex p-6 flex-col justify-start align-center'>
+    <div className='flex p-6 flex-col justify-start align-center flex-1'>
       <h4 className='px-2 text-3xl font-serif mb-6'>My investments</h4>
-      <ProjectGrid projects={projects} />
+      {projects.length > 0 ? (
+        <ProjectGrid projects={projects} />
+      ) : (
+        <div className='flex flex-col flex-1 items-center justify-center px-10 py-8 rounded-2xl border-[3px] border-dashed border-stone-300'>
+          <p className='font-mono m-0 text-lg text-stone-400'>
+            You have not invested into any of projects yet
+          </p>
+        </div>
+      )}
     </div>
   );
 };

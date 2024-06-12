@@ -8,7 +8,7 @@ import {
   IUserSliceStateErrors,
 } from '../../types/redux/user.types';
 import axios from 'axios';
-import { ICreateUser, IUpdateUser, IUser } from '../../types/user.types';
+import { ICreateUser, IUser } from '../../types/user.types';
 import { RequestQueryParams } from '../../types/app.types';
 import { serializeQueryParams } from '../../utils/request.utils';
 
@@ -99,11 +99,11 @@ export const fetchUser =
   };
 
 export const createUser =
-  (User: ICreateUser, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (user: ICreateUser, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(userSlice.actions.setError({ createUser: null }));
 
     try {
-      const response = await axios.post(`users`, User);
+      const response = await axios.post(`users`, user);
 
       if (response.status === HttpStatusCode.Created) {
         options?.onSuccess?.(response.data);
@@ -120,12 +120,16 @@ export const createUser =
   };
 
 export const updateUser =
-  (id: string, User: IUpdateUser, options?: ActionCreatorOptions) =>
+  (id: string, formData: FormData, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(userSlice.actions.setError({ updateUser: null }));
 
     try {
-      const response = await axios.put(`users/${id}`, User);
+      const response = await axios.put(`users/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
 
       if (response.status === HttpStatusCode.Ok) {
         options?.onSuccess?.(response.data);

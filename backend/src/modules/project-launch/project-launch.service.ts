@@ -31,6 +31,7 @@ export class ProjectLaunchService {
           author: true,
           project: true,
           projectLaunchInvestments: true,
+          approver: true,
         },
         where: formattedOptions,
         order,
@@ -52,6 +53,7 @@ export class ProjectLaunchService {
           author: true,
           project: true,
           projectLaunchInvestments: true,
+          approver: true,
         },
         where: formattedOptions,
         order,
@@ -98,12 +100,22 @@ export class ProjectLaunchService {
 
   async update(id: string, data: IUpdateProjectLaunchDto): Promise<ProjectLaunch> {
     try {
-      await AppDataSource.getRepository(ProjectLaunch).update({ id }, data);
+      const { approverId } = data;
+      delete data.approverId;
+
+      await AppDataSource.getRepository(ProjectLaunch).update(
+        { id },
+        {
+          ...data,
+          ...(approverId ? { approver: { id: approverId } } : {}),
+        },
+      );
 
       return await AppDataSource.getRepository(ProjectLaunch).findOneOrFail({
         relations: {
           author: true,
           project: true,
+          approver: true,
         },
         where: { id },
       });
@@ -125,6 +137,7 @@ export class ProjectLaunchService {
         relations: {
           author: true,
           project: true,
+          approver: true,
         },
         where: { id },
       });

@@ -66,7 +66,7 @@ const SignInPage: FC = () => {
       SignInMethod.Credentials,
       { email: state.data.email, password: state.data.password },
       {
-        onSuccess: () => navigate(AppRoutes.Projects),
+        onSuccess: () => navigate(AppRoutes.Home),
         onError: ({ response }) => setState({ ...state, error: response.data.error }),
       },
     );
@@ -84,7 +84,7 @@ const SignInPage: FC = () => {
             SignInMethod.Google,
             { googleAccessToken: (result.payload as any).accessToken },
             {
-              onSuccess: () => navigate(AppRoutes.Projects),
+              onSuccess: () => navigate(AppRoutes.Home),
               onError: ({ response }) => setState({ ...state, error: response.data.error }),
             },
           );
@@ -107,7 +107,7 @@ const SignInPage: FC = () => {
         { wallet },
         {
           onSuccess: () => {
-            navigate(AppRoutes.Projects);
+            navigate(AppRoutes.Home);
             sessionStorage.setItem('wallet', wallet.publicKey!.toString());
           },
           onError: () => {
@@ -141,7 +141,7 @@ const SignInPage: FC = () => {
             )}
             <div className='flex flex-col gap-4 my-4'>
               <input
-                className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+                className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
                 type='email'
                 id='sign_in_email'
                 defaultValue={state.data.email}
@@ -155,7 +155,7 @@ const SignInPage: FC = () => {
                 }
               />
               <input
-                className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+                className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
                 type='password'
                 id='sign_in_password'
                 defaultValue={state.data.password}

@@ -118,7 +118,7 @@ const CreateInvestmentModal: FC<ICreateInvestmentModalProps> = ({
         <input
           type='number'
           id='create_project_launch_investment_amount'
-          className='border border-stone-400 p-3 rounded-lg text-stone-800 text-center placeholder:text-stone-600 placeholder:text-center font-mono'
+          className='border border-stone-400 p-3 rounded-lg text-stone-800 text-center placeholder:text-stone-400 placeholder:text-center font-mono'
           placeholder='Amount'
           defaultValue={state.data.amount}
           onChange={event =>

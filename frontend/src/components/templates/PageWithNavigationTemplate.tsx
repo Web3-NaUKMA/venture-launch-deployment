@@ -9,8 +9,8 @@ export interface INavbarLink {
 
 const links: INavbarLink[] = [
   {
-    name: 'Projects',
-    to: AppRoutes.Projects,
+    name: 'Home',
+    to: AppRoutes.Home,
   },
   {
     name: 'Portfolio',

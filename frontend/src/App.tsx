@@ -17,6 +17,7 @@ import './App.css';
 import ProfilePage from './pages/ProfilePage/ProfilePage';
 import AboutPage from './pages/AboutPage/AboutPage';
 import PortfolioPage from './pages/PortfolioPage/PortfolioPage';
+import DetailsUserPage from './pages/DetailsUserPage/DetailsUserPage';
 
 axios.defaults.baseURL = `${import.meta.env.VITE_BACKEND_URI}/${import.meta.env.VITE_BACKEND_PREFIX || ''}`;
 axios.defaults.withCredentials = true;
@@ -43,12 +44,13 @@ const Content: FC = () => {
 
         <Route Component={PageWithNavigationTemplate}>
           <Route Component={AuthProtectedRoute}>
-            <Route path={AppRoutes.Projects} Component={ProjectsPage} />
+            <Route path={AppRoutes.Home} Component={ProjectsPage} />
             <Route path={AppRoutes.Portfolio} Component={PortfolioPage} />
             <Route path={AppRoutes.DetailsProject} Component={DetailsProjectPage} />
+            <Route path={AppRoutes.DetailsUser} Component={DetailsUserPage} />
             <Route path={AppRoutes.Profile} Component={ProfilePage} />
           </Route>
-          <Route path={AppRoutes.Root} element={<Navigate to={AppRoutes.Projects} />} />
+          <Route path={AppRoutes.Root} element={<Navigate to={AppRoutes.Home} />} />
           <Route path={AppRoutes.About} Component={AboutPage} />
         </Route>
         <Route path={AppRoutes.Any} Component={NotFoundPage} />

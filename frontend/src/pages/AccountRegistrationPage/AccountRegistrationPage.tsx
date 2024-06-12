@@ -73,7 +73,7 @@ const AccountRegistrationPage: FC = () => {
         wallet,
         { ...state.data, role: [state.data.role] },
         {
-          onSuccess: () => navigate(AppRoutes.Projects),
+          onSuccess: () => navigate(AppRoutes.Home),
         },
       );
     }

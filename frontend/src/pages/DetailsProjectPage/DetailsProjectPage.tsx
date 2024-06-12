@@ -174,7 +174,7 @@ const DetailsProjectPage: FC = () => {
                   Launch info
                 </Button>
                 <Link
-                  to={AppRoutes.Projects}
+                  to={AppRoutes.Home}
                   className='inline-flex border-transparent bg-stone-400 hover:bg-transparent border-2 hover:border-stone-600 hover:text-stone-600 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
                 >
                   Back

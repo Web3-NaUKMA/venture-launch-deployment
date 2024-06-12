@@ -2,7 +2,6 @@ import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typ
 import { IUser } from '../../types/user.interface';
 import { Session } from './Session';
 import { UserRoleEnum } from '../../types/enums/user-role.enum';
-import { Project } from './Project';
 import { UserToProject } from './UsersToProjects';
 import { ProjectLaunchInvestment } from './ProjectLaunchInvestment';
 import { IProjectLaunchInvestment } from '../../types/project-launch-investment.interface';
@@ -33,6 +32,9 @@ export class User implements IUser {
 
   @Column({ type: 'text', default: null })
   avatar: string | null;
+
+  @Column({ type: 'text', default: null })
+  bio: string | null;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   firstName?: string;
@@ -69,6 +71,9 @@ export class User implements IUser {
 
   @OneToMany(() => ProjectLaunch, projectLaunch => projectLaunch.author)
   projectLaunches: ProjectLaunch[];
+
+  @OneToMany(() => ProjectLaunch, projectLaunch => projectLaunch.approver)
+  approvedProjectLaunches: ProjectLaunch[];
 
   @OneToMany(() => UserToProject, userToProject => userToProject.user)
   userToProjects: UserToProject[];

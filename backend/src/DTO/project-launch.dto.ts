@@ -23,7 +23,7 @@ export interface IUpdateProjectLaunchDto {
   description?: string;
   logo?: string | null;
   isFundraised?: boolean;
-  isApproved?: boolean;
+  approverId?: string;
   fundraiseAmount?: number;
   fundraiseProgress?: number;
   fundraiseDeadline?: Date;
@@ -42,7 +42,7 @@ export interface IFindProjectLaunchDto {
   name?: string;
   description?: string;
   isFundraised?: boolean;
-  isApproved?: boolean;
+  approverId?: string;
   fundraiseAmount?: number;
   fundraiseProgress?: number;
   fundraiseDeadline?: Date;
@@ -53,6 +53,7 @@ export interface IFindProjectLaunchDto {
   tokenomics?: string;
   roundDetails?: JSON;
   author?: Partial<IUser>;
+  approver?: Partial<IUser>;
   project?: Partial<IFindProjectDto>;
   createdAt?: Date;
   vaultTokenAccount?: string;

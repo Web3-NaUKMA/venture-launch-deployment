@@ -11,11 +11,13 @@ import {
   PlanetIcon,
   ShareIcon,
   StarIcon,
+  UserIcon,
   VideoIcon,
 } from '../../atoms/Icons/Icons';
 import { Link } from 'react-router-dom';
 import { resolveImage } from '../../../utils/file.utils';
 import ProgressBar from '../../molecules/ProgressBar/ProgressBar';
+import { AppRoutes } from '../../../types/enums/app-routes.enum';
 
 export interface IProjectLaunchInfoModalProps extends IModalProps {
   projectLaunch: IProjectLaunch;
@@ -84,45 +86,119 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
           </button>
         </div>
         <div className='grid md:grid-cols-2 gap-5'>
-          <div className='flex flex-col'>
-            <div className='flex items-center mb-5'>
-              <img
-                src={resolveImage(projectLaunch.logo || '')}
-                onError={({ currentTarget }) => {
-                  currentTarget.onerror = null;
-                  currentTarget.src = '/logo.png';
-                }}
-                className='w-[6em] aspect-square rounded-xl object-cover'
-              />
-              <h4 className='font-medium text-2xl ms-5 font-sans'>{projectLaunch.name}</h4>
+          <div className='flex flex-col flex-1 justify-between'>
+            <div className='flex flex-col'>
+              <div className='flex items-center mb-5'>
+                <img
+                  src={resolveImage(projectLaunch.logo || '')}
+                  onError={({ currentTarget }) => {
+                    currentTarget.onerror = null;
+                    currentTarget.src = '/logo.png';
+                  }}
+                  className='w-[6em] aspect-square rounded-xl object-cover'
+                />
+                <div className='flex flex-col ms-5'>
+                  <h4 className='font-medium text-2xl font-sans'>{projectLaunch.name}</h4>
+                </div>
+              </div>
+              {!projectLaunch.isFundraised ? (
+                <>
+                  <div className='flex gap-2'>
+                    <span className='font-bold font-sans text-lg mt-[5px]'>Time left:</span>
+                    <span className='font-medium font-sans text-[22px]'>
+                      {timeLeft.days < 10 && '0'}
+                      {timeLeft.days}d • {timeLeft.hours < 10 && '0'}
+                      {timeLeft.hours}h • {timeLeft.minutes < 10 && '0'}
+                      {timeLeft.minutes}m
+                    </span>
+                  </div>
+                  {projectLaunch.approver && !projectLaunch.isFundraised && (
+                    <Button
+                      className='inline-flex text-center font-medium justify-center mt-4 border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-2 transition-all duration-300 rounded-full max-w-[260px] text-lg'
+                      onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}
+                    >
+                      Invest Now
+                    </Button>
+                  )}
+                </>
+              ) : (
+                <span className='text-gray-500 text-sm font-mono'>
+                  The money for this project has already been raised
+                </span>
+              )}
             </div>
-            {!projectLaunch.isFundraised ? (
-              <>
-                <div className='flex gap-2'>
-                  <span className='font-bold font-sans text-lg mt-[5px]'>Time left:</span>
-                  <span className='font-medium font-sans text-[22px]'>
-                    {timeLeft.days < 10 && '0'}
-                    {timeLeft.days}d • {timeLeft.hours < 10 && '0'}
-                    {timeLeft.hours}h • {timeLeft.minutes < 10 && '0'}
-                    {timeLeft.minutes}m
+            <div className='grid min-[568px]:grid-cols-2 gap-2 mt-5'>
+              <Link
+                to={AppRoutes.DetailsUser.replace(':id', projectLaunch.author.id)}
+                className='inline-flex  border-2 border-stone-200 items-center p-2 rounded-xl hover:bg-stone-100 transition-all duration-300'
+              >
+                {projectLaunch.author.avatar ? (
+                  <img
+                    src={resolveImage(projectLaunch.author.avatar)}
+                    alt='User profile image'
+                    className='w-[48px] rounded-full aspect-square object-cover'
+                  />
+                ) : (
+                  <div className='inline-flex items-center justify-center bg-gray-300 w-[48px] rounded-full aspect-square'>
+                    <UserIcon className='size-8' />
+                  </div>
+                )}
+                <div className='inline-flex flex-col ms-2'>
+                  <span className='font-sans font-semibold'>{projectLaunch.author.username}</span>
+                  {(projectLaunch.author.firstName || projectLaunch.author.lastName) && (
+                    <span className='text-xs font-bold font-sans text-nowrap'>
+                      (
+                      {[projectLaunch.author.firstName, projectLaunch.author.lastName]
+                        .filter(item => item)
+                        .join(' ')}
+                      )
+                    </span>
+                  )}
+                  <span className='font-mono text-stone-500 text-xs mt-1'>Author</span>
+                </div>
+              </Link>
+              {projectLaunch.approver ? (
+                <Link
+                  to={AppRoutes.DetailsUser.replace(':id', projectLaunch.approver.id)}
+                  className='inline-flex  border-2 border-stone-200 items-center p-2 rounded-xl hover:bg-stone-100 transition-all duration-300'
+                >
+                  {projectLaunch.approver.avatar ? (
+                    <img
+                      src={resolveImage(projectLaunch.approver.avatar)}
+                      alt='User profile image'
+                      className='w-[48px] rounded-full aspect-square object-cover'
+                    />
+                  ) : (
+                    <div className='inline-flex items-center justify-center bg-gray-300 w-[48px] rounded-full aspect-square'>
+                      <UserIcon className='size-8' />
+                    </div>
+                  )}
+                  <div className='inline-flex flex-col ms-2'>
+                    <span className='font-sans font-semibold'>
+                      {projectLaunch.approver.username}
+                    </span>
+                    {(projectLaunch.approver.firstName || projectLaunch.approver.lastName) && (
+                      <span className='text-xs font-bold font-sans text-nowrap'>
+                        (
+                        {[projectLaunch.approver.firstName, projectLaunch.approver.lastName]
+                          .filter(item => item)
+                          .join(' ')}
+                        )
+                      </span>
+                    )}
+                    <span className='font-mono text-stone-500 text-xs mt-1'>Approver BA</span>
+                  </div>
+                </Link>
+              ) : (
+                <div className='rounded-xl border-2 border-dashed inline-flex items-center justify-center px-5 font-semibold text-slate-300 border-slate-200'>
+                  <span className='font-mono text-xs text-center'>
+                    Here will be shown business analyst who approved project launch
                   </span>
                 </div>
-                {projectLaunch.isApproved && !projectLaunch.isFundraised && (
-                  <Button
-                    className='inline-flex text-center font-medium justify-center mt-4 border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-2 transition-all duration-300 rounded-full max-w-[260px] text-lg'
-                    onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}
-                  >
-                    Invest Now
-                  </Button>
-                )}
-              </>
-            ) : (
-              <span className='text-gray-500 text-sm font-mono'>
-                The money for this project has already been raised
-              </span>
-            )}
+              )}
+            </div>
           </div>
-          <div className='flex flex-col h-full'>
+          <div className='flex flex-col h-full flex-1 justify-between'>
             <div className='shadow-[0_0_7px_0px_silver] mb-5 font-medium font-sans rounded-lg px-8 py-5 w-full flex flex-col text-lg gap-y-2'>
               <div className='grid grid-cols-[1fr_130px]'>
                 <span>Deal structure</span>
@@ -373,7 +449,7 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
             <div className='flex flex-col items-end justify-end'>
               {!projectLaunch.isFundraised && (
                 <>
-                  {projectLaunch.isApproved && !projectLaunch.isFundraised && (
+                  {projectLaunch.approver && !projectLaunch.isFundraised && (
                     <Button
                       className='inline-flex text-center font-medium justify-center border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-1.5 transition-all duration-300 rounded-full text-lg'
                       onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}
