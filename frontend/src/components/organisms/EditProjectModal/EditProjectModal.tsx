@@ -31,7 +31,13 @@ const initialState: IEditProjectModalState = {
   error: null,
 };
 
-const EditProjectModal: FC<IEditProjectModalProps> = ({ project, title, buttons, children }) => {
+const EditProjectModal: FC<IEditProjectModalProps> = ({
+  project,
+  title,
+  onClose,
+  onProcess,
+  children,
+}) => {
   const { authenticatedUser } = useAuth();
   const [state, setState] = useState({
     ...initialState,
@@ -88,7 +94,7 @@ const EditProjectModal: FC<IEditProjectModalProps> = ({ project, title, buttons,
 
         dispatch(
           updateProjectLaunch(project.id, formData, {
-            onSuccess: () => buttons?.find(button => button.type === 'accept')?.action(),
+            onSuccess: () => onProcess?.(),
           }),
         );
       } else {
@@ -98,24 +104,7 @@ const EditProjectModal: FC<IEditProjectModalProps> = ({ project, title, buttons,
   };
 
   return (
-    <Modal
-      title={title}
-      buttons={buttons?.map(button =>
-        button.type === 'accept'
-          ? {
-              ...button,
-              action: () => {
-                if (formRef.current && formRef.current instanceof HTMLFormElement) {
-                  formRef.current.dispatchEvent(
-                    new Event('submit', { cancelable: true, bubbles: true }),
-                  );
-                }
-              },
-            }
-          : button,
-      )}
-      className='max-w-[768px]'
-    >
+    <Modal title={title} onClose={onClose} className='max-w-[768px]'>
       <form ref={formRef} className='flex flex-col' onSubmit={onSubmit}>
         {state.error && (
           <span className='bg-rose-100 border border-rose-200 p-2 rounded-md mb-5'>
