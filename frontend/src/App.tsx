@@ -51,7 +51,7 @@ const Content: FC = () => {
             <Route path={AppRoutes.Profile} Component={ProfilePage} />
           </Route>
           <Route path={AppRoutes.Root} element={<Navigate to={AppRoutes.Home} />} />
-          <Route path={AppRoutes.Wishlist} Component={AboutPage} />
+          <Route path={AppRoutes.About} Component={AboutPage} />
         </Route>
         <Route path={AppRoutes.Any} Component={NotFoundPage} />
       </Routes>

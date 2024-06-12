@@ -8,6 +8,6 @@ export enum AppRoutes {
   DetailsProject = '/projects/:id',
   DetailsUser = '/users/:id',
   AccountRegistration = '/create-account',
-  Wishlist = '/wishlist',
+  About = '/about',
   Profile = '/profile',
 }

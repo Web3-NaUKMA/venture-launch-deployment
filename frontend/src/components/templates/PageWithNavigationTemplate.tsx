@@ -17,8 +17,8 @@ const links: INavbarLink[] = [
     to: AppRoutes.Portfolio,
   },
   {
-    name: 'Wishlist',
-    to: AppRoutes.Wishlist,
+    name: 'About',
+    to: AppRoutes.About,
   },
 ];
 
