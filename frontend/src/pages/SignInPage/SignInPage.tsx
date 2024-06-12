@@ -66,7 +66,7 @@ const SignInPage: FC = () => {
       SignInMethod.Credentials,
       { email: state.data.email, password: state.data.password },
       {
-        onSuccess: () => navigate(AppRoutes.Projects),
+        onSuccess: () => navigate(AppRoutes.Home),
         onError: ({ response }) => setState({ ...state, error: response.data.error }),
       },
     );
@@ -84,7 +84,7 @@ const SignInPage: FC = () => {
             SignInMethod.Google,
             { googleAccessToken: (result.payload as any).accessToken },
             {
-              onSuccess: () => navigate(AppRoutes.Projects),
+              onSuccess: () => navigate(AppRoutes.Home),
               onError: ({ response }) => setState({ ...state, error: response.data.error }),
             },
           );
@@ -107,7 +107,7 @@ const SignInPage: FC = () => {
         { wallet },
         {
           onSuccess: () => {
-            navigate(AppRoutes.Projects);
+            navigate(AppRoutes.Home);
             sessionStorage.setItem('wallet', wallet.publicKey!.toString());
           },
           onError: () => {

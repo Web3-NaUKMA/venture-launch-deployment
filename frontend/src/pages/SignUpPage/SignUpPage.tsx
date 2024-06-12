@@ -93,7 +93,7 @@ const SignUpPage: FC = () => {
         wallet,
         { ...state.data, role: [state.data.role] },
         {
-          onSuccess: () => navigate(AppRoutes.Projects),
+          onSuccess: () => navigate(AppRoutes.Home),
           onError: ({ response }) => setState({ ...state, error: response.data.error }),
         },
       );
@@ -238,7 +238,7 @@ const SignUpPage: FC = () => {
           </div>
           <div className='flex flex-col'>
             <label
-              htmlFor='create_account_username'
+              htmlFor='create_account_password'
               className='mb-1.5 font-sans font-semibold text-zinc-900 text-lg mx-0.5'
             >
               Password (Optional):

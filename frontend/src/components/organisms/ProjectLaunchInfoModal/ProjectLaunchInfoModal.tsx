@@ -16,6 +16,7 @@ import {
 import { Link } from 'react-router-dom';
 import { resolveImage } from '../../../utils/file.utils';
 import ProgressBar from '../../molecules/ProgressBar/ProgressBar';
+import { AppRoutes } from '../../../types/enums/app-routes.enum';
 
 export interface IProjectLaunchInfoModalProps extends IModalProps {
   projectLaunch: IProjectLaunch;
@@ -94,7 +95,16 @@ const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
                 }}
                 className='w-[6em] aspect-square rounded-xl object-cover'
               />
-              <h4 className='font-medium text-2xl ms-5 font-sans'>{projectLaunch.name}</h4>
+              <div className='flex flex-col ms-5'>
+                <h4 className='font-medium text-2xl font-sans'>{projectLaunch.name}</h4>
+                {/* <p className='mt-1'>
+                  <span className='font-sans font-medium text-neutral-500'>Author:</span>{' '}
+                  <Link
+                    to={AppRoutes.DetailsUser.replace(':id', projectLaunch.author.id)}
+                    className='text-blue-500 font-medium font-sans'
+                  >{`${projectLaunch.author.username}${projectLaunch.author.firstName || projectLaunch.author.lastName ? `(${[projectLaunch.author.firstName, projectLaunch.author.lastName].filter(item => item).join(' ')})` : ''}`}</Link>
+                </p> */}
+              </div>
             </div>
             {!projectLaunch.isFundraised ? (
               <>

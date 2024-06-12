@@ -8,6 +8,7 @@ import {
   NotFoundException,
 } from '../../utils/exceptions/exceptions.utils';
 import { EntityNotFoundError } from 'typeorm';
+import passwordService from '../password/password.service';
 
 export class UserService {
   async findMany(options: IFindUserDto): Promise<User[]> {
@@ -64,6 +65,12 @@ export class UserService {
 
   async update(id: string, data: IUpdateUserDto): Promise<User> {
     try {
+      if (data.password?.trim()) {
+        data.password = await passwordService.hash(data.password);
+      } else {
+        delete data.password;
+      }
+
       await AppDataSource.getRepository(User).update({ id }, data);
 
       return await AppDataSource.getRepository(User).findOneOrFail({

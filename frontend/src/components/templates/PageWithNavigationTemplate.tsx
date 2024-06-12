@@ -9,16 +9,16 @@ export interface INavbarLink {
 
 const links: INavbarLink[] = [
   {
-    name: 'Projects',
-    to: AppRoutes.Projects,
+    name: 'Home',
+    to: AppRoutes.Home,
   },
   {
     name: 'Portfolio',
     to: AppRoutes.Portfolio,
   },
   {
-    name: 'About',
-    to: AppRoutes.About,
+    name: 'Wishlist',
+    to: AppRoutes.Wishlist,
   },
 ];
 

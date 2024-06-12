@@ -81,6 +81,8 @@ export class ProjectLaunchController {
 
   async update(request: Request, response: Response) {
     const { id } = request.params;
+    await projectLaunchService.findOne({ id });
+
     let team = request.body.team ? JSON.parse(request.body.team) : undefined;
     let files: Express.Multer.File[] = [];
 
@@ -118,7 +120,6 @@ export class ProjectLaunchController {
     }
 
     await uploadMultipleFiles(files);
-    await projectLaunchService.findOne({ id });
 
     const logoFile = files.find(file => file.fieldname === 'project-logo') ?? null;
 

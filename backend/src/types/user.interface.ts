@@ -11,6 +11,7 @@ export interface IUser {
   createdAt: Date;
   password?: string | null;
   avatar?: string | null;
+  bio?: string | null;
   firstName?: string;
   lastName?: string;
   birthDate?: Date;

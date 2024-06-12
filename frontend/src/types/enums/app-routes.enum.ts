@@ -3,10 +3,11 @@ export enum AppRoutes {
   Any = '*',
   SignIn = '/sign-in',
   SignUp = '/sign-up',
-  Projects = '/projects',
+  Home = '/home',
   Portfolio = '/portfolio',
   DetailsProject = '/projects/:id',
+  DetailsUser = '/users/:id',
   AccountRegistration = '/create-account',
-  About = '/about',
+  Wishlist = '/wishlist',
   Profile = '/profile',
 }

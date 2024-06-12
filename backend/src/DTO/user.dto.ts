@@ -17,6 +17,7 @@ export interface IUpdateUserDto {
   role?: UserRoleEnum[];
   password?: string;
   avatar?: string | null;
+  bio?: string | null;
   firstName?: string;
   lastName?: string;
   birthDate?: Date;
