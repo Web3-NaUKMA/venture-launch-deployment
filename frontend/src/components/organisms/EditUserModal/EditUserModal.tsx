@@ -201,7 +201,7 @@ const EditUserModal: FC<EditUserModalProps> = ({ user, title, onClose, onProcess
             type='text'
             id='update_user_username'
             placeholder='username'
-            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
             defaultValue={state.data.username}
             onChange={event =>
               setState({
@@ -223,7 +223,7 @@ const EditUserModal: FC<EditUserModalProps> = ({ user, title, onClose, onProcess
             id='update_user_email'
             type='email'
             placeholder='aboba@gmail.com'
-            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
             defaultValue={state.data.email}
             onChange={event =>
               setState({
@@ -245,7 +245,7 @@ const EditUserModal: FC<EditUserModalProps> = ({ user, title, onClose, onProcess
             type='password'
             id='update_user_password'
             placeholder='Password'
-            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
             onChange={event =>
               setState({
                 ...state,
@@ -266,7 +266,7 @@ const EditUserModal: FC<EditUserModalProps> = ({ user, title, onClose, onProcess
             type='text'
             id='update_user_first_name'
             placeholder='John'
-            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
             defaultValue={state.data.firstName}
             onChange={event =>
               setState({
@@ -288,7 +288,7 @@ const EditUserModal: FC<EditUserModalProps> = ({ user, title, onClose, onProcess
             id='update_user_last_name'
             type='text'
             placeholder='Doe'
-            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
             defaultValue={state.data.lastName}
             onChange={event =>
               setState({

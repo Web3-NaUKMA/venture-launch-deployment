@@ -72,6 +72,9 @@ export class User implements IUser {
   @OneToMany(() => ProjectLaunch, projectLaunch => projectLaunch.author)
   projectLaunches: ProjectLaunch[];
 
+  @OneToMany(() => ProjectLaunch, projectLaunch => projectLaunch.approver)
+  approvedProjectLaunches: ProjectLaunch[];
+
   @OneToMany(() => UserToProject, userToProject => userToProject.user)
   userToProjects: UserToProject[];
 

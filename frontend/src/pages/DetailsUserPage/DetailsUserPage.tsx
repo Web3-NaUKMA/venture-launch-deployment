@@ -101,7 +101,7 @@ const DetailsUserPage: FC = () => {
           </div>
         </div>
         <div className='my-10 px-6'>
-          <h4 className='px-2 text-3xl font-serif mb-10'>My projects</h4>
+          <h4 className='px-2 text-3xl font-serif mb-10'>User projects</h4>
           {projects.length > 0 ? (
             <div className='grid lg:grid-cols-2 gap-10 mt-5 auto-rows-fr'>
               {projects.map(project => (

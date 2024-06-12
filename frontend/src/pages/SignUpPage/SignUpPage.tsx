@@ -159,7 +159,7 @@ const SignUpPage: FC = () => {
                   defaultValue={state.data.walletId}
                   readOnly
                   disabled
-                  className='border disabled:bg-neutral-100 border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+                  className='border disabled:bg-neutral-100 border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
                 />
                 <WalletMultiButton>Choose a wallet</WalletMultiButton>
               </div>
@@ -173,7 +173,7 @@ const SignUpPage: FC = () => {
               </label>
               <input
                 disabled={state.withGoogle}
-                className='disabled:bg-neutral-100 border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+                className='disabled:bg-neutral-100 border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
                 type='email'
                 id='create_account_email'
                 placeholder='example@gmail.com'
@@ -195,7 +195,7 @@ const SignUpPage: FC = () => {
                 Username:
               </label>
               <input
-                className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+                className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
                 type='text'
                 id='create_account_username'
                 defaultValue={state.data.username}
@@ -226,7 +226,7 @@ const SignUpPage: FC = () => {
                     error: null,
                   })
                 }
-                className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+                className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
               >
                 {Object.values(UserRoleEnum).map((item, index) => (
                   <option key={index} value={item}>
@@ -250,7 +250,7 @@ const SignUpPage: FC = () => {
               letter, one digit and one special symbol.
             </span>
             <input
-              className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+              className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
               type='password'
               id='create_account_password'
               defaultValue={state.data.password}

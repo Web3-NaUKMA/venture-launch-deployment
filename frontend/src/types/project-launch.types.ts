@@ -8,7 +8,7 @@ export interface IProjectLaunch {
   description: string;
   logo: string | null;
   isFundraised: boolean;
-  isApproved: boolean;
+  approver: IUser | null;
   fundraiseAmount: number;
   fundraiseProgress: number;
   fundraiseDeadline: Date;
@@ -46,7 +46,7 @@ export interface IUpdateProjectLaunch {
   name?: string;
   description?: string;
   isFundraised?: boolean;
-  isApproved?: boolean;
+  approverId?: string;
   fundraiseAmount?: number;
   fundraiseProgress?: number;
   fundraiseDeadline?: Date;

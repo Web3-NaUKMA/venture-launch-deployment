@@ -23,5 +23,6 @@ export interface IUser {
   zipCode?: string;
   phone?: string;
   projectLaunches: IProjectLaunch[];
+  approvedProjectLaunches: IProjectLaunch[];
   projectLaunchInvestments?: IProjectLaunchInvestment[];
 }

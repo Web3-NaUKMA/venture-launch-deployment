@@ -1,4 +1,6 @@
 import { UserRoleEnum } from './enums/user-role.enum';
+import { IProjectLaunchInvestment } from './project-launch-investment.types';
+import { IProjectLaunch } from './project-launch.types';
 
 export interface IUser {
   id: string;
@@ -19,6 +21,9 @@ export interface IUser {
   street?: string;
   zipCode?: string;
   phone?: string;
+  projectLaunches: IProjectLaunch[];
+  approvedProjectLaunches: IProjectLaunch[];
+  projectLaunchInvestments?: IProjectLaunchInvestment[];
 }
 
 export interface ICreateUser {

@@ -13,12 +13,12 @@ import { IProjectLaunch } from '../../../types/project-launch.types';
 import {
   fetchAllProjectLaunches,
   removeProjectLaunch,
-  updateProjectLaunch,
 } from '../../../redux/slices/project-launch.slice';
 import CreateInvestmentModal from '../../organisms/CreateInvestmentModal/CreateInvestmentModal';
 import ProjectLaunchInfoModal from '../../organisms/ProjectLaunchInfoModal/ProjectLaunchInfoModal';
 import ProgressBar from '../ProgressBar/ProgressBar';
 import { resolveImage } from '../../../utils/file.utils';
+import ApproveProjectLaunchModal from '../../organisms/ApproveProjectLaunchModal/ApproveProjectLaunchModal';
 
 export interface IProjectProps {
   project: IProjectLaunch;
@@ -44,17 +44,6 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = '
     dispatch(
       removeProjectLaunch(projectLaunch.id, {
         onSuccess: () => setIsRemoveProjectModalVisible(false),
-      }),
-    );
-  };
-
-  const approveProjectLaunch = () => {
-    const formData = new FormData();
-    formData.set('isApproved', 'true');
-
-    dispatch(
-      updateProjectLaunch(projectLaunch.id, formData, {
-        onSuccess: () => setIsApproveProjectLaunchModalVisible(false),
       }),
     );
   };
@@ -95,31 +84,12 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = '
         )}
       {isApproveProjectLaunchModalVisible &&
         createPortal(
-          <Modal
-            title='Approve project launch'
+          <ApproveProjectLaunchModal
+            projectLaunch={projectLaunch}
+            title={'Approve project launch'}
             onClose={() => setIsApproveProjectLaunchModalVisible(false)}
-            className='max-w-[596px]'
-          >
-            <div className='flex flex-col px-10 py-8'>
-              <p className='font-mono'>Are you sure you want to approve this project launch?</p>
-              <div className='flex gap-4 mt-8'>
-                <button
-                  type='button'
-                  className='inline-flex text-center justify-center items-center border-2 border-transparent bg-zinc-900 hover:border-zinc-900 hover:bg-transparent hover:text-zinc-900 text-white rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
-                  onClick={() => approveProjectLaunch()}
-                >
-                  Approve
-                </button>
-                <button
-                  type='button'
-                  className='inline-flex text-center justify-center items-center text-zinc-700 border-2 border-zinc-900 hover:text-zinc-900 hover:bg-slate-100 rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
-                  onClick={() => setIsApproveProjectLaunchModalVisible(false)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          </Modal>,
+            onProcess={() => setIsApproveProjectLaunchModalVisible(false)}
+          />,
           document.getElementById('root')!,
         )}
       {isCreateProjectLaunchInvestmentModalVisible &&
@@ -163,22 +133,22 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = '
                 <h4 className='font-semibold text-2xl'>{projectLaunch.name}</h4>
                 {variant === 'short' && (
                   <div className='flex items-center gap-0.5 mt-3'>
-                    {projectLaunch.isApproved && !projectLaunch.isFundraised ? (
+                    {projectLaunch.approver !== null && !projectLaunch.isFundraised ? (
                       <span className='font-medium text-white bg-red rounded-full text-xs bg-blue-500 px-2 py-0.5'>
                         Approved
                       </span>
-                    ) : projectLaunch.isApproved &&
+                    ) : projectLaunch.approver !== null &&
                       projectLaunch.isFundraised &&
                       projectLaunch.project?.isFinal ? (
                       <span className='font-medium text-white bg-red rounded-full text-xs bg-emerald-500 px-2 py-0.5'>
                         Submitted
                       </span>
-                    ) : projectLaunch.isApproved && projectLaunch.isFundraised ? (
-                      <span className='font-medium text-white bg-red rounded-full text-xs bg-orange-500 px-2 py-0.5'>
+                    ) : projectLaunch.approver !== null && projectLaunch.isFundraised ? (
+                      <span className='whitespace-nowrap font-medium text-white bg-red rounded-full text-xs bg-orange-500 px-2 py-0.5'>
                         Funds raised
                       </span>
                     ) : (
-                      <span className='font-medium text-white bg-red rounded-full text-xs bg-slate-500 px-2 py-0.5'>
+                      <span className='whitespace-nowrap font-medium text-white bg-red rounded-full text-xs bg-slate-500 px-2 py-0.5'>
                         Under review
                       </span>
                     )}
@@ -229,7 +199,7 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = '
               {variant === 'short' && (
                 <div className='grid auto-cols-max gap-2'>
                   {projectLaunch.isFundraised &&
-                    projectLaunch.isApproved &&
+                    projectLaunch.approver !== null &&
                     projectLaunch.project && (
                       <Link
                         to={AppRoutes.DetailsProject.replace(':id', projectLaunch.project.id)}
@@ -246,7 +216,7 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = '
                   </Button>
                   {!projectLaunch.isFundraised && (
                     <>
-                      {!projectLaunch.isApproved &&
+                      {!projectLaunch.approver &&
                         authenticatedUser?.role.find(
                           role => role === UserRoleEnum.BusinessAnalyst,
                         ) && (
@@ -260,7 +230,7 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = '
                       {authenticatedUser?.role.find(
                         role => role === UserRoleEnum.Investor || role === UserRoleEnum.Startup,
                       ) &&
-                        projectLaunch.isApproved && (
+                        projectLaunch.approver !== null && (
                           <Button
                             className='inline-flex text-center justify-center items-center font-medium font-sans text-lg border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1 transition-all duration-300 rounded-full'
                             onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}
@@ -275,22 +245,22 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = '
             </div>
             {variant === 'extended' && (
               <div className='flex items-center gap-0.5'>
-                {projectLaunch.isApproved && !projectLaunch.isFundraised ? (
+                {projectLaunch.approver !== null && !projectLaunch.isFundraised ? (
                   <span className='font-medium text-white bg-red rounded-full text-xs bg-blue-500 px-2 py-0.5'>
                     Approved
                   </span>
-                ) : projectLaunch.isApproved &&
+                ) : projectLaunch.approver !== null &&
                   projectLaunch.isFundraised &&
                   projectLaunch.project?.isFinal ? (
                   <span className='font-medium text-white bg-red rounded-full text-xs bg-emerald-500 px-2 py-0.5'>
                     Submitted
                   </span>
-                ) : projectLaunch.isApproved && projectLaunch.isFundraised ? (
+                ) : projectLaunch.approver !== null && projectLaunch.isFundraised ? (
                   <span className='whitespace-nowrap font-medium text-white bg-red rounded-full text-xs bg-orange-500 px-2 py-0.5'>
                     Funds raised
                   </span>
                 ) : (
-                  <span className='font-medium text-white bg-red rounded-full text-xs bg-slate-500 px-2 py-0.5'>
+                  <span className='whitespace-nowrap font-medium text-white bg-red rounded-full text-xs bg-slate-500 px-2 py-0.5'>
                     Under review
                   </span>
                 )}
@@ -369,14 +339,16 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = '
         </div>
         {variant === 'extended' && (
           <div className='grid w-full gap-2 grid-flow-col auto-cols-fr'>
-            {projectLaunch.isFundraised && projectLaunch.isApproved && projectLaunch.project && (
-              <Link
-                to={AppRoutes.DetailsProject.replace(':id', projectLaunch.project.id)}
-                className='inline-flex text-center justify-center items-center font-medium font-sans text-lg hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white px-10 py-1 transition-all duration-300 rounded-full'
-              >
-                Details
-              </Link>
-            )}
+            {projectLaunch.isFundraised &&
+              projectLaunch.approver !== null &&
+              projectLaunch.project && (
+                <Link
+                  to={AppRoutes.DetailsProject.replace(':id', projectLaunch.project.id)}
+                  className='inline-flex text-center justify-center items-center font-medium font-sans text-lg hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white px-10 py-1 transition-all duration-300 rounded-full'
+                >
+                  Details
+                </Link>
+              )}
             <Button
               className='inline-flex text-center justify-center items-center font-medium font-sans text-lg hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white px-10 py-1 transition-all duration-300 rounded-full'
               onClick={() => setIsShowProjectLaunchInfoModalVisible(true)}
@@ -385,7 +357,7 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = '
             </Button>
             {!projectLaunch.isFundraised && (
               <>
-                {!projectLaunch.isApproved &&
+                {!projectLaunch.approver &&
                   authenticatedUser?.role.find(role => role === UserRoleEnum.BusinessAnalyst) && (
                     <Button
                       className='inline-flex text-center justify-center items-center font-medium font-sans text-lg border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1 transition-all duration-300 rounded-full'
@@ -397,7 +369,7 @@ export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = '
                 {authenticatedUser?.role.find(
                   role => role === UserRoleEnum.Investor || role === UserRoleEnum.Startup,
                 ) &&
-                  projectLaunch.isApproved && (
+                  projectLaunch.approver !== null && (
                     <Button
                       className='inline-flex text-center justify-center items-center font-medium font-sans text-lg border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1 transition-all duration-300 rounded-full'
                       onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}

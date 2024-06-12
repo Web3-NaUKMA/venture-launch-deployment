@@ -141,7 +141,7 @@ const SignInPage: FC = () => {
             )}
             <div className='flex flex-col gap-4 my-4'>
               <input
-                className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+                className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
                 type='email'
                 id='sign_in_email'
                 defaultValue={state.data.email}
@@ -155,7 +155,7 @@ const SignInPage: FC = () => {
                 }
               />
               <input
-                className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-600 font-mono'
+                className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
                 type='password'
                 id='sign_in_password'
                 defaultValue={state.data.password}
