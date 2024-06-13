@@ -1,5 +1,5 @@
 import { DeleteResult, EntityNotFoundError } from 'typeorm';
-import { AppDataSource } from '../../typeorm/index.typeorm';
+import AppDataSource from '../../typeorm/index.typeorm';
 import { Session } from '../../typeorm/models/Session';
 import { User } from '../../typeorm/models/User';
 import bs58 from 'bs58';

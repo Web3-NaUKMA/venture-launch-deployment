@@ -1,6 +1,6 @@
 import { ICreateSessionDto, IFindSessionDto, IUpdateSessionDto } from '../../DTO/session.dto';
 import { Session } from '../../typeorm/models/Session';
-import { AppDataSource } from '../../typeorm/index.typeorm';
+import AppDataSource from '../../typeorm/index.typeorm';
 import {
   ConflictException,
   DatabaseException,

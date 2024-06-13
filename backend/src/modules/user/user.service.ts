@@ -1,4 +1,4 @@
-import { AppDataSource } from '../../typeorm/index.typeorm';
+import AppDataSource from '../../typeorm/index.typeorm';
 import { ICreateUserDto, IFindUserDto, IUpdateUserDto } from '../../DTO/user.dto';
 import { User } from '../../typeorm/models/User';
 import { formatQueryOptions } from '../../utils/typeorm.utils';

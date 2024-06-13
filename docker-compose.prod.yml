@@ -65,10 +65,13 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DATABASE}
+    ports:
+      - ${INTERNAL_DATABASE_PORT}:5432
     expose:
       - ${INTERNAL_DATABASE_PORT}
     volumes:
       - database_data:/var/lib/postgresql/data
+      - ./backups:/backups
     restart: on-failure
 
   nginx:
@@ -106,6 +109,24 @@ services:
     restart: unless-stopped
     entrypoint:
       "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+  backup:
+    image: postgres:latest
+    container_name: venture-launch-backup
+    networks:
+      - venture-launch-network
+    env_file: ./.env.prod
+    volumes:
+      - ./backups:/backups
+    depends_on:
+      - database
+    restart: unless-stopped
+    entrypoint: >
+      /bin/sh -c 'while true; do
+        PGPASSWORD=$POSTGRES_PASSWORD pg_dump -h $DATABASE_HOST -U $POSTGRES_USER -d \
+      $POSTGRES_DATABASE > "/backups/backup_$(date "+%Y%m%d_%H%M%S").sql";
+        sleep 600; 
+      done;'
 
 networks:
   venture-launch-network:

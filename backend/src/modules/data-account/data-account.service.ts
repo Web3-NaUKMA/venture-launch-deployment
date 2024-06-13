@@ -1,4 +1,4 @@
-import { AppDataSource } from '../../typeorm/index.typeorm';
+import AppDataSource from '../../typeorm/index.typeorm';
 import {
   ICreateDataAccountDto,
   IFindDataAccountDto,
