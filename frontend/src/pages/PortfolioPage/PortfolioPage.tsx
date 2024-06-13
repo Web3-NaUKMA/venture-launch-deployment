@@ -14,7 +14,11 @@ export const PortfolioPage: FC = () => {
 
   useEffect(() => {
     if (authenticatedUser) {
-      dispatch(fetchAllProjectLaunches({ investorId: authenticatedUser.id }));
+      dispatch(
+        fetchAllProjectLaunches({
+          where: { projectLaunchInvestments: { investor: { id: authenticatedUser.id } } },
+        }),
+      );
     }
   }, [authenticatedUser]);
 

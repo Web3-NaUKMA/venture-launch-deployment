@@ -28,7 +28,7 @@ const DetailsUserPage: FC = () => {
 
   useEffect(() => {
     if (user) {
-      dispatch(fetchAllProjectLaunches({ ownerId: user.id }));
+      dispatch(fetchAllProjectLaunches({ where: { author: { id: user.id } } }));
     }
   }, [user]);
 

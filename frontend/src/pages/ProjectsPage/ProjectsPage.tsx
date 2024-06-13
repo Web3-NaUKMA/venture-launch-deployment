@@ -22,7 +22,7 @@ const ProjectsPage: FC = () => {
       if (authenticatedUser.role.includes(UserRoleEnum.BusinessAnalyst)) {
         dispatch(fetchAllProjectLaunches());
       } else {
-        dispatch(fetchAllProjectLaunches({ isApproved: true }));
+        dispatch(fetchAllProjectLaunches({ where: { approver: { id: { not: null } } } }));
       }
     }
   }, [authenticatedUser]);

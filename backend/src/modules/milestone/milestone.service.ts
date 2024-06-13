@@ -1,35 +1,30 @@
 import AppDataSource from '../../typeorm/index.typeorm';
-import {
-  ICreateMilestoneDto,
-  IFindMilestoneDto,
-  IUpdateMilestoneDto,
-} from '../../DTO/milestone.dto';
+import { ICreateMilestoneDto, IUpdateMilestoneDto } from '../../DTO/milestone.dto';
 import { Milestone } from '../../typeorm/models/Milestone';
-import { EntityNotFoundError, FindOptionsOrder } from 'typeorm';
+import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
 import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
+import _ from 'lodash';
 
 export class MilestoneService {
-  async findMany(
-    options: IFindMilestoneDto,
-    order?: FindOptionsOrder<Milestone>,
-  ): Promise<Milestone[]> {
+  async findMany(options?: FindManyOptions<Milestone>): Promise<Milestone[]> {
     try {
-      return await AppDataSource.getRepository(Milestone).find({
-        relations: { project: true },
-        where: options,
-        order,
-      });
+      return await AppDataSource.getRepository(Milestone).find(
+        _.merge(options, {
+          relations: { project: true },
+        }),
+      );
     } catch (error: any) {
       throw new DatabaseException('Internal server error', error);
     }
   }
 
-  async findOne(options: IFindMilestoneDto): Promise<Milestone> {
+  async findOne(options?: FindOneOptions<Milestone>): Promise<Milestone> {
     try {
-      return await AppDataSource.getRepository(Milestone).findOneOrFail({
-        relations: { project: true },
-        where: options,
-      });
+      return await AppDataSource.getRepository(Milestone).findOneOrFail(
+        _.merge(options, {
+          relations: { project: true },
+        }),
+      );
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException('The milestone with provided params does not exist');

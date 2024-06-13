@@ -1,4 +1,4 @@
-import { ICreateSessionDto, IFindSessionDto, IUpdateSessionDto } from '../../DTO/session.dto';
+import { ICreateSessionDto, IUpdateSessionDto } from '../../DTO/session.dto';
 import { Session } from '../../typeorm/models/Session';
 import AppDataSource from '../../typeorm/index.typeorm';
 import {
@@ -6,26 +6,29 @@ import {
   DatabaseException,
   NotFoundException,
 } from '../../utils/exceptions/exceptions.utils';
-import { EntityNotFoundError } from 'typeorm';
+import { EntityNotFoundError, FindManyOptions } from 'typeorm';
+import _ from 'lodash';
 
 export class SessionService {
-  async findMany(options: IFindSessionDto): Promise<Session[]> {
+  async findMany(options?: FindManyOptions<Session>): Promise<Session[]> {
     try {
-      return await AppDataSource.getRepository(Session).find({
-        relations: { user: true },
-        where: options,
-      });
+      return await AppDataSource.getRepository(Session).find(
+        _.merge(options, {
+          relations: { user: true },
+        }),
+      );
     } catch (error: any) {
       throw new DatabaseException('Internal server error', error);
     }
   }
 
-  async findOne(options: IFindSessionDto): Promise<Session> {
+  async findOne(options?: FindManyOptions<Session>): Promise<Session> {
     try {
-      return await AppDataSource.getRepository(Session).findOneOrFail({
-        relations: { user: true },
-        where: options,
-      });
+      return await AppDataSource.getRepository(Session).findOneOrFail(
+        _.merge(options, {
+          relations: { user: true },
+        }),
+      );
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException('The session with provided params does not exist', error);

@@ -1,37 +1,35 @@
 import AppDataSource from '../../typeorm/index.typeorm';
-import { ICreateUserDto, IFindUserDto, IUpdateUserDto } from '../../DTO/user.dto';
+import { ICreateUserDto, IUpdateUserDto } from '../../DTO/user.dto';
 import { User } from '../../typeorm/models/User';
-import { formatQueryOptions } from '../../utils/typeorm.utils';
 import {
   ConflictException,
   DatabaseException,
   NotFoundException,
 } from '../../utils/exceptions/exceptions.utils';
-import { EntityNotFoundError } from 'typeorm';
+import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
 import passwordService from '../password/password.service';
+import _ from 'lodash';
 
 export class UserService {
-  async findMany(options: IFindUserDto): Promise<User[]> {
+  async findMany(options?: FindManyOptions<User>): Promise<User[]> {
     try {
-      const formattedOptions = formatQueryOptions(options);
-
-      return await AppDataSource.getRepository(User).find({
-        relations: { projectLaunches: true, session: true, projectLaunchInvestments: true },
-        where: formattedOptions,
-      });
+      return await AppDataSource.getRepository(User).find(
+        _.merge(options, {
+          relations: { projectLaunches: true, session: true, projectLaunchInvestments: true },
+        }),
+      );
     } catch (error: any) {
       throw new DatabaseException('Internal server error', error);
     }
   }
 
-  async findOne(options: IFindUserDto): Promise<User> {
+  async findOne(options?: FindOneOptions<User>): Promise<User> {
     try {
-      const formattedOptions = formatQueryOptions(options);
-
-      return await AppDataSource.getRepository(User).findOneOrFail({
-        relations: { projectLaunches: true, session: true, projectLaunchInvestments: true },
-        where: formattedOptions,
-      });
+      return await AppDataSource.getRepository(User).findOneOrFail(
+        _.merge(options, {
+          relations: { projectLaunches: true, session: true, projectLaunchInvestments: true },
+        }),
+      );
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException('The user with provided params does not exist', error);

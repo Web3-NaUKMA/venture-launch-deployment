@@ -9,8 +9,7 @@ import {
 } from '../../types/redux/project.types';
 import axios from 'axios';
 import { ICreateProject, IUpdateProject, IProject } from '../../types/project.types';
-import { RequestQueryParams } from '../../types/app.types';
-import { serializeQueryParams } from '../../utils/request.utils';
+import qs from 'qs';
 
 const initialState: IProjectSliceState = {
   projects: [],
@@ -76,12 +75,15 @@ const projectSlice = createSlice({
 });
 
 export const fetchAllProjects =
-  (queryParams?: RequestQueryParams, options?: ActionCreatorOptions) =>
-  async (dispatch: AppDispatch) => {
+  (queryParams?: any, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(projectSlice.actions.setError({ fetchAllProjects: null }));
 
     try {
-      const query = queryParams ? serializeQueryParams(queryParams) : undefined;
+      const query = qs.stringify(queryParams, {
+        arrayFormat: 'comma',
+        allowDots: true,
+        commaRoundTrip: true,
+      } as any);
       const response = await axios.get(`projects/${query ? `?${query}` : ``}`);
 
       if (response.status === HttpStatusCode.Ok) {

@@ -1,31 +1,30 @@
 import AppDataSource from '../../typeorm/index.typeorm';
-import {
-  ICreateDataAccountDto,
-  IFindDataAccountDto,
-  IUpdateDataAccountDto,
-} from '../../DTO/data-account.dto';
+import { ICreateDataAccountDto, IUpdateDataAccountDto } from '../../DTO/data-account.dto';
 import { DataAccount } from '../../typeorm/models/DataAccount';
 import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
-import { EntityNotFoundError } from 'typeorm';
+import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
+import _ from 'lodash';
 
 export class DataAccountService {
-  async findMany(options: IFindDataAccountDto): Promise<DataAccount[]> {
+  async findMany(options?: FindManyOptions<DataAccount>): Promise<DataAccount[]> {
     try {
-      return await AppDataSource.getRepository(DataAccount).find({
-        relations: { project: true },
-        where: options,
-      });
+      return await AppDataSource.getRepository(DataAccount).find(
+        _.merge(options, {
+          relations: { project: true },
+        }),
+      );
     } catch (error: any) {
       throw new DatabaseException('Internal server error', error);
     }
   }
 
-  async findOne(options: IFindDataAccountDto): Promise<DataAccount> {
+  async findOne(options?: FindOneOptions<DataAccount>): Promise<DataAccount> {
     try {
-      return await AppDataSource.getRepository(DataAccount).findOneOrFail({
-        relations: { project: true },
-        where: options,
-      });
+      return await AppDataSource.getRepository(DataAccount).findOneOrFail(
+        _.merge(options, {
+          relations: { project: true },
+        }),
+      );
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException('The data account with provided params does not exist', error);

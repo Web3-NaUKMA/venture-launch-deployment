@@ -1,11 +1,10 @@
 import AppDataSource from '../../typeorm/index.typeorm';
-import { ICreateProjectDto, IFindProjectDto, IUpdateProjectDto } from '../../DTO/project.dto';
+import { ICreateProjectDto, IUpdateProjectDto } from '../../DTO/project.dto';
 import { Project } from '../../typeorm/models/Project';
 import { UserToProject } from '../../typeorm/models/UsersToProjects';
-import { EntityNotFoundError, FindOptionsOrder } from 'typeorm';
+import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
 import { IMilestone } from '../../types/milestone.interface';
 import { ThirdwebStorage } from '@thirdweb-dev/storage';
-import { formatQueryOptions } from '../../utils/typeorm.utils';
 import { DataAccount } from '../../typeorm/models/DataAccount';
 import { ProjectLaunch } from '../../typeorm/models/ProjectLaunch';
 import {
@@ -14,41 +13,38 @@ import {
   NotFoundException,
   ServerException,
 } from '../../utils/exceptions/exceptions.utils';
+import _ from 'lodash';
 
 export class ProjectService {
-  async findMany(options: IFindProjectDto, order?: FindOptionsOrder<Project>): Promise<Project[]> {
+  async findMany(options?: FindManyOptions<Project>): Promise<Project[]> {
     try {
-      const formattedOptions = formatQueryOptions(options);
-
-      return await AppDataSource.getRepository(Project).find({
-        relations: {
-          projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
-          dataAccount: true,
-          milestones: true,
-          userToProjects: { project: true },
-        },
-        where: formattedOptions,
-        order,
-      });
+      return await AppDataSource.getRepository(Project).find(
+        _.merge(options, {
+          relations: {
+            projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
+            dataAccount: true,
+            milestones: true,
+            userToProjects: { project: true },
+          },
+        }),
+      );
     } catch (error: any) {
       throw new DatabaseException('Internal server error', error);
     }
   }
 
-  async findOne(options: IFindProjectDto, order?: FindOptionsOrder<Project>): Promise<Project> {
+  async findOne(options: FindOneOptions<Project>): Promise<Project> {
     try {
-      const formattedOptions = formatQueryOptions(options);
-
-      return await AppDataSource.getRepository(Project).findOneOrFail({
-        relations: {
-          projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
-          dataAccount: true,
-          milestones: true,
-          userToProjects: { project: true },
-        },
-        where: formattedOptions,
-        order,
-      });
+      return await AppDataSource.getRepository(Project).findOneOrFail(
+        _.merge(options, {
+          relations: {
+            projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
+            dataAccount: true,
+            milestones: true,
+            userToProjects: { project: true },
+          },
+        }),
+      );
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException('The project with provided params does not exist');

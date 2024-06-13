@@ -1,12 +1,7 @@
 import AppDataSource from '../../typeorm/index.typeorm';
-import { EntityNotFoundError, FindOptionsOrder } from 'typeorm';
-import { formatQueryOptions } from '../../utils/typeorm.utils';
+import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
 import { ProjectLaunch } from '../../typeorm/models/ProjectLaunch';
-import {
-  ICreateProjectLaunchDto,
-  IFindProjectLaunchDto,
-  IUpdateProjectLaunchDto,
-} from '../../DTO/project-launch.dto';
+import { ICreateProjectLaunchDto, IUpdateProjectLaunchDto } from '../../DTO/project-launch.dto';
 import {
   ICreateProjectLaunchInvestmentDto,
   IUpdateProjectLaunchInvestmentDto,
@@ -17,47 +12,38 @@ import {
   DatabaseException,
   NotFoundException,
 } from '../../utils/exceptions/exceptions.utils';
+import _ from 'lodash';
 
 export class ProjectLaunchService {
-  async findMany(
-    options: IFindProjectLaunchDto,
-    order?: FindOptionsOrder<ProjectLaunch>,
-  ): Promise<ProjectLaunch[]> {
+  async findMany(options?: FindManyOptions<ProjectLaunch>): Promise<ProjectLaunch[]> {
     try {
-      const formattedOptions = formatQueryOptions(options);
-
-      return await AppDataSource.getRepository(ProjectLaunch).find({
-        relations: {
-          author: true,
-          project: true,
-          projectLaunchInvestments: true,
-          approver: true,
-        },
-        where: formattedOptions,
-        order,
-      });
+      return await AppDataSource.getRepository(ProjectLaunch).find(
+        _.merge(options, {
+          relations: {
+            author: true,
+            project: true,
+            projectLaunchInvestments: true,
+            approver: true,
+          },
+        }),
+      );
     } catch (error: any) {
       throw new DatabaseException('Internal server error', error);
     }
   }
 
-  async findOne(
-    options: IFindProjectLaunchDto,
-    order?: FindOptionsOrder<ProjectLaunch>,
-  ): Promise<ProjectLaunch> {
+  async findOne(options?: FindOneOptions<ProjectLaunch>): Promise<ProjectLaunch> {
     try {
-      const formattedOptions = formatQueryOptions(options);
-
-      return await AppDataSource.getRepository(ProjectLaunch).findOneOrFail({
-        relations: {
-          author: true,
-          project: true,
-          projectLaunchInvestments: true,
-          approver: true,
-        },
-        where: formattedOptions,
-        order,
-      });
+      return await AppDataSource.getRepository(ProjectLaunch).findOneOrFail(
+        _.merge(options, {
+          relations: {
+            author: true,
+            project: true,
+            projectLaunchInvestments: true,
+            approver: true,
+          },
+        }),
+      );
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException('The project launch with provided data does not exist', error);

@@ -4,31 +4,51 @@ import { HttpStatusCode } from 'axios';
 import { deleteFolder, uploadMultipleFiles } from '../../utils/file.utils';
 import path from 'path';
 import { v4 as uuid } from 'uuid';
-import { IFindProjectLaunchDto } from '../../DTO/project-launch.dto';
 import { Controller } from '../../decorators/app.decorators';
+import qs from 'qs';
+import { parseObjectStringValuesToPrimitives } from '../../utils/object.utils';
+import _ from 'lodash';
+import { IsNull, Not } from 'typeorm';
 
 @Controller()
 export class ProjectLaunchController {
   async findMany(request: Request, response: Response) {
-    const { ownerId, memberId, investorId, ...otherQueryParams } = request.query;
-    let query: IFindProjectLaunchDto = {};
+    const query = request.query
+      ? parseObjectStringValuesToPrimitives(
+          qs.parse(request.query as Record<string, any>, { comma: true, allowDots: true }),
+        )
+      : undefined;
 
-    if (ownerId) query.author = { id: ownerId.toString() };
-    if (memberId) query.project = { userToProjects: { userId: memberId as string } };
-    if (investorId) query.projectLaunchInvestments = { investor: { id: investorId as string } };
+    if (typeof query?.where?.approver?.id === 'object') {
+      if (query?.where?.approver?.id?.not !== undefined) {
+        query.where.approver.id = Not(
+          query.where.approver.id.not === 0 ? IsNull() : query.where.approver.id.not,
+        );
+      }
+    } else if (query?.where?.approver?.id === null) {
+      query.where.approver.id = IsNull();
+    }
 
-    query = { ...query, ...otherQueryParams };
-
-    const projectLaunches = await projectLaunchService.findMany(query, {
-      createdAt: 'DESC',
-    });
+    const projectLaunches = await projectLaunchService.findMany(
+      _.merge({
+        order: {
+          createdAt: 'DESC',
+        },
+        ...query,
+      }),
+    );
 
     return response.status(HttpStatusCode.Ok).json(projectLaunches);
   }
 
   async findOne(request: Request, response: Response) {
+    const query = request.query
+      ? parseObjectStringValuesToPrimitives(
+          qs.parse(request.query as Record<string, any>, { comma: true, allowDots: true }),
+        )
+      : undefined;
     const { id } = request.params;
-    const projectLaunch = await projectLaunchService.findOne({ ...request.query, id });
+    const projectLaunch = await projectLaunchService.findOne(_.merge(query, { where: { id } }));
 
     return response.status(HttpStatusCode.Ok).json(projectLaunch);
   }
@@ -81,7 +101,7 @@ export class ProjectLaunchController {
 
   async update(request: Request, response: Response) {
     const { id } = request.params;
-    await projectLaunchService.findOne({ id });
+    await projectLaunchService.findOne({ where: { id } });
 
     let team = request.body.team ? JSON.parse(request.body.team) : undefined;
     let files: Express.Multer.File[] = [];
@@ -142,7 +162,7 @@ export class ProjectLaunchController {
 
   async remove(request: Request, response: Response) {
     const { id } = request.params;
-    await projectLaunchService.findOne({ id });
+    await projectLaunchService.findOne({ where: { id } });
     await deleteFolder(`uploads/project-launches/${id}`);
     const projectLaunch = await projectLaunchService.remove(id);
 

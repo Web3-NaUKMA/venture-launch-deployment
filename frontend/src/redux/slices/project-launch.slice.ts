@@ -9,8 +9,6 @@ import {
 } from '../../types/redux/project-launch.types';
 import axios from 'axios';
 import { IProjectLaunch } from '../../types/project-launch.types';
-import { RequestQueryParams } from '../../types/app.types';
-import { serializeQueryParams } from '../../utils/request.utils';
 import { createProject } from './project.slice';
 import { ICreateProject } from '../../types/project.types';
 import {
@@ -18,6 +16,7 @@ import {
   IProjectLaunchInvestment,
   IUpdateProjectLaunchInvestment,
 } from '../../types/project-launch-investment.types';
+import qs from 'qs';
 
 const initialState: IProjectLaunchSliceState = {
   projectLaunches: [],
@@ -124,12 +123,16 @@ const projectLaunchSlice = createSlice({
 });
 
 export const fetchAllProjectLaunches =
-  (queryParams?: RequestQueryParams, options?: ActionCreatorOptions) =>
-  async (dispatch: AppDispatch) => {
+  (queryParams?: any, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(projectLaunchSlice.actions.setError({ fetchAllProjectLaunches: null }));
 
     try {
-      const query = queryParams ? serializeQueryParams(queryParams) : undefined;
+      const query = qs.stringify(queryParams, {
+        arrayFormat: 'comma',
+        allowDots: true,
+        commaRoundTrip: true,
+      } as any);
+
       const response = await axios.get(`project-launches/${query ? `?${query}` : ``}`);
 
       if (response.status === HttpStatusCode.Ok) {

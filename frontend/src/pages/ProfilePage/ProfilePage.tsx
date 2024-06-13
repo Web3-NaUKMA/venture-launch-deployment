@@ -23,7 +23,7 @@ const ProfilePage: FC = () => {
 
   useEffect(() => {
     if (authenticatedUser) {
-      dispatch(fetchAllProjectLaunches({ ownerId: authenticatedUser.id }));
+      dispatch(fetchAllProjectLaunches({ where: { author: { id: authenticatedUser.id } } }));
     }
   }, [authenticatedUser]);
 
