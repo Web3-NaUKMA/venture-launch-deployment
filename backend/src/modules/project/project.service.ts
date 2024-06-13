@@ -1,4 +1,4 @@
-import { AppDataSource } from '../../typeorm/index.typeorm';
+import AppDataSource from '../../typeorm/index.typeorm';
 import { ICreateProjectDto, IFindProjectDto, IUpdateProjectDto } from '../../DTO/project.dto';
 import { Project } from '../../typeorm/models/Project';
 import { UserToProject } from '../../typeorm/models/UsersToProjects';

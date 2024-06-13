@@ -1,4 +1,4 @@
-import { AppDataSource } from '../../typeorm/index.typeorm';
+import AppDataSource from '../../typeorm/index.typeorm';
 import { EntityNotFoundError, FindOptionsOrder } from 'typeorm';
 import { formatQueryOptions } from '../../utils/typeorm.utils';
 import { ProjectLaunch } from '../../typeorm/models/ProjectLaunch';

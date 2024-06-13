@@ -89,6 +89,7 @@ typings/
 .env.test
 .env.local
 .env.prod
+.env.database
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
@@ -122,3 +123,4 @@ dist
 .tern-port
 
 src/public
+backups/
