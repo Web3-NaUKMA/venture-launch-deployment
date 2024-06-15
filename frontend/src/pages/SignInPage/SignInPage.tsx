@@ -80,14 +80,20 @@ const SignInPage: FC = () => {
           new TextEncoder().encode(import.meta.env.VITE_JWT_SECRET),
         )
         .then(result => {
-          signIn(
-            SignInMethod.Google,
-            { googleAccessToken: (result.payload as any).accessToken },
-            {
-              onSuccess: () => navigate(AppRoutes.Home),
-              onError: ({ response }) => setState({ ...state, error: response.data.error }),
-            },
-          );
+          const payload = result.payload as any;
+
+          if (payload.accessToken) {
+            signIn(
+              SignInMethod.Google,
+              { googleAccessToken: payload.accessToken },
+              {
+                onSuccess: () => navigate(AppRoutes.Home),
+                onError: ({ response }) => setState({ ...state, error: response.data.error }),
+              },
+            );
+          } else {
+            setState({ ...state, error: payload.error });
+          }
         });
       cookies.remove('auth.token');
     }

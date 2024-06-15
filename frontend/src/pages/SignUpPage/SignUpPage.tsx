@@ -116,12 +116,18 @@ const SignUpPage: FC = () => {
           new TextEncoder().encode(import.meta.env.VITE_JWT_SECRET),
         )
         .then(result => {
-          const { email, firstName, lastName } = result.payload as any;
-          setState({
-            ...state,
-            data: { ...state.data, email, firstName, lastName },
-            withGoogle: true,
-          });
+          const payload = result.payload as any;
+
+          if (payload.error) {
+            setState({ ...state, error: payload.error });
+          } else {
+            const { email, firstName, lastName } = payload;
+            setState({
+              ...state,
+              data: { ...state.data, email, firstName, lastName },
+              withGoogle: true,
+            });
+          }
         });
       cookies.remove('auth.token');
     }

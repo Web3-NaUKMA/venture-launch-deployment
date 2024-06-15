@@ -15,6 +15,13 @@ export class AuthException extends Exception {
   }
 }
 
+export class GoogleAuthException extends AuthException {
+  constructor(message: string, cause?: Error | string) {
+    super(message, cause);
+    this.name = 'GoogleAuthException';
+  }
+}
+
 export class ForbiddenException extends Exception {
   constructor(message: string, cause?: Error | string) {
     super(message, cause);

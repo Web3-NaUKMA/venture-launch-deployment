@@ -9,6 +9,7 @@ import {
   AuthException,
   ConflictException,
   DatabaseException,
+  GoogleAuthException,
   ServerException,
 } from '../../utils/exceptions/exceptions.utils';
 import {
@@ -20,7 +21,7 @@ import {
 import { Auth, google } from 'googleapis';
 import * as jose from 'jose';
 import passwordService from '../password/password.service';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 
 export class AuthService {
   private readonly googleOauth2Client: Auth.OAuth2Client;
@@ -271,26 +272,48 @@ export class AuthService {
 
   async generateGoogleOAuth2Token(code: string, state: any): Promise<GenerateGoogleOAuth2Response> {
     try {
-      const { tokens } = await this.googleOauth2Client.getToken(code || '');
-      const { email } = await this.googleOauth2Client.getTokenInfo(tokens.access_token || '');
+      try {
+        const { tokens } = await this.googleOauth2Client.getToken(code || '');
+        const { email } = await this.googleOauth2Client.getTokenInfo(tokens.access_token || '');
 
-      const { given_name: firstName, family_name: lastName } = (
-        await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
-          headers: {
-            Authorization: `Bearer ${tokens.access_token}`,
-          },
+        const { given_name: firstName, family_name: lastName } = (
+          await axios.get('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: {
+              Authorization: `Bearer ${tokens.access_token}`,
+            },
+          })
+        ).data;
+
+        if (!tokens.access_token || !email) {
+          throw new AuthException('Cannot authenticate the user with provided credentials');
+        }
+
+        const token = await new jose.SignJWT({
+          email,
+          firstName,
+          lastName,
+          accessToken: tokens.access_token,
+          referer: state.referer,
         })
-      ).data;
+          .setProtectedHeader({ alg: 'HS256' })
+          .setExpirationTime('60s')
+          .sign(new TextEncoder().encode(process.env.JWT_SECRET!));
 
-      if (!tokens.access_token || !email) {
-        throw new AuthException('Cannot authenticate the user with provided credentials');
+        return { token };
+      } catch (error: any) {
+        if (error.constructor.name === 'GaxiosError') {
+          throw new GoogleAuthException('Cannot authenticate user via Google OAuth2');
+        }
+
+        if (error instanceof AuthException) {
+          throw error;
+        }
+
+        throw new ServerException('Internal server error', error);
       }
-
+    } catch (error: any) {
       const token = await new jose.SignJWT({
-        email,
-        firstName,
-        lastName,
-        accessToken: tokens.access_token,
+        error: error.message,
         referer: state.referer,
       })
         .setProtectedHeader({ alg: 'HS256' })
@@ -298,12 +321,6 @@ export class AuthService {
         .sign(new TextEncoder().encode(process.env.JWT_SECRET!));
 
       return { token };
-    } catch (error: any) {
-      if (error instanceof AuthException) {
-        throw error;
-      }
-
-      throw new ServerException('Internal server error', error);
     }
   }
 }
