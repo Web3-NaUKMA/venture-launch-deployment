@@ -3,14 +3,14 @@ import Button from '../../atoms/Button/Button';
 import { useOutsideClick } from '../../../hooks/dom.hooks';
 import { CloseIcon } from '../../atoms/Icons/Icons';
 
-export interface IModalProps extends HTMLAttributes<HTMLElement> {
+export interface ModalProps extends HTMLAttributes<HTMLElement> {
   title: string;
   onClose?: (...args: any[]) => any;
   onProcess?: (...args: any[]) => any;
   children?: ReactNode | ReactNode[];
 }
 
-const Modal: FC<IModalProps> = ({ children, title, onClose, className }) => {
+const Modal: FC<ModalProps> = ({ children, title, onClose, className }) => {
   const modalRef = useOutsideClick(() => onClose?.());
 
   useEffect(() => {

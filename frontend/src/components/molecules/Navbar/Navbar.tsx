@@ -1,17 +1,17 @@
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { FC, useEffect, useState } from 'react';
-import { INavbarLink } from '../../templates/PageWithNavigationTemplate';
+import { NavbarLink } from '../../templates/PageWithNavigationTemplate';
 import { v4 as uuid } from 'uuid';
 import { AppRoutes } from '../../../types/enums/app-routes.enum';
 import { BurgerMenuIcon, ExitIcon, UserCircleIcon, UserIcon } from '../../atoms/Icons/Icons';
 import { useAuth } from '../../../hooks/auth.hooks';
 import Button from '../../atoms/Button/Button';
 
-export interface INavbarProps {
-  links: INavbarLink[];
+export interface NavbarProps {
+  links: NavbarLink[];
 }
 
-const DesktopNavbar: FC<INavbarProps> = ({ links }) => {
+const DesktopNavbar: FC<NavbarProps> = ({ links }) => {
   const { authenticatedUser } = useAuth();
 
   return (
@@ -56,7 +56,7 @@ const DesktopNavbar: FC<INavbarProps> = ({ links }) => {
   );
 };
 
-const MobileNavbar: FC<INavbarProps> = ({ links }) => {
+const MobileNavbar: FC<NavbarProps> = ({ links }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const { authenticatedUser, signOut } = useAuth();
   const navigate = useNavigate();
@@ -146,7 +146,7 @@ const MobileNavbar: FC<INavbarProps> = ({ links }) => {
   );
 };
 
-export const Navbar: FC<INavbarProps> = ({ links }) => {
+export const Navbar: FC<NavbarProps> = ({ links }) => {
   return (
     <nav className='flex p-3 items-center py-10 justify-between z-50'>
       <DesktopNavbar links={links} />

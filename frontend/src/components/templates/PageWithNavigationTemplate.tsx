@@ -2,12 +2,12 @@ import { Outlet } from 'react-router';
 import Navbar from '../molecules/Navbar/Navbar';
 import { AppRoutes } from '../../types/enums/app-routes.enum';
 
-export interface INavbarLink {
+export interface NavbarLink {
   name: string;
   to: string;
 }
 
-const links: INavbarLink[] = [
+const links: NavbarLink[] = [
   {
     name: 'Home',
     to: AppRoutes.Home,

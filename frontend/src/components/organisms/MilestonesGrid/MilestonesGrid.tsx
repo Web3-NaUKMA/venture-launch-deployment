@@ -1,17 +1,17 @@
 import { FC } from 'react';
-import { IMilestone } from '../../../types/milestone.types';
+import { Milestone as MilestoneType } from '../../../types/milestone.types';
 import Button from '../../atoms/Button/Button';
 import Milestone from '../../molecules/Milestone/Milestone';
-import { IProject } from '../../../types/project.types';
+import { Project } from '../../../types/project.types';
 
-export interface IMilestonesGrid {
+export interface MilestonesGrid {
   setIsCreateMilestoneModalVisible?: (...args: any[]) => any;
   isCreateMilestoneButtonVisible?: boolean;
-  milestones: IMilestone[];
-  project?: IProject;
+  milestones: MilestoneType[];
+  project?: Project;
 }
 
-export const MilestonesGrid: FC<IMilestonesGrid> = ({
+export const MilestonesGrid: FC<MilestonesGrid> = ({
   milestones,
   setIsCreateMilestoneModalVisible,
   isCreateMilestoneButtonVisible = true,
@@ -25,7 +25,7 @@ export const MilestonesGrid: FC<IMilestonesGrid> = ({
           <>
             {!milestones.find(milestone => !milestone.isFinal) ? (
               <Button
-                className='font-sans inline-flex border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
+                className='inline-flex border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
                 onClick={() => setIsCreateMilestoneModalVisible?.(true)}
               >
                 Create new milestone

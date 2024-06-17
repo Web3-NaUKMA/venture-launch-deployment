@@ -1,19 +1,19 @@
 import { FC, FormEvent, useEffect, useRef, useState } from 'react';
-import Modal, { IModalProps } from '../../molecules/Modal/Modal';
+import Modal, { ModalProps } from '../../molecules/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
 import { useAuth } from '../../../hooks/auth.hooks';
-import { IProjectLaunch } from '../../../types/project-launch.types';
+import { ProjectLaunch } from '../../../types/project-launch.types';
 import {
   selectErrors,
   setError,
   updateProjectLaunch,
 } from '../../../redux/slices/project-launch.slice';
 
-export interface IEditProjectModalProps extends IModalProps {
-  project: IProjectLaunch;
+export interface EditProjectModalProps extends ModalProps {
+  project: ProjectLaunch;
 }
 
-interface IEditProjectModalState {
+interface EditProjectModalState {
   data: {
     name?: string;
     description?: string;
@@ -22,7 +22,7 @@ interface IEditProjectModalState {
   error: string | null;
 }
 
-const initialState: IEditProjectModalState = {
+const initialState: EditProjectModalState = {
   data: {
     name: undefined,
     description: undefined,
@@ -31,7 +31,7 @@ const initialState: IEditProjectModalState = {
   error: null,
 };
 
-const EditProjectModal: FC<IEditProjectModalProps> = ({
+const EditProjectModal: FC<EditProjectModalProps> = ({
   project,
   title,
   onClose,
@@ -66,7 +66,7 @@ const EditProjectModal: FC<IEditProjectModalProps> = ({
     }
   }, [authenticatedUser]);
 
-  const isDataValid = (data: IEditProjectModalState['data']): boolean => {
+  const isDataValid = (data: EditProjectModalState['data']): boolean => {
     if (!data.name?.trim()) {
       setState({ ...state, error: 'Project name cannot be empty.' });
       return false;

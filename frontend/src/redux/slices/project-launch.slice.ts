@@ -3,22 +3,22 @@ import { AppDispatch, RootState } from '../store';
 import { HttpStatusCode } from 'axios';
 import { ActionCreatorOptions } from '../../types/redux/store.types';
 import {
-  IProjectLaunchSliceState,
-  IProjectLaunchSliceStateError,
-  IProjectLaunchSliceStateErrors,
+  ProjectLaunchSliceState,
+  ProjectLaunchSliceStateError,
+  ProjectLaunchSliceStateErrors,
 } from '../../types/redux/project-launch.types';
 import axios from 'axios';
-import { IProjectLaunch } from '../../types/project-launch.types';
+import { ProjectLaunch } from '../../types/project-launch.types';
 import { createProject } from './project.slice';
-import { ICreateProject } from '../../types/project.types';
+import { CreateProjectDto } from '../../types/project.types';
 import {
-  ICreateProjectLaunchInvestment,
-  IProjectLaunchInvestment,
-  IUpdateProjectLaunchInvestment,
+  CreateProjectLaunchInvestmentDto,
+  ProjectLaunchInvestment,
+  UpdateProjectLaunchInvestmentDto,
 } from '../../types/project-launch-investment.types';
 import qs from 'qs';
 
-const initialState: IProjectLaunchSliceState = {
+const initialState: ProjectLaunchSliceState = {
   projectLaunches: [],
   projectLaunch: null,
   errors: {
@@ -37,27 +37,27 @@ const projectLaunchSlice = createSlice({
   initialState,
   reducers: {
     setProjectLaunches: (
-      state: IProjectLaunchSliceState,
-      action: PayloadAction<IProjectLaunch[]>,
-    ): IProjectLaunchSliceState => {
+      state: ProjectLaunchSliceState,
+      action: PayloadAction<ProjectLaunch[]>,
+    ): ProjectLaunchSliceState => {
       return { ...state, projectLaunches: action.payload };
     },
     setProjectLaunch: (
-      state: IProjectLaunchSliceState,
-      action: PayloadAction<IProjectLaunch | null>,
-    ): IProjectLaunchSliceState => {
+      state: ProjectLaunchSliceState,
+      action: PayloadAction<ProjectLaunch | null>,
+    ): ProjectLaunchSliceState => {
       return { ...state, projectLaunch: action.payload };
     },
     addProjectLaunch: (
-      state: IProjectLaunchSliceState,
-      action: PayloadAction<IProjectLaunch>,
-    ): IProjectLaunchSliceState => {
+      state: ProjectLaunchSliceState,
+      action: PayloadAction<ProjectLaunch>,
+    ): ProjectLaunchSliceState => {
       return { ...state, projectLaunches: [action.payload, ...state.projectLaunches] };
     },
     editProjectLaunch: (
-      state: IProjectLaunchSliceState,
-      action: PayloadAction<IProjectLaunch>,
-    ): IProjectLaunchSliceState => {
+      state: ProjectLaunchSliceState,
+      action: PayloadAction<ProjectLaunch>,
+    ): ProjectLaunchSliceState => {
       return {
         ...state,
         projectLaunches: state.projectLaunches.map(projectLaunch =>
@@ -66,9 +66,9 @@ const projectLaunchSlice = createSlice({
       };
     },
     deleteProjectLaunch: (
-      state: IProjectLaunchSliceState,
+      state: ProjectLaunchSliceState,
       action: PayloadAction<string>,
-    ): IProjectLaunchSliceState => {
+    ): ProjectLaunchSliceState => {
       return {
         ...state,
         projectLaunches: state.projectLaunches.filter(
@@ -77,9 +77,9 @@ const projectLaunchSlice = createSlice({
       };
     },
     addProjectLaunchInvestment: (
-      state: IProjectLaunchSliceState,
-      action: PayloadAction<{ id: string; data: IProjectLaunchInvestment }>,
-    ): IProjectLaunchSliceState => {
+      state: ProjectLaunchSliceState,
+      action: PayloadAction<{ id: string; data: ProjectLaunchInvestment }>,
+    ): ProjectLaunchSliceState => {
       return {
         ...state,
         projectLaunches: state.projectLaunches.map(projectLaunch =>
@@ -96,9 +96,9 @@ const projectLaunchSlice = createSlice({
       };
     },
     editProjectLaunchInvestment: (
-      state: IProjectLaunchSliceState,
-      action: PayloadAction<{ id: string; data: IProjectLaunchInvestment }>,
-    ): IProjectLaunchSliceState => {
+      state: ProjectLaunchSliceState,
+      action: PayloadAction<{ id: string; data: ProjectLaunchInvestment }>,
+    ): ProjectLaunchSliceState => {
       return {
         ...state,
         projectLaunches: state.projectLaunches.map(projectLaunch =>
@@ -114,9 +114,9 @@ const projectLaunchSlice = createSlice({
       };
     },
     setError: (
-      state: IProjectLaunchSliceState,
-      action: PayloadAction<IProjectLaunchSliceStateError>,
-    ): IProjectLaunchSliceState => {
+      state: ProjectLaunchSliceState,
+      action: PayloadAction<ProjectLaunchSliceStateError>,
+    ): ProjectLaunchSliceState => {
       return { ...state, errors: { ...state.errors, ...action.payload } };
     },
   },
@@ -188,7 +188,7 @@ export const createProjectLaunch =
       if (response.status === HttpStatusCode.Created) {
         options?.onSuccess?.(response.data);
 
-        const project: ICreateProject = {
+        const project: CreateProjectDto = {
           projectLaunchId: response.data.id,
           projectLaunchName: formData.get('name')?.toString() ?? '',
           projectLaunchDescription: formData.get('description')?.toString() ?? '',
@@ -260,7 +260,7 @@ export const removeProjectLaunch =
   };
 
 export const createProjectLaunchInvestment =
-  (investment: ICreateProjectLaunchInvestment, options?: ActionCreatorOptions) =>
+  (investment: CreateProjectLaunchInvestmentDto, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(projectLaunchSlice.actions.setError({ createProjectLaunchInvestment: null }));
 
@@ -295,7 +295,7 @@ export const updateProjectLaunchInvestment =
   (
     id: string,
     investorId: string,
-    investment: IUpdateProjectLaunchInvestment,
+    investment: UpdateProjectLaunchInvestmentDto,
     options?: ActionCreatorOptions,
   ) =>
   async (dispatch: AppDispatch) => {
@@ -324,11 +324,11 @@ export const updateProjectLaunchInvestment =
     }
   };
 
-export const selectProjectLaunches = (state: RootState): IProjectLaunch[] =>
+export const selectProjectLaunches = (state: RootState): ProjectLaunch[] =>
   state.projectLaunch.projectLaunches;
-export const selectProjectLaunch = (state: RootState): IProjectLaunch | null =>
+export const selectProjectLaunch = (state: RootState): ProjectLaunch | null =>
   state.projectLaunch.projectLaunch;
-export const selectErrors = (state: RootState): IProjectLaunchSliceStateErrors =>
+export const selectErrors = (state: RootState): ProjectLaunchSliceStateErrors =>
   state.projectLaunch.errors;
 
 export const {

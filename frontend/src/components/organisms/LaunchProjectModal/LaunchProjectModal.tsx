@@ -1,5 +1,5 @@
 import { FC, FormEvent, useEffect, useRef, useState } from 'react';
-import Modal, { IModalProps } from '../../molecules/Modal/Modal';
+import Modal, { ModalProps } from '../../molecules/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
 import { useAuth } from '../../../hooks/auth.hooks';
 import {
@@ -22,9 +22,9 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { USDC_MINT, createVaultTx, programId } from '../../../utils/venture-launch.utils';
 import useWeb3Auth from '../../../hooks/web3auth.hooks';
 
-export interface ILaunchProjectModalProps extends IModalProps {}
+export interface LaunchProjectModalProps extends ModalProps {}
 
-interface ILaunchProjectModalState {
+interface LaunchProjectModalState {
   data: {
     name?: string;
     description?: string;
@@ -59,7 +59,7 @@ interface ILaunchProjectModalState {
   error: string | null;
 }
 
-const initialState: ILaunchProjectModalState = {
+const initialState: LaunchProjectModalState = {
   data: {
     name: undefined,
     description: undefined,
@@ -86,7 +86,7 @@ const initialState: ILaunchProjectModalState = {
   error: null,
 };
 
-const LaunchProjectModal: FC<ILaunchProjectModalProps> = ({ title, onClose, children }) => {
+const LaunchProjectModal: FC<LaunchProjectModalProps> = ({ title, onClose, children }) => {
   const { authenticatedUser } = useAuth();
   const [state, setState] = useState(initialState);
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -104,7 +104,7 @@ const LaunchProjectModal: FC<ILaunchProjectModalProps> = ({ title, onClose, chil
     setState({ ...state, error: errors.createProjectLaunch });
   }, [errors.createProjectLaunch]);
 
-  const isDataValid = (data: ILaunchProjectModalState['data']): boolean => {
+  const isDataValid = (data: LaunchProjectModalState['data']): boolean => {
     if (!data.name?.trim()) {
       setState({ ...state, error: 'Project launch name cannot be empty.' });
       return false;

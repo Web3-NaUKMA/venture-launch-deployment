@@ -1,13 +1,13 @@
 import { FC, FormEvent, useEffect, useRef, useState } from 'react';
-import Modal, { IModalProps } from '../../molecules/Modal/Modal';
+import Modal, { ModalProps } from '../../molecules/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
 import { selectErrors, setError, updateUser } from '../../../redux/slices/user.slice';
-import { IUser } from '../../../types/user.types';
+import { User } from '../../../types/user.types';
 import { UserIcon } from '../../atoms/Icons/Icons';
 import { resolveImage } from '../../../utils/file.utils';
 
-export interface EditUserModalProps extends IModalProps {
-  user: IUser;
+export interface EditUserModalProps extends ModalProps {
+  user: User;
 }
 
 interface EditUserModalState {

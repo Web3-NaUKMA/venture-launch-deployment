@@ -1,8 +1,8 @@
-import { IDataAccount } from './data-account.types';
-import { IMilestone } from './milestone.types';
-import { IProjectLaunch } from './project-launch.types';
+import { DataAccount } from './data-account.types';
+import { Milestone } from './milestone.types';
+import { ProjectLaunch } from './project-launch.types';
 
-export interface IProject {
+export interface Project {
   id: string;
   projectLaunchName: string;
   projectLaunchDescription: string;
@@ -10,13 +10,13 @@ export interface IProject {
   milestoneNumber: number;
   isFinal: boolean;
   createdAt: Date;
-  projectLaunch: IProjectLaunch;
+  projectLaunch: ProjectLaunch;
   users: string[];
-  milestones: IMilestone[];
-  dataAccount: IDataAccount | null;
+  milestones: Milestone[];
+  dataAccount: DataAccount | null;
 }
 
-export interface ICreateProject {
+export interface CreateProjectDto {
   projectLaunchId: string;
   projectLaunchName: string;
   projectLaunchDescription: string;
@@ -25,7 +25,7 @@ export interface ICreateProject {
   users?: string[];
 }
 
-export interface IUpdateProject {
+export interface UpdateProjectDto {
   projectLaunchName?: string;
   projectLaunchDescription?: string;
   projectLaunchRaisedFunds?: number;

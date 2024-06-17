@@ -1,14 +1,14 @@
-import { IProjectLaunchInvestment } from './project-launch-investment.types';
-import { IProject } from './project.types';
-import { IUser } from './user.types';
+import { ProjectLaunchInvestment } from './project-launch-investment.types';
+import { Project } from './project.types';
+import { User } from './user.types';
 
-export interface IProjectLaunch {
+export interface ProjectLaunch {
   id: string;
   name: string;
   description: string;
   logo: string | null;
   isFundraised: boolean;
-  approver: IUser | null;
+  approver: User | null;
   fundraiseAmount: number;
   fundraiseProgress: number;
   fundraiseDeadline: Date;
@@ -17,17 +17,17 @@ export interface IProjectLaunch {
   businessModel: string;
   tokenomics: string;
   roundDetails: any;
-  project: IProject | null;
+  project: Project | null;
   authorId?: string;
-  author: IUser;
-  projectLaunchInvestments?: IProjectLaunchInvestment[];
+  author: User;
+  projectLaunchInvestments?: ProjectLaunchInvestment[];
   createdAt: Date;
   vaultTokenAccount: string;
   cryptoTrackerAccount: string;
   businessAnalystReview: string | null;
 }
 
-export interface ICreateProjectLaunch {
+export interface CreateProjectLaunchDto {
   name: string;
   description: string;
   fundraiseAmount: number;
@@ -42,7 +42,7 @@ export interface ICreateProjectLaunch {
   cryptoTrackerAccount: string;
 }
 
-export interface IUpdateProjectLaunch {
+export interface UpdateProjectLaunchDto {
   name?: string;
   description?: string;
   isFundraised?: boolean;

@@ -9,7 +9,7 @@ import { useAppDispatch } from '../../../hooks/redux.hooks';
 import { createPortal } from 'react-dom';
 import { useAuth } from '../../../hooks/auth.hooks';
 import { UserRoleEnum } from '../../../types/enums/user-role.enum';
-import { IProjectLaunch } from '../../../types/project-launch.types';
+import { ProjectLaunch } from '../../../types/project-launch.types';
 import {
   fetchAllProjectLaunches,
   removeProjectLaunch,
@@ -20,12 +20,12 @@ import ProgressBar from '../ProgressBar/ProgressBar';
 import { resolveImage } from '../../../utils/file.utils';
 import ApproveProjectLaunchModal from '../../organisms/ApproveProjectLaunchModal/ApproveProjectLaunchModal';
 
-export interface IProjectProps {
-  project: IProjectLaunch;
+export interface ProjectProps {
+  project: ProjectLaunch;
   variant?: 'extended' | 'short';
 }
 
-export const Project: FC<IProjectProps> = ({ project: projectLaunch, variant = 'extended' }) => {
+export const Project: FC<ProjectProps> = ({ project: projectLaunch, variant = 'extended' }) => {
   const dispatch = useAppDispatch();
   const [isSettingsDropdownVisible, setIsSettingsDropdownVisible] = useState(false);
   const [isRemoveProjectModalVisible, setIsRemoveProjectModalVisible] = useState(false);

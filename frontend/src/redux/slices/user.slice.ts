@@ -3,15 +3,15 @@ import { AppDispatch, RootState } from '../store';
 import { HttpStatusCode } from 'axios';
 import { ActionCreatorOptions } from '../../types/redux/store.types';
 import {
-  IUserSliceState,
-  IUserSliceStateError,
-  IUserSliceStateErrors,
+  UserSliceState,
+  UserSliceStateError,
+  UserSliceStateErrors,
 } from '../../types/redux/user.types';
 import axios from 'axios';
-import { ICreateUser, IUser } from '../../types/user.types';
+import { CreateUserDto, User } from '../../types/user.types';
 import qs from 'qs';
 
-const initialState: IUserSliceState = {
+const initialState: UserSliceState = {
   users: [],
   user: null,
   errors: {
@@ -27,31 +27,31 @@ const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
-    setUsers: (state: IUserSliceState, action: PayloadAction<IUser[]>): IUserSliceState => {
+    setUsers: (state: UserSliceState, action: PayloadAction<User[]>): UserSliceState => {
       return { ...state, users: action.payload };
     },
-    setUser: (state: IUserSliceState, action: PayloadAction<IUser | null>): IUserSliceState => {
+    setUser: (state: UserSliceState, action: PayloadAction<User | null>): UserSliceState => {
       return { ...state, user: action.payload };
     },
-    addUser: (state: IUserSliceState, action: PayloadAction<IUser>): IUserSliceState => {
+    addUser: (state: UserSliceState, action: PayloadAction<User>): UserSliceState => {
       return { ...state, users: [action.payload, ...state.users] };
     },
-    editUser: (state: IUserSliceState, action: PayloadAction<IUser>): IUserSliceState => {
+    editUser: (state: UserSliceState, action: PayloadAction<User>): UserSliceState => {
       return {
         ...state,
         users: state.users.map(user => (user.id === action.payload.id ? action.payload : user)),
       };
     },
-    deleteUser: (state: IUserSliceState, action: PayloadAction<string>): IUserSliceState => {
+    deleteUser: (state: UserSliceState, action: PayloadAction<string>): UserSliceState => {
       return {
         ...state,
         users: state.users.filter(user => user.id !== action.payload),
       };
     },
     setError: (
-      state: IUserSliceState,
-      action: PayloadAction<IUserSliceStateError>,
-    ): IUserSliceState => {
+      state: UserSliceState,
+      action: PayloadAction<UserSliceStateError>,
+    ): UserSliceState => {
       return { ...state, errors: { ...state.errors, ...action.payload } };
     },
   },
@@ -101,7 +101,7 @@ export const fetchUser =
   };
 
 export const createUser =
-  (user: ICreateUser, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (user: CreateUserDto, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(userSlice.actions.setError({ createUser: null }));
 
     try {
@@ -168,9 +168,9 @@ export const removeUser =
     }
   };
 
-export const selectUsers = (state: RootState): IUser[] => state.user.users;
-export const selectUser = (state: RootState): IUser | null => state.user.user;
-export const selectErrors = (state: RootState): IUserSliceStateErrors => state.user.errors;
+export const selectUsers = (state: RootState): User[] => state.user.users;
+export const selectUser = (state: RootState): User | null => state.user.user;
+export const selectErrors = (state: RootState): UserSliceStateErrors => state.user.errors;
 
 export const { setError, setUser, setUsers, addUser, editUser, deleteUser } = userSlice.actions;
 export default userSlice.reducer;

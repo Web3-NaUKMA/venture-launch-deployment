@@ -3,15 +3,15 @@ import { AppDispatch, RootState } from '../store';
 import { HttpStatusCode } from 'axios';
 import { ActionCreatorOptions } from '../../types/redux/store.types';
 import {
-  IProjectSliceState,
-  IProjectSliceStateError,
-  IProjectSliceStateErrors,
+  ProjectSliceState,
+  ProjectSliceStateError,
+  ProjectSliceStateErrors,
 } from '../../types/redux/project.types';
 import axios from 'axios';
-import { ICreateProject, IUpdateProject, IProject } from '../../types/project.types';
+import { CreateProjectDto, UpdateProjectDto, Project } from '../../types/project.types';
 import qs from 'qs';
 
-const initialState: IProjectSliceState = {
+const initialState: ProjectSliceState = {
   projects: [],
   project: null,
   errors: {
@@ -28,27 +28,21 @@ const projectSlice = createSlice({
   initialState,
   reducers: {
     setProjects: (
-      state: IProjectSliceState,
-      action: PayloadAction<IProject[]>,
-    ): IProjectSliceState => {
+      state: ProjectSliceState,
+      action: PayloadAction<Project[]>,
+    ): ProjectSliceState => {
       return { ...state, projects: action.payload };
     },
     setProject: (
-      state: IProjectSliceState,
-      action: PayloadAction<IProject | null>,
-    ): IProjectSliceState => {
+      state: ProjectSliceState,
+      action: PayloadAction<Project | null>,
+    ): ProjectSliceState => {
       return { ...state, project: action.payload };
     },
-    addProject: (
-      state: IProjectSliceState,
-      action: PayloadAction<IProject>,
-    ): IProjectSliceState => {
+    addProject: (state: ProjectSliceState, action: PayloadAction<Project>): ProjectSliceState => {
       return { ...state, projects: [action.payload, ...state.projects] };
     },
-    editProject: (
-      state: IProjectSliceState,
-      action: PayloadAction<IProject>,
-    ): IProjectSliceState => {
+    editProject: (state: ProjectSliceState, action: PayloadAction<Project>): ProjectSliceState => {
       return {
         ...state,
         projects: state.projects.map(project =>
@@ -56,19 +50,16 @@ const projectSlice = createSlice({
         ),
       };
     },
-    deleteProject: (
-      state: IProjectSliceState,
-      action: PayloadAction<string>,
-    ): IProjectSliceState => {
+    deleteProject: (state: ProjectSliceState, action: PayloadAction<string>): ProjectSliceState => {
       return {
         ...state,
         projects: state.projects.filter(project => project.id !== action.payload),
       };
     },
     setError: (
-      state: IProjectSliceState,
-      action: PayloadAction<IProjectSliceStateError>,
-    ): IProjectSliceState => {
+      state: ProjectSliceState,
+      action: PayloadAction<ProjectSliceStateError>,
+    ): ProjectSliceState => {
       return { ...state, errors: { ...state.errors, ...action.payload } };
     },
   },
@@ -120,7 +111,7 @@ export const fetchProject =
   };
 
 export const createProject =
-  (project: ICreateProject, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (project: CreateProjectDto, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(projectSlice.actions.setError({ createProject: null }));
 
     try {
@@ -141,7 +132,7 @@ export const createProject =
   };
 
 export const updateProject =
-  (id: string, project: IUpdateProject, options?: ActionCreatorOptions) =>
+  (id: string, project: UpdateProjectDto, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(projectSlice.actions.setError({ updateProject: null }));
 
@@ -183,9 +174,9 @@ export const removeProject =
     }
   };
 
-export const selectProjects = (state: RootState): IProject[] => state.project.projects;
-export const selectProject = (state: RootState): IProject | null => state.project.project;
-export const selectErrors = (state: RootState): IProjectSliceStateErrors => state.project.errors;
+export const selectProjects = (state: RootState): Project[] => state.project.projects;
+export const selectProject = (state: RootState): Project | null => state.project.project;
+export const selectErrors = (state: RootState): ProjectSliceStateErrors => state.project.errors;
 
 export const { setError, setProject, setProjects, addProject, editProject, deleteProject } =
   projectSlice.actions;

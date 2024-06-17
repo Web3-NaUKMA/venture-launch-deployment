@@ -4,7 +4,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
 import * as web3 from '@solana/web3.js';
-import { IProject } from '../types/project.types';
+import { Project } from '../types/project.types';
 import axios, { HttpStatusCode } from 'axios';
 
 const toBytesArray = (string: string) => new TextEncoder().encode(string);
@@ -143,7 +143,7 @@ export const createNftTransaction = async (
   return transaction;
 };
 
-export const getIPFSUrlForProject = async (project: IProject) => {
+export const getIPFSUrlForProject = async (project: Project) => {
   const response = await axios.post(`projects/ipfs-url`, project);
   if (response.status === HttpStatusCode.Created) {
     return response.data.ipfsURL;

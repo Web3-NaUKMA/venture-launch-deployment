@@ -1,21 +1,21 @@
-import { IProjectLaunch } from './project-launch.types';
-import { IUser } from './user.types';
+import { ProjectLaunch } from './project-launch.types';
+import { User } from './user.types';
 
-export interface IProjectLaunchInvestment {
+export interface ProjectLaunchInvestment {
   id: string;
-  investor: IUser;
-  projectLaunch: IProjectLaunch;
+  investor: User;
+  projectLaunch: ProjectLaunch;
   amount: number;
   createdAt: Date;
 }
 
-export interface ICreateProjectLaunchInvestment {
+export interface CreateProjectLaunchInvestmentDto {
   amount?: number;
   investorId: string;
   projectLaunchId: string;
 }
 
-export interface IUpdateProjectLaunchInvestment {
+export interface UpdateProjectLaunchInvestmentDto {
   amount?: number;
   isInvestorApproved?: boolean;
 }

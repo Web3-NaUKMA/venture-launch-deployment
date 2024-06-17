@@ -1,4 +1,4 @@
-export interface IMilestone {
+export interface Milestone {
   id: string;
   mergedPullRequestUrl: string;
   isFinal: boolean;
@@ -8,13 +8,13 @@ export interface IMilestone {
   projectId: string;
 }
 
-export interface ICreateMilestone {
+export interface CreateMilestoneDto {
   mergedPullRequestUrl: string;
   transactionApprovalHash: string;
   projectId: string;
 }
 
-export interface IUpdateMilestone {
+export interface UpdateMilestoneDto {
   isFinal?: boolean;
   isWithdrawn?: boolean;
   transactionApprovalHash?: string;

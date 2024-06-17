@@ -1,10 +1,10 @@
-import { IProjectLaunch } from '../project-launch.types';
+import { ProjectLaunch } from '../project-launch.types';
 
-export interface IProjectLaunchSliceStateError {
+export interface ProjectLaunchSliceStateError {
   [key: string]: string | null;
 }
 
-export interface IProjectLaunchSliceStateErrors {
+export interface ProjectLaunchSliceStateErrors {
   fetchAllProjectLaunches: string | null;
   fetchProjectLaunch: string | null;
   createProjectLaunch: string | null;
@@ -14,8 +14,8 @@ export interface IProjectLaunchSliceStateErrors {
   updateProjectLaunchInvestment: string | null;
 }
 
-export interface IProjectLaunchSliceState {
-  projectLaunches: IProjectLaunch[];
-  projectLaunch: IProjectLaunch | null;
-  errors: IProjectLaunchSliceStateErrors;
+export interface ProjectLaunchSliceState {
+  projectLaunches: ProjectLaunch[];
+  projectLaunch: ProjectLaunch | null;
+  errors: ProjectLaunchSliceStateErrors;
 }
