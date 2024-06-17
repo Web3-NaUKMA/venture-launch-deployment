@@ -20,6 +20,10 @@ const links: INavbarLink[] = [
     name: 'About',
     to: AppRoutes.About,
   },
+  {
+    name: 'Message Center',
+    to: AppRoutes.MessageCenter,
+  },
 ];
 
 const PageWithNavigationTemplate = () => {

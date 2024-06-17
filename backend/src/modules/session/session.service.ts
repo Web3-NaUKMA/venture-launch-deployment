@@ -1,4 +1,4 @@
-import { ICreateSessionDto, IUpdateSessionDto } from '../../DTO/session.dto';
+import { CreateSessionDto, UpdateSessionDto } from '../../DTO/session.dto';
 import { Session } from '../../typeorm/models/Session';
 import AppDataSource from '../../typeorm/index.typeorm';
 import {
@@ -38,7 +38,7 @@ export class SessionService {
     }
   }
 
-  async create(data: ICreateSessionDto): Promise<Session> {
+  async create(data: CreateSessionDto): Promise<Session> {
     try {
       const exists = await AppDataSource.getRepository(Session).exists({
         where: [{ sessionId: data.sessionId }, { user: { id: data.userId } }],
@@ -64,7 +64,7 @@ export class SessionService {
     }
   }
 
-  async update(sessionId: string, data: IUpdateSessionDto): Promise<Session> {
+  async update(sessionId: string, data: UpdateSessionDto): Promise<Session> {
     try {
       await AppDataSource.getRepository(Session).update({ sessionId }, data);
 

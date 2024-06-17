@@ -1,5 +1,5 @@
 import AppDataSource from '../../typeorm/index.typeorm';
-import { ICreateUserDto, IUpdateUserDto } from '../../DTO/user.dto';
+import { CreateUserDto, UpdateUserDto } from '../../DTO/user.dto';
 import { User } from '../../typeorm/models/User';
 import {
   ConflictException,
@@ -39,7 +39,7 @@ export class UserService {
     }
   }
 
-  async create(data: ICreateUserDto): Promise<User> {
+  async create(data: CreateUserDto): Promise<User> {
     try {
       const exists = await AppDataSource.getRepository(User).exists({
         where: [{ email: data.email, username: data.username, walletId: data.walletId }],
@@ -61,7 +61,7 @@ export class UserService {
     }
   }
 
-  async update(id: string, data: IUpdateUserDto): Promise<User> {
+  async update(id: string, data: UpdateUserDto): Promise<User> {
     try {
       if (data.password?.trim()) {
         data.password = await passwordService.hash(data.password);

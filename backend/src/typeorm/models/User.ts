@@ -1,14 +1,14 @@
 import { Column, Entity, OneToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { IUser } from '../../types/user.interface';
+import { User as UserInterface } from '../../types/user.interface';
 import { Session } from './Session';
 import { UserRoleEnum } from '../../types/enums/user-role.enum';
 import { UserToProject } from './UsersToProjects';
 import { ProjectLaunchInvestment } from './ProjectLaunchInvestment';
-import { IProjectLaunchInvestment } from '../../types/project-launch-investment.interface';
+import { ProjectLaunchInvestment as ProjectLaunchInvestmentInterface } from '../../types/project-launch-investment.interface';
 import { ProjectLaunch } from './ProjectLaunch';
 
 @Entity()
-export class User implements IUser {
+export class User implements UserInterface {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -82,5 +82,5 @@ export class User implements IUser {
     () => ProjectLaunchInvestment,
     projectLaunchInvestment => projectLaunchInvestment.investor,
   )
-  projectLaunchInvestments?: IProjectLaunchInvestment[] | undefined;
+  projectLaunchInvestments?: ProjectLaunchInvestmentInterface[] | undefined;
 }

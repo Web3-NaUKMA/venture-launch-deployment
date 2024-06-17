@@ -1,19 +1,8 @@
-import { IProjectLaunch } from '../types/project-launch.interface';
-import { IUser } from '../types/user.interface';
-
-export interface ICreateProjectLaunchInvestmentDto {
+export interface CreateProjectLaunchInvestmentDto {
   investorId: string;
   projectLaunchId: string;
 }
 
-export interface IUpdateProjectLaunchInvestmentDto {
+export interface UpdateProjectLaunchInvestmentDto {
   amount?: number;
-}
-
-export interface IFindProjectLaunchInvestmentDto {
-  id?: string;
-  investor?: Partial<IUser>;
-  projectLaunch?: Partial<IProjectLaunch>;
-  amount?: number;
-  createdAt?: Date;
 }

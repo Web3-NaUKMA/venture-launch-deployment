@@ -1,9 +1,9 @@
 import AppDataSource from '../../typeorm/index.typeorm';
-import { ICreateProjectDto, IUpdateProjectDto } from '../../DTO/project.dto';
+import { CreateProjectDto, UpdateProjectDto } from '../../DTO/project.dto';
 import { Project } from '../../typeorm/models/Project';
 import { UserToProject } from '../../typeorm/models/UsersToProjects';
 import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
-import { IMilestone } from '../../types/milestone.interface';
+import { Milestone } from '../../types/milestone.interface';
 import { ThirdwebStorage } from '@thirdweb-dev/storage';
 import { DataAccount } from '../../typeorm/models/DataAccount';
 import { ProjectLaunch } from '../../typeorm/models/ProjectLaunch';
@@ -54,7 +54,7 @@ export class ProjectService {
     }
   }
 
-  async create(data: ICreateProjectDto): Promise<Project> {
+  async create(data: CreateProjectDto): Promise<Project> {
     try {
       const exists = await AppDataSource.getRepository(Project).exists({
         where: {
@@ -103,7 +103,7 @@ export class ProjectService {
     }
   }
 
-  async update(id: string, data: IUpdateProjectDto): Promise<Project> {
+  async update(id: string, data: UpdateProjectDto): Promise<Project> {
     try {
       const { users, dataAccountHash, ...projectData } = data;
 
@@ -190,7 +190,7 @@ export class ProjectService {
         edition: '',
         background_color: '000000',
         milestoneHashes: project.milestones.map(
-          (milestone: IMilestone) => milestone.transactionApprovalHash,
+          (milestone: Milestone) => milestone.transactionApprovalHash,
         ),
         image: process.env.NFT_DEFAULT_IMAGE,
       };

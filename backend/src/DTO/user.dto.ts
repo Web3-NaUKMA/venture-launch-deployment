@@ -1,6 +1,6 @@
 import { UserRoleEnum } from '../types/enums/user-role.enum';
 
-export interface ICreateUserDto {
+export interface CreateUserDto {
   walletId: string;
   username: string;
   password?: string | null;
@@ -10,7 +10,7 @@ export interface ICreateUserDto {
   lastName?: string;
 }
 
-export interface IUpdateUserDto {
+export interface UpdateUserDto {
   walletId?: string;
   username?: string;
   email?: string;
@@ -18,25 +18,6 @@ export interface IUpdateUserDto {
   password?: string;
   avatar?: string | null;
   bio?: string | null;
-  firstName?: string;
-  lastName?: string;
-  birthDate?: Date;
-  nationality?: string;
-  country?: string;
-  state?: string;
-  city?: string;
-  street?: string;
-  zipCode?: string;
-  phone?: string;
-}
-
-export interface IFindUserDto {
-  id?: string;
-  walletId?: string;
-  username?: string;
-  email?: string;
-  role?: UserRoleEnum[];
-  createdAt?: Date;
   firstName?: string;
   lastName?: string;
   birthDate?: Date;

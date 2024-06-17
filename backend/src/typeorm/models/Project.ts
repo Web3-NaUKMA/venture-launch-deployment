@@ -7,16 +7,16 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { IProject } from '../../types/project.interface';
+import { Project as ProjectInterface } from '../../types/project.interface';
 import { Milestone } from './Milestone';
 import { DataAccount } from './DataAccount';
 import { UserToProject } from './UsersToProjects';
-import { IProjectLaunch } from '../../types/project-launch.interface';
+import { ProjectLaunch as ProjectLaunchInterface } from '../../types/project-launch.interface';
 import { ProjectLaunch } from './ProjectLaunch';
 
 @Entity()
 @Index(['projectLaunchName', 'projectLaunch.id'], { unique: true })
-export class Project implements IProject {
+export class Project implements ProjectInterface {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -52,5 +52,5 @@ export class Project implements IProject {
 
   @OneToOne(() => ProjectLaunch, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'projectLaunchId', referencedColumnName: 'id' })
-  projectLaunch: IProjectLaunch;
+  projectLaunch: ProjectLaunchInterface;
 }

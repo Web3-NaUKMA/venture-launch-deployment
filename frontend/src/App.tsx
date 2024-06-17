@@ -7,7 +7,6 @@ import SignInPage from './pages/SignInPage/SignInPage';
 import SignUpPage from './pages/SignUpPage/SignUpPage';
 import ProjectsPage from './pages/ProjectsPage/ProjectsPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
-import AccountRegistrationPage from './pages/AccountRegistrationPage/AccountRegistrationPage';
 import DetailsProjectPage from './pages/DetailsProjectPage/DetailsProjectPage';
 import PageWithNavigationTemplate from './components/templates/PageWithNavigationTemplate';
 import { store } from './redux/store';
@@ -18,6 +17,7 @@ import ProfilePage from './pages/ProfilePage/ProfilePage';
 import AboutPage from './pages/AboutPage/AboutPage';
 import PortfolioPage from './pages/PortfolioPage/PortfolioPage';
 import DetailsUserPage from './pages/DetailsUserPage/DetailsUserPage';
+import MessageCenterPage from './pages/MessageCenterPage/MessageCenterPage';
 
 axios.defaults.baseURL = `${import.meta.env.VITE_BACKEND_URI}/${import.meta.env.VITE_BACKEND_PREFIX || ''}`;
 axios.defaults.withCredentials = true;
@@ -40,8 +40,6 @@ const Content: FC = () => {
       <Routes>
         <Route path={AppRoutes.SignIn} Component={SignInPage} />
         <Route path={AppRoutes.SignUp} Component={SignUpPage} />
-        <Route path={AppRoutes.AccountRegistration} Component={AccountRegistrationPage} />
-
         <Route Component={PageWithNavigationTemplate}>
           <Route Component={AuthProtectedRoute}>
             <Route path={AppRoutes.Home} Component={ProjectsPage} />
@@ -49,6 +47,7 @@ const Content: FC = () => {
             <Route path={AppRoutes.DetailsProject} Component={DetailsProjectPage} />
             <Route path={AppRoutes.DetailsUser} Component={DetailsUserPage} />
             <Route path={AppRoutes.Profile} Component={ProfilePage} />
+            <Route path={AppRoutes.MessageCenter} Component={MessageCenterPage} />
           </Route>
           <Route path={AppRoutes.Root} element={<Navigate to={AppRoutes.Home} />} />
           <Route path={AppRoutes.About} Component={AboutPage} />

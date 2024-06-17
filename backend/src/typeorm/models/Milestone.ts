@@ -1,9 +1,9 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { IMilestone } from '../../types/milestone.interface';
+import { Milestone as MilestoneInterface } from '../../types/milestone.interface';
 import { Project } from './Project';
 
 @Entity()
-export class Milestone implements IMilestone {
+export class Milestone implements MilestoneInterface {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

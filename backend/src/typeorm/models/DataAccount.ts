@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Project } from './Project';
-import { IDataAccount } from '../../types/data-account.interface';
+import { DataAccount as DataAccountInterface } from '../../types/data-account.interface';
 
 @Entity()
-export class DataAccount implements IDataAccount {
+export class DataAccount implements DataAccountInterface {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

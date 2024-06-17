@@ -1,5 +1,5 @@
 import AppDataSource from '../../typeorm/index.typeorm';
-import { ICreateMilestoneDto, IUpdateMilestoneDto } from '../../DTO/milestone.dto';
+import { CreateMilestoneDto, UpdateMilestoneDto } from '../../DTO/milestone.dto';
 import { Milestone } from '../../typeorm/models/Milestone';
 import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
 import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
@@ -34,7 +34,7 @@ export class MilestoneService {
     }
   }
 
-  async create(data: ICreateMilestoneDto): Promise<Milestone> {
+  async create(data: CreateMilestoneDto): Promise<Milestone> {
     try {
       return await AppDataSource.getRepository(Milestone).save({
         ...data,
@@ -45,7 +45,7 @@ export class MilestoneService {
     }
   }
 
-  async update(id: string, data: IUpdateMilestoneDto): Promise<Milestone> {
+  async update(id: string, data: UpdateMilestoneDto): Promise<Milestone> {
     try {
       await AppDataSource.getRepository(Milestone).update({ id }, data);
 

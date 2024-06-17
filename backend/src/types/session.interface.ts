@@ -1,4 +1,4 @@
-export interface ISession {
+export interface Session {
   sessionId: string;
   expiresAt: Date;
 }

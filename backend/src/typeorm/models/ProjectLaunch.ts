@@ -8,17 +8,17 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { IProjectLaunch } from '../../types/project-launch.interface';
-import { IProject } from '../../types/project.interface';
+import { ProjectLaunch as ProjectLaunchInterface } from '../../types/project-launch.interface';
+import { Project as ProjectInterface } from '../../types/project.interface';
 import { Project } from './Project';
 import { ProjectLaunchInvestment } from './ProjectLaunchInvestment';
-import { IProjectLaunchInvestment } from '../../types/project-launch-investment.interface';
-import { IUser } from '../../types/user.interface';
+import { ProjectLaunchInvestment as ProjectLaunchInvestmentInterface } from '../../types/project-launch-investment.interface';
+import { User as UserInterface } from '../../types/user.interface';
 import { User } from './User';
 
 @Entity()
 @Index(['name', 'author.id'], { unique: true })
-export class ProjectLaunch implements IProjectLaunch {
+export class ProjectLaunch implements ProjectLaunchInterface {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -60,7 +60,7 @@ export class ProjectLaunch implements IProjectLaunch {
 
   @OneToOne(() => Project)
   @JoinColumn({ name: 'projectId', referencedColumnName: 'id' })
-  project: IProject | null;
+  project: ProjectInterface | null;
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
@@ -72,13 +72,13 @@ export class ProjectLaunch implements IProjectLaunch {
   cryptoTrackerAccount: string;
 
   @ManyToOne(() => User, user => user.projectLaunches, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-  author: IUser;
+  author: UserInterface;
 
   @OneToMany(
     () => ProjectLaunchInvestment,
     projectLaunchInvestment => projectLaunchInvestment.projectLaunch,
   )
-  projectLaunchInvestments?: IProjectLaunchInvestment[] | undefined;
+  projectLaunchInvestments?: ProjectLaunchInvestmentInterface[] | undefined;
 
   @Column({ type: 'text', default: null })
   businessAnalystReview: string | null;
@@ -87,5 +87,5 @@ export class ProjectLaunch implements IProjectLaunch {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  approver: IUser;
+  approver: UserInterface;
 }

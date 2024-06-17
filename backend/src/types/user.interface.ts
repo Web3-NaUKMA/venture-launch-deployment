@@ -1,8 +1,8 @@
 import { UserRoleEnum } from './enums/user-role.enum';
-import { IProjectLaunchInvestment } from './project-launch-investment.interface';
-import { IProjectLaunch } from './project-launch.interface';
+import { ProjectLaunchInvestment } from './project-launch-investment.interface';
+import { ProjectLaunch } from './project-launch.interface';
 
-export interface IUser {
+export interface User {
   id: string;
   walletId: string;
   username: string;
@@ -22,7 +22,7 @@ export interface IUser {
   street?: string;
   zipCode?: string;
   phone?: string;
-  projectLaunches: IProjectLaunch[];
-  approvedProjectLaunches: IProjectLaunch[];
-  projectLaunchInvestments?: IProjectLaunchInvestment[];
+  projectLaunches: ProjectLaunch[];
+  approvedProjectLaunches: ProjectLaunch[];
+  projectLaunchInvestments?: ProjectLaunchInvestment[];
 }

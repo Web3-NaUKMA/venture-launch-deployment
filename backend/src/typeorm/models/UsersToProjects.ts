@@ -1,11 +1,11 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { IUserToProject } from '../../types/user-to-project.interface';
+import { UserToProject as UserToProjectInterface } from '../../types/user-to-project.interface';
 import { Project } from './Project';
 import { User } from './User';
 // import { UserRoleEnum } from "../../types/enums/user-role.enum";
 
 @Entity()
-export class UserToProject implements IUserToProject {
+export class UserToProject implements UserToProjectInterface {
   @PrimaryGeneratedColumn()
   id: number;
 

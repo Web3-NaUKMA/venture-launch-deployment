@@ -1,8 +1,8 @@
-import { IProjectLaunchInvestment } from './project-launch-investment.interface';
-import { IProject } from './project.interface';
-import { IUser } from './user.interface';
+import { ProjectLaunchInvestment } from './project-launch-investment.interface';
+import { Project } from './project.interface';
+import { User } from './user.interface';
 
-export interface IProjectLaunch {
+export interface ProjectLaunch {
   id: string;
   name: string;
   description: string;
@@ -16,10 +16,10 @@ export interface IProjectLaunch {
   businessModel: string;
   tokenomics: string;
   roundDetails: JSON;
-  project: IProject | null;
-  author: IUser;
-  approver: IUser;
-  projectLaunchInvestments?: IProjectLaunchInvestment[];
+  project: Project | null;
+  author: User;
+  approver: User;
+  projectLaunchInvestments?: ProjectLaunchInvestment[];
   createdAt: Date;
   vaultTokenAccount: string;
   cryptoTrackerAccount: string;

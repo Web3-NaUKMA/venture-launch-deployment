@@ -1,10 +1,10 @@
 import AppDataSource from '../../typeorm/index.typeorm';
 import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
 import { ProjectLaunch } from '../../typeorm/models/ProjectLaunch';
-import { ICreateProjectLaunchDto, IUpdateProjectLaunchDto } from '../../DTO/project-launch.dto';
+import { CreateProjectLaunchDto, UpdateProjectLaunchDto } from '../../DTO/project-launch.dto';
 import {
-  ICreateProjectLaunchInvestmentDto,
-  IUpdateProjectLaunchInvestmentDto,
+  CreateProjectLaunchInvestmentDto,
+  UpdateProjectLaunchInvestmentDto,
 } from '../../DTO/project-launch-investment.dto';
 import { ProjectLaunchInvestment } from '../../typeorm/models/ProjectLaunchInvestment';
 import {
@@ -53,7 +53,7 @@ export class ProjectLaunchService {
     }
   }
 
-  async create(data: ICreateProjectLaunchDto): Promise<ProjectLaunch> {
+  async create(data: CreateProjectLaunchDto): Promise<ProjectLaunch> {
     try {
       const exists = await AppDataSource.getRepository(ProjectLaunch).exists({
         where: {
@@ -84,7 +84,7 @@ export class ProjectLaunchService {
     }
   }
 
-  async update(id: string, data: IUpdateProjectLaunchDto): Promise<ProjectLaunch> {
+  async update(id: string, data: UpdateProjectLaunchDto): Promise<ProjectLaunch> {
     try {
       const { approverId } = data;
       delete data.approverId;
@@ -144,7 +144,7 @@ export class ProjectLaunchService {
 
   async createInvestment(
     id: string,
-    data: ICreateProjectLaunchInvestmentDto,
+    data: CreateProjectLaunchInvestmentDto,
   ): Promise<ProjectLaunchInvestment> {
     try {
       const projectLaunchInvestment = await AppDataSource.getRepository(
@@ -194,7 +194,7 @@ export class ProjectLaunchService {
   async updateInvestment(
     id: string,
     investorId: string,
-    data: IUpdateProjectLaunchInvestmentDto,
+    data: UpdateProjectLaunchInvestmentDto,
   ): Promise<ProjectLaunchInvestment> {
     try {
       await AppDataSource.getRepository(ProjectLaunchInvestment).update(

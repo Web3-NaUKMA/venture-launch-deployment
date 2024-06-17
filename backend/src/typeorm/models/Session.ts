@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryColumn } from 'typeorm';
-import { ISession } from '../../types/session.interface';
+import { Session as SessionInterface } from '../../types/session.interface';
 import { User } from './User';
 
 @Entity()
-export class Session implements ISession {
+export class Session implements SessionInterface {
   @PrimaryColumn({ type: 'varchar' })
   sessionId: string;
 

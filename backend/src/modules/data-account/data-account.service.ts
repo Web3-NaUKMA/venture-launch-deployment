@@ -1,5 +1,5 @@
 import AppDataSource from '../../typeorm/index.typeorm';
-import { ICreateDataAccountDto, IUpdateDataAccountDto } from '../../DTO/data-account.dto';
+import { CreateDataAccountDto, UpdateDataAccountDto } from '../../DTO/data-account.dto';
 import { DataAccount } from '../../typeorm/models/DataAccount';
 import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
 import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
@@ -34,7 +34,7 @@ export class DataAccountService {
     }
   }
 
-  async create(data: ICreateDataAccountDto): Promise<DataAccount> {
+  async create(data: CreateDataAccountDto): Promise<DataAccount> {
     try {
       return await AppDataSource.getRepository(DataAccount).save({
         ...data,
@@ -45,7 +45,7 @@ export class DataAccountService {
     }
   }
 
-  async update(id: string, data: IUpdateDataAccountDto): Promise<DataAccount> {
+  async update(id: string, data: UpdateDataAccountDto): Promise<DataAccount> {
     try {
       await AppDataSource.getRepository(DataAccount).update({ id }, data);
 

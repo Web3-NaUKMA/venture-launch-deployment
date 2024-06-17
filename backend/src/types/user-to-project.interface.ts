@@ -1,4 +1,4 @@
-export interface IUserToProject {
+export interface UserToProject {
   id: number;
   projectId: string;
   userId: string;
