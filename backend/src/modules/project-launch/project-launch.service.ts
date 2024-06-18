@@ -1,12 +1,12 @@
 import AppDataSource from '../../typeorm/index.typeorm';
 import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
-import { ProjectLaunch } from '../../typeorm/models/ProjectLaunch';
+import { ProjectLaunchEntity } from '../../typeorm/entities/project-launch.entity';
 import { CreateProjectLaunchDto, UpdateProjectLaunchDto } from '../../DTO/project-launch.dto';
 import {
   CreateProjectLaunchInvestmentDto,
   UpdateProjectLaunchInvestmentDto,
 } from '../../DTO/project-launch-investment.dto';
-import { ProjectLaunchInvestment } from '../../typeorm/models/ProjectLaunchInvestment';
+import { ProjectLaunchInvestmentEntity } from '../../typeorm/entities/project-launch-investment.entity';
 import {
   ConflictException,
   DatabaseException,
@@ -15,9 +15,9 @@ import {
 import _ from 'lodash';
 
 export class ProjectLaunchService {
-  async findMany(options?: FindManyOptions<ProjectLaunch>): Promise<ProjectLaunch[]> {
+  async findMany(options?: FindManyOptions<ProjectLaunchEntity>): Promise<ProjectLaunchEntity[]> {
     try {
-      return await AppDataSource.getRepository(ProjectLaunch).find(
+      return await AppDataSource.getRepository(ProjectLaunchEntity).find(
         _.merge(options, {
           relations: {
             author: true,
@@ -32,9 +32,9 @@ export class ProjectLaunchService {
     }
   }
 
-  async findOne(options?: FindOneOptions<ProjectLaunch>): Promise<ProjectLaunch> {
+  async findOne(options?: FindOneOptions<ProjectLaunchEntity>): Promise<ProjectLaunchEntity> {
     try {
-      return await AppDataSource.getRepository(ProjectLaunch).findOneOrFail(
+      return await AppDataSource.getRepository(ProjectLaunchEntity).findOneOrFail(
         _.merge(options, {
           relations: {
             author: true,
@@ -53,9 +53,9 @@ export class ProjectLaunchService {
     }
   }
 
-  async create(data: CreateProjectLaunchDto): Promise<ProjectLaunch> {
+  async create(data: CreateProjectLaunchDto): Promise<ProjectLaunchEntity> {
     try {
-      const exists = await AppDataSource.getRepository(ProjectLaunch).exists({
+      const exists = await AppDataSource.getRepository(ProjectLaunchEntity).exists({
         where: {
           name: data.name,
           author: { id: data.authorId },
@@ -66,12 +66,12 @@ export class ProjectLaunchService {
         throw new ConflictException('The record with such name already exists.');
       }
 
-      const projectLaunch = await AppDataSource.getRepository(ProjectLaunch).save({
+      const projectLaunch = await AppDataSource.getRepository(ProjectLaunchEntity).save({
         ...data,
         author: { id: data.authorId },
       });
 
-      return await AppDataSource.getRepository(ProjectLaunch).findOneOrFail({
+      return await AppDataSource.getRepository(ProjectLaunchEntity).findOneOrFail({
         where: { id: projectLaunch.id },
         relations: { author: true, project: true },
       });
@@ -84,12 +84,12 @@ export class ProjectLaunchService {
     }
   }
 
-  async update(id: string, data: UpdateProjectLaunchDto): Promise<ProjectLaunch> {
+  async update(id: string, data: UpdateProjectLaunchDto): Promise<ProjectLaunchEntity> {
     try {
       const { approverId } = data;
       delete data.approverId;
 
-      await AppDataSource.getRepository(ProjectLaunch).update(
+      await AppDataSource.getRepository(ProjectLaunchEntity).update(
         { id },
         {
           ...data,
@@ -97,7 +97,7 @@ export class ProjectLaunchService {
         },
       );
 
-      return await AppDataSource.getRepository(ProjectLaunch).findOneOrFail({
+      return await AppDataSource.getRepository(ProjectLaunchEntity).findOneOrFail({
         relations: {
           author: true,
           project: true,
@@ -117,9 +117,9 @@ export class ProjectLaunchService {
     }
   }
 
-  async remove(id: string): Promise<ProjectLaunch> {
+  async remove(id: string): Promise<ProjectLaunchEntity> {
     try {
-      const projectLaunch = await AppDataSource.getRepository(ProjectLaunch).findOneOrFail({
+      const projectLaunch = await AppDataSource.getRepository(ProjectLaunchEntity).findOneOrFail({
         relations: {
           author: true,
           project: true,
@@ -128,7 +128,7 @@ export class ProjectLaunchService {
         where: { id },
       });
 
-      await AppDataSource.getRepository(ProjectLaunch).remove(structuredClone(projectLaunch));
+      await AppDataSource.getRepository(ProjectLaunchEntity).remove(structuredClone(projectLaunch));
       return projectLaunch;
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {
@@ -145,25 +145,24 @@ export class ProjectLaunchService {
   async createInvestment(
     id: string,
     data: CreateProjectLaunchInvestmentDto,
-  ): Promise<ProjectLaunchInvestment> {
+  ): Promise<ProjectLaunchInvestmentEntity> {
     try {
       const projectLaunchInvestment = await AppDataSource.getRepository(
-        ProjectLaunchInvestment,
+        ProjectLaunchInvestmentEntity,
       ).save({
         ...data,
         investor: { id: data.investorId },
         projectLaunch: { id },
       });
 
-      const projectLaunch = await AppDataSource.getRepository(ProjectLaunch).findOneOrFail({
+      const projectLaunch = await AppDataSource.getRepository(ProjectLaunchEntity).findOneOrFail({
         where: { id },
         relations: { projectLaunchInvestments: true },
       });
 
-      const fundraiseProgress = await AppDataSource.getRepository(ProjectLaunchInvestment).sum(
-        'amount',
-        { projectLaunch: { id } },
-      );
+      const fundraiseProgress = await AppDataSource.getRepository(
+        ProjectLaunchInvestmentEntity,
+      ).sum('amount', { projectLaunch: { id } });
 
       let projectLaunchUpdateData: any = {
         fundraiseProgress,
@@ -173,9 +172,9 @@ export class ProjectLaunchService {
         projectLaunchUpdateData = { ...projectLaunchUpdateData, isFundraised: true };
       }
 
-      await AppDataSource.getRepository(ProjectLaunch).update({ id }, projectLaunchUpdateData);
+      await AppDataSource.getRepository(ProjectLaunchEntity).update({ id }, projectLaunchUpdateData);
 
-      return await AppDataSource.getRepository(ProjectLaunchInvestment).findOneOrFail({
+      return await AppDataSource.getRepository(ProjectLaunchInvestmentEntity).findOneOrFail({
         where: { id: projectLaunchInvestment.id },
         relations: { investor: true, projectLaunch: true },
       });
@@ -195,14 +194,14 @@ export class ProjectLaunchService {
     id: string,
     investorId: string,
     data: UpdateProjectLaunchInvestmentDto,
-  ): Promise<ProjectLaunchInvestment> {
+  ): Promise<ProjectLaunchInvestmentEntity> {
     try {
-      await AppDataSource.getRepository(ProjectLaunchInvestment).update(
+      await AppDataSource.getRepository(ProjectLaunchInvestmentEntity).update(
         { projectLaunch: { id }, investor: { id: investorId } },
         data,
       );
 
-      return await AppDataSource.getRepository(ProjectLaunchInvestment).findOneOrFail({
+      return await AppDataSource.getRepository(ProjectLaunchInvestmentEntity).findOneOrFail({
         relations: {
           investor: true,
           projectLaunch: true,

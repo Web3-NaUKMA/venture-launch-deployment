@@ -1,14 +1,14 @@
 import AppDataSource from '../../typeorm/index.typeorm';
 import { CreateDataAccountDto, UpdateDataAccountDto } from '../../DTO/data-account.dto';
-import { DataAccount } from '../../typeorm/models/DataAccount';
+import { DataAccountEntity } from '../../typeorm/entities/data-account.entity';
 import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
 import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
 import _ from 'lodash';
 
 export class DataAccountService {
-  async findMany(options?: FindManyOptions<DataAccount>): Promise<DataAccount[]> {
+  async findMany(options?: FindManyOptions<DataAccountEntity>): Promise<DataAccountEntity[]> {
     try {
-      return await AppDataSource.getRepository(DataAccount).find(
+      return await AppDataSource.getRepository(DataAccountEntity).find(
         _.merge(options, {
           relations: { project: true },
         }),
@@ -18,9 +18,9 @@ export class DataAccountService {
     }
   }
 
-  async findOne(options?: FindOneOptions<DataAccount>): Promise<DataAccount> {
+  async findOne(options?: FindOneOptions<DataAccountEntity>): Promise<DataAccountEntity> {
     try {
-      return await AppDataSource.getRepository(DataAccount).findOneOrFail(
+      return await AppDataSource.getRepository(DataAccountEntity).findOneOrFail(
         _.merge(options, {
           relations: { project: true },
         }),
@@ -34,9 +34,9 @@ export class DataAccountService {
     }
   }
 
-  async create(data: CreateDataAccountDto): Promise<DataAccount> {
+  async create(data: CreateDataAccountDto): Promise<DataAccountEntity> {
     try {
-      return await AppDataSource.getRepository(DataAccount).save({
+      return await AppDataSource.getRepository(DataAccountEntity).save({
         ...data,
         project: { id: data.projectId },
       });
@@ -45,11 +45,11 @@ export class DataAccountService {
     }
   }
 
-  async update(id: string, data: UpdateDataAccountDto): Promise<DataAccount> {
+  async update(id: string, data: UpdateDataAccountDto): Promise<DataAccountEntity> {
     try {
-      await AppDataSource.getRepository(DataAccount).update({ id }, data);
+      await AppDataSource.getRepository(DataAccountEntity).update({ id }, data);
 
-      return await AppDataSource.getRepository(DataAccount).findOneOrFail({
+      return await AppDataSource.getRepository(DataAccountEntity).findOneOrFail({
         relations: { project: true },
         where: { id },
       });
@@ -65,14 +65,14 @@ export class DataAccountService {
     }
   }
 
-  async remove(id: string): Promise<DataAccount> {
+  async remove(id: string): Promise<DataAccountEntity> {
     try {
-      const dataAccount = await AppDataSource.getRepository(DataAccount).findOneOrFail({
+      const dataAccount = await AppDataSource.getRepository(DataAccountEntity).findOneOrFail({
         relations: { project: true },
         where: { id },
       });
 
-      await AppDataSource.getRepository(DataAccount).remove(structuredClone(dataAccount));
+      await AppDataSource.getRepository(DataAccountEntity).remove(structuredClone(dataAccount));
       return dataAccount;
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {

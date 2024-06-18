@@ -1,12 +1,18 @@
+import { Message } from './message.interface';
+import { UserToChat } from './user-to-chat.interface';
+import { User } from './user.interface';
+
 export interface Chat {
   id: string;
-  title: string;
-  image?: string | null;
-  description?: string | null;
+  name: string | null;
+  image: string | null;
+  description: string | null;
   isGroup: boolean;
-  isArchived: boolean;
-  isFavourite: boolean;
   createdAt: Date;
-  updatedAt?: Date | null;
-  removedAt?: Date | null;
+  updatedAt: Date | null;
+  removedAt: Date | null;
+  usersToChat: UserToChat[];
+  archivedBy: User[];
+  favouriteFor: User[];
+  messages: Message[];
 }

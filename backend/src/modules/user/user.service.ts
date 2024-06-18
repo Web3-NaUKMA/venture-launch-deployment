@@ -1,6 +1,6 @@
 import AppDataSource from '../../typeorm/index.typeorm';
 import { CreateUserDto, UpdateUserDto } from '../../DTO/user.dto';
-import { User } from '../../typeorm/models/User';
+import { UserEntity } from '../../typeorm/entities/user.entity';
 import {
   ConflictException,
   DatabaseException,
@@ -11,9 +11,9 @@ import passwordService from '../password/password.service';
 import _ from 'lodash';
 
 export class UserService {
-  async findMany(options?: FindManyOptions<User>): Promise<User[]> {
+  async findMany(options?: FindManyOptions<UserEntity>): Promise<UserEntity[]> {
     try {
-      return await AppDataSource.getRepository(User).find(
+      return await AppDataSource.getRepository(UserEntity).find(
         _.merge(options, {
           relations: { projectLaunches: true, session: true, projectLaunchInvestments: true },
         }),
@@ -23,9 +23,9 @@ export class UserService {
     }
   }
 
-  async findOne(options?: FindOneOptions<User>): Promise<User> {
+  async findOne(options?: FindOneOptions<UserEntity>): Promise<UserEntity> {
     try {
-      return await AppDataSource.getRepository(User).findOneOrFail(
+      return await AppDataSource.getRepository(UserEntity).findOneOrFail(
         _.merge(options, {
           relations: { projectLaunches: true, session: true, projectLaunchInvestments: true },
         }),
@@ -39,9 +39,9 @@ export class UserService {
     }
   }
 
-  async create(data: CreateUserDto): Promise<User> {
+  async create(data: CreateUserDto): Promise<UserEntity> {
     try {
-      const exists = await AppDataSource.getRepository(User).exists({
+      const exists = await AppDataSource.getRepository(UserEntity).exists({
         where: [{ email: data.email, username: data.username, walletId: data.walletId }],
       });
 
@@ -51,7 +51,7 @@ export class UserService {
         );
       }
 
-      return await AppDataSource.getRepository(User).save(data);
+      return await AppDataSource.getRepository(UserEntity).save(data);
     } catch (error: any) {
       if (error instanceof ConflictException) {
         throw error;
@@ -61,7 +61,7 @@ export class UserService {
     }
   }
 
-  async update(id: string, data: UpdateUserDto): Promise<User> {
+  async update(id: string, data: UpdateUserDto): Promise<UserEntity> {
     try {
       if (data.password?.trim()) {
         data.password = await passwordService.hash(data.password);
@@ -69,9 +69,9 @@ export class UserService {
         delete data.password;
       }
 
-      await AppDataSource.getRepository(User).update({ id }, data);
+      await AppDataSource.getRepository(UserEntity).update({ id }, data);
 
-      return await AppDataSource.getRepository(User).findOneOrFail({
+      return await AppDataSource.getRepository(UserEntity).findOneOrFail({
         relations: { projectLaunches: true, session: true, projectLaunchInvestments: true },
         where: { id },
       });
@@ -87,14 +87,14 @@ export class UserService {
     }
   }
 
-  async remove(id: string): Promise<User> {
+  async remove(id: string): Promise<UserEntity> {
     try {
-      const user = await AppDataSource.getRepository(User).findOneOrFail({
+      const user = await AppDataSource.getRepository(UserEntity).findOneOrFail({
         relations: { projectLaunches: true, session: true, projectLaunchInvestments: true },
         where: { id },
       });
 
-      await AppDataSource.getRepository(User).remove(structuredClone(user));
+      await AppDataSource.getRepository(UserEntity).remove(structuredClone(user));
 
       return user;
     } catch (error: any) {

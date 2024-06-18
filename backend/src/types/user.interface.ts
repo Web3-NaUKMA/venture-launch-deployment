@@ -1,6 +1,9 @@
+import { Chat } from './chat.interface';
 import { UserRoleEnum } from './enums/user-role.enum';
+import { Message } from './message.interface';
 import { ProjectLaunchInvestment } from './project-launch-investment.interface';
 import { ProjectLaunch } from './project-launch.interface';
+import { UserToChat } from './user-to-chat.interface';
 
 export interface User {
   id: string;
@@ -25,4 +28,8 @@ export interface User {
   projectLaunches: ProjectLaunch[];
   approvedProjectLaunches: ProjectLaunch[];
   projectLaunchInvestments?: ProjectLaunchInvestment[];
+  userToChats: UserToChat[];
+  archivedChats: Chat[];
+  favouriteChats: Chat[];
+  messages: Message[];
 }

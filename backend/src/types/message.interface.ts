@@ -3,10 +3,13 @@ import { User } from './user.interface';
 
 export interface Message {
   id: string;
-  author: User;
-  chat: Chat;
+  isPinned: boolean;
   content: string;
   createdAt: Date;
-  updatedAt?: Date | null;
-  removedAt?: Date | null;
+  updatedAt: Date | null;
+  removedAt: Date | null;
+  replyTo: Message | null;
+  author: User;
+  chat: Chat;
+  replies: Message[];
 }

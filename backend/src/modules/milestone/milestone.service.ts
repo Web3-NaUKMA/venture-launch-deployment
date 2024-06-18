@@ -1,14 +1,14 @@
 import AppDataSource from '../../typeorm/index.typeorm';
 import { CreateMilestoneDto, UpdateMilestoneDto } from '../../DTO/milestone.dto';
-import { Milestone } from '../../typeorm/models/Milestone';
+import { MilestoneEntity } from '../../typeorm/entities/milestone.entity';
 import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
 import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
 import _ from 'lodash';
 
 export class MilestoneService {
-  async findMany(options?: FindManyOptions<Milestone>): Promise<Milestone[]> {
+  async findMany(options?: FindManyOptions<MilestoneEntity>): Promise<MilestoneEntity[]> {
     try {
-      return await AppDataSource.getRepository(Milestone).find(
+      return await AppDataSource.getRepository(MilestoneEntity).find(
         _.merge(options, {
           relations: { project: true },
         }),
@@ -18,9 +18,9 @@ export class MilestoneService {
     }
   }
 
-  async findOne(options?: FindOneOptions<Milestone>): Promise<Milestone> {
+  async findOne(options?: FindOneOptions<MilestoneEntity>): Promise<MilestoneEntity> {
     try {
-      return await AppDataSource.getRepository(Milestone).findOneOrFail(
+      return await AppDataSource.getRepository(MilestoneEntity).findOneOrFail(
         _.merge(options, {
           relations: { project: true },
         }),
@@ -34,9 +34,9 @@ export class MilestoneService {
     }
   }
 
-  async create(data: CreateMilestoneDto): Promise<Milestone> {
+  async create(data: CreateMilestoneDto): Promise<MilestoneEntity> {
     try {
-      return await AppDataSource.getRepository(Milestone).save({
+      return await AppDataSource.getRepository(MilestoneEntity).save({
         ...data,
         project: { id: data.projectId },
       });
@@ -45,11 +45,11 @@ export class MilestoneService {
     }
   }
 
-  async update(id: string, data: UpdateMilestoneDto): Promise<Milestone> {
+  async update(id: string, data: UpdateMilestoneDto): Promise<MilestoneEntity> {
     try {
-      await AppDataSource.getRepository(Milestone).update({ id }, data);
+      await AppDataSource.getRepository(MilestoneEntity).update({ id }, data);
 
-      return await AppDataSource.getRepository(Milestone).findOneOrFail({
+      return await AppDataSource.getRepository(MilestoneEntity).findOneOrFail({
         relations: { project: true },
         where: { id },
       });
@@ -64,14 +64,15 @@ export class MilestoneService {
     }
   }
 
-  async remove(id: string): Promise<Milestone> {
+  async remove(id: string): Promise<MilestoneEntity> {
     try {
-      const milestone = await AppDataSource.getRepository(Milestone).findOneOrFail({
+      const milestone = await AppDataSource.getRepository(MilestoneEntity).findOneOrFail({
         relations: { project: true },
         where: { id },
       });
 
-      await AppDataSource.getRepository(Milestone).remove(structuredClone(milestone));
+      await AppDataSource.getRepository(MilestoneEntity).remove(structuredClone(milestone));
+
       return milestone;
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {

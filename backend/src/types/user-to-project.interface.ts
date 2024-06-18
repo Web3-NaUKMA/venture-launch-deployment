@@ -1,6 +1,10 @@
+import { Project } from './project.interface';
+import { User } from './user.interface';
+
 export interface UserToProject {
   id: number;
   projectId: string;
   userId: string;
-  // role: UserRoleEnum;      // Could be implemented later
+  project: Project;
+  user: User;
 }

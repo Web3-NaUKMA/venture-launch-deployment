@@ -1,7 +1,7 @@
 import { DeleteResult, EntityNotFoundError } from 'typeorm';
 import AppDataSource from '../../typeorm/index.typeorm';
-import { Session } from '../../typeorm/models/Session';
-import { User } from '../../typeorm/models/User';
+import { SessionEntity } from '../../typeorm/entities/session.entity';
+import { UserEntity } from '../../typeorm/entities/user.entity';
 import bs58 from 'bs58';
 import nacl from 'tweetnacl';
 import { AccountRegistrationData } from '../../DTO/auth.dto';
@@ -21,7 +21,7 @@ import {
 import { Auth, google } from 'googleapis';
 import * as jose from 'jose';
 import passwordService from '../password/password.service';
-import axios, { AxiosError } from 'axios';
+import axios from 'axios';
 
 export class AuthService {
   private readonly googleOauth2Client: Auth.OAuth2Client;
@@ -34,15 +34,17 @@ export class AuthService {
     );
   }
 
-  async loginWithWallet(token: string, walletId: string, sessionId: string): Promise<User> {
+  async loginWithWallet(token: string, walletId: string, sessionId: string): Promise<UserEntity> {
     try {
       if (!this.validateAuthToken(token)) {
         throw new AuthException('Cannot authenticate the user. Auth token is missing');
       }
 
-      const user = await AppDataSource.getRepository(User).findOneOrFail({ where: { walletId } });
+      const user = await AppDataSource.getRepository(UserEntity).findOneOrFail({
+        where: { walletId },
+      });
 
-      await AppDataSource.getRepository(Session).upsert(
+      await AppDataSource.getRepository(SessionEntity).upsert(
         {
           expiresAt: new Date(
             Date.now() + Number(process.env.SESSION_MAX_AGE || 24 * 60 * 60 * 1000),
@@ -79,10 +81,12 @@ export class AuthService {
       }
 
       const { email } = await this.googleOauth2Client.getTokenInfo(googleAccessToken);
-      const user = await AppDataSource.getRepository(User).findOneOrFail({ where: { email } });
+      const user = await AppDataSource.getRepository(UserEntity).findOneOrFail({
+        where: { email },
+      });
       const { accessToken } = await this.generateJwtTokens(user);
 
-      await AppDataSource.getRepository(Session).upsert(
+      await AppDataSource.getRepository(SessionEntity).upsert(
         {
           expiresAt: new Date(
             Date.now() + Number(process.env.SESSION_MAX_AGE || 24 * 60 * 60 * 1000),
@@ -113,7 +117,9 @@ export class AuthService {
     sessionId: string,
   ): Promise<LoginWithGoogleResponse | never> {
     try {
-      const user = await AppDataSource.getRepository(User).findOneOrFail({ where: { email } });
+      const user = await AppDataSource.getRepository(UserEntity).findOneOrFail({
+        where: { email },
+      });
       const isPasswordCorrect = await passwordService.compare(password, user.password);
 
       if (!user.password || !isPasswordCorrect) {
@@ -122,7 +128,7 @@ export class AuthService {
 
       const { accessToken } = await this.generateJwtTokens(user);
 
-      await AppDataSource.getRepository(Session).upsert(
+      await AppDataSource.getRepository(SessionEntity).upsert(
         {
           expiresAt: new Date(
             Date.now() + Number(process.env.SESSION_MAX_AGE || 24 * 60 * 60 * 1000),
@@ -147,9 +153,9 @@ export class AuthService {
     }
   }
 
-  async register(user: AccountRegistrationData): Promise<User> {
+  async register(user: AccountRegistrationData): Promise<UserEntity> {
     try {
-      const exists = await AppDataSource.getRepository(User).exists({
+      const exists = await AppDataSource.getRepository(UserEntity).exists({
         where: [{ email: user.email }, { username: user.username }, { walletId: user.walletId }],
       });
 
@@ -163,7 +169,7 @@ export class AuthService {
         user.password = await passwordService.hash(user.password);
       }
 
-      return AppDataSource.getRepository(User).save(user);
+      return AppDataSource.getRepository(UserEntity).save(user);
     } catch (error: any) {
       if (error instanceof ConflictException) {
         throw error;
@@ -179,9 +185,11 @@ export class AuthService {
     );
   }
 
-  async getUserSession(id: string): Promise<Session> {
+  async getUserSession(id: string): Promise<SessionEntity> {
     try {
-      return await AppDataSource.getRepository(Session).findOneOrFail({ where: { user: { id } } });
+      return await AppDataSource.getRepository(SessionEntity).findOneOrFail({
+        where: { user: { id } },
+      });
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {
         throw new AuthException('The session with provided sessionID was not found', error);
@@ -191,9 +199,9 @@ export class AuthService {
     }
   }
 
-  async getAuthenticatedUser(id: string): Promise<User> {
+  async getAuthenticatedUser(id: string): Promise<UserEntity> {
     try {
-      return await AppDataSource.getRepository(User).findOneOrFail({ where: { id } });
+      return await AppDataSource.getRepository(UserEntity).findOneOrFail({ where: { id } });
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {
         throw new AuthException('Cannot retrieve the data about the authenticated user', error);
@@ -205,7 +213,7 @@ export class AuthService {
 
   async logout(userId: string): Promise<DeleteResult> {
     try {
-      return AppDataSource.getRepository(Session).delete({ user: { id: userId } });
+      return AppDataSource.getRepository(SessionEntity).delete({ user: { id: userId } });
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {
         throw new AuthException('The user is not authenticated', error);
@@ -242,7 +250,7 @@ export class AuthService {
     }
   }
 
-  private async generateJwtTokens(user: User): Promise<GenerateJwtTokensResponse> {
+  private async generateJwtTokens(user: UserEntity): Promise<GenerateJwtTokensResponse> {
     const accessToken = await new jose.SignJWT({
       id: user.id,
       email: user.email,

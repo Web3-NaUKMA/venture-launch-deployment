@@ -15,11 +15,11 @@ const AppDataSource = new DataSource({
   logging: false,
   ...(process.env.NODE_ENV === 'production'
     ? {
-        entities: ['dist/typeorm/models/*{.ts,.js}'],
+        entities: ['dist/typeorm/entities/*{.ts,.js}'],
         migrations: ['dist/typeorm/migrations/*{.ts,.js}'],
       }
     : {
-        entities: ['src/typeorm/models/*{.ts,.js}'],
+        entities: ['src/typeorm/entities/*{.ts,.js}'],
         migrations: ['src/typeorm/migrations/*{.ts,.js}'],
       }),
 });
