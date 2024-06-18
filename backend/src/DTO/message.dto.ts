@@ -10,4 +10,5 @@ export interface UpdateMessageDto {
   isPinned?: boolean;
   updatedAt?: Date | null;
   removedAt?: Date | null;
+  seenBy?: string;
 }

@@ -36,7 +36,7 @@ export class ChatService {
     }
   }
 
-  async create(data: CreateChatDto) {
+  async create(data: CreateChatDto): Promise<ChatEntity> {
     try {
       const chat = await AppDataSource.getRepository(ChatEntity).save(data);
 
