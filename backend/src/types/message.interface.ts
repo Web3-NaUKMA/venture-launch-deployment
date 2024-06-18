@@ -12,4 +12,5 @@ export interface Message {
   author: User;
   chat: Chat;
   replies: Message[];
+  seenBy: User[];
 }

@@ -6,6 +6,7 @@ import projectLaunchRoutes from '../project-launch/project-launch.routes';
 import dataAccountRoutes from '../data-account/data-account.routes';
 import milestoneRoutes from '../milestone/milestone.routes';
 import fileRoutes from '../file/file.routes';
+import chatRoutes from '../chat/chat.routes';
 
 export default [
   authRoutes,
@@ -16,4 +17,6 @@ export default [
   dataAccountRoutes,
   milestoneRoutes,
   fileRoutes,
+  chatRoutes,
 ];
+

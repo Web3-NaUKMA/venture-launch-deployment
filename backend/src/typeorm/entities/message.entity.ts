@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Message } from '../../types/message.interface';
 import { Chat } from '../../types/chat.interface';
 import { User } from '../../types/user.interface';
@@ -40,4 +40,8 @@ export class MessageEntity implements Message {
 
   @OneToMany(() => MessageEntity, message => message.replyTo)
   replies: Message[];
+
+  @ManyToMany(() => UserEntity, user => user.seenMessages, { cascade: true })
+  @JoinTable()
+  seenBy: User[];
 }

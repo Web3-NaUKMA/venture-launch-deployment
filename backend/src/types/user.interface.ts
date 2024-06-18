@@ -32,4 +32,5 @@ export interface User {
   archivedChats: Chat[];
   favouriteChats: Chat[];
   messages: Message[];
+  seenMessages: Message[];
 }

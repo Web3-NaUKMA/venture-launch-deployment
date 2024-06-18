@@ -114,4 +114,7 @@ export class UserEntity implements User {
 
   @OneToMany(() => MessageEntity, message => message.author)
   messages: Message[];
+
+  @ManyToMany(() => MessageEntity, message => message.seenBy)
+  seenMessages: Message[];
 }
