@@ -69,7 +69,6 @@ export const fetchAllChats =
       } as any);
 
       const response = await axios.get(`chats/${query ? `?${query}` : ``}`);
-
       if (response.status === HttpStatusCode.Ok) {
         options?.onSuccess?.(response.data);
         return dispatch(chatSlice.actions.setChats(response.data));

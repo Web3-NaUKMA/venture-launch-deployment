@@ -41,7 +41,7 @@ export class MessageService {
 
       return await AppDataSource.getRepository(MessageEntity).findOneOrFail({
         where: { id: message.id },
-        relations: { author: true, replies: true, seenBy: true, replyTo: true },
+        relations: { author: true, replies: true, seenBy: true, replyTo: true, chat: true },
       });
     } catch (error: any) {
       throw new DatabaseException('Internal server error', error);

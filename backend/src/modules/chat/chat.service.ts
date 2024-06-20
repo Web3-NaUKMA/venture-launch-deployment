@@ -12,7 +12,7 @@ export class ChatService {
     try {
       return await AppDataSource.getRepository(ChatEntity).find(
         _.merge(options, {
-          relations: { usersToChat: { user: true }, messages: { author: true, replyTo: true } },
+          relations: { usersToChat: { user: true } },
         }),
       );
     } catch (error: any) {
@@ -24,7 +24,7 @@ export class ChatService {
     try {
       return await AppDataSource.getRepository(ChatEntity).findOneOrFail(
         _.merge(options, {
-          relations: { usersToChat: { user: true }, messages: { author: true, replyTo: true } },
+          relations: { usersToChat: { user: true } },
         }),
       );
     } catch (error: any) {
@@ -46,7 +46,7 @@ export class ChatService {
 
       return await AppDataSource.getRepository(ChatEntity).findOneOrFail({
         where: { id: chat.id },
-        relations: { usersToChat: { user: true }, messages: { author: true, replyTo: true } },
+        relations: { usersToChat: { user: true } },
       });
     } catch (error: any) {
       throw new DatabaseException('Internal server error', error);
@@ -76,7 +76,7 @@ export class ChatService {
       }
 
       return await AppDataSource.getRepository(ChatEntity).findOneOrFail({
-        relations: { usersToChat: { user: true }, messages: { author: true, replyTo: true } },
+        relations: { usersToChat: { user: true } },
         where: { id },
       });
     } catch (error: any) {
@@ -93,7 +93,7 @@ export class ChatService {
   async remove(id: string): Promise<ChatEntity> {
     try {
       const chat = await AppDataSource.getRepository(ChatEntity).findOneOrFail({
-        relations: { usersToChat: { user: true }, messages: { author: true, replyTo: true } },
+        relations: { usersToChat: { user: true } },
         where: { id },
       });
 
@@ -134,7 +134,7 @@ export class ChatService {
       );
 
       return await AppDataSource.getRepository(ChatEntity).findOneOrFail({
-        relations: { usersToChat: { user: true }, messages: { author: true, replyTo: true } },
+        relations: { usersToChat: { user: true } },
         where: { id },
       });
     } catch (error: any) {
@@ -172,7 +172,7 @@ export class ChatService {
       );
 
       return await AppDataSource.getRepository(ChatEntity).findOneOrFail({
-        relations: { usersToChat: { user: true }, messages: { author: true, replyTo: true } },
+        relations: { usersToChat: { user: true } },
         where: { id },
       });
     } catch (error: any) {
@@ -209,7 +209,7 @@ export class ChatService {
       );
 
       return await AppDataSource.getRepository(ChatEntity).findOneOrFail({
-        relations: { usersToChat: { user: true }, messages: { author: true, replyTo: true } },
+        relations: { usersToChat: { user: true } },
         where: { id },
       });
     } catch (error: any) {

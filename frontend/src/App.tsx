@@ -18,6 +18,7 @@ import AboutPage from './pages/AboutPage/AboutPage';
 import PortfolioPage from './pages/PortfolioPage/PortfolioPage';
 import DetailsUserPage from './pages/DetailsUserPage/DetailsUserPage';
 import MessageCenterPage from './pages/MessageCenterPage/MessageCenterPage';
+import DetailsChatPage from './pages/DetailsChatPage/DetailsChatPage';
 
 axios.defaults.baseURL = `${import.meta.env.VITE_BACKEND_URI}/${import.meta.env.VITE_BACKEND_PREFIX || ''}`;
 axios.defaults.withCredentials = true;
@@ -47,7 +48,9 @@ const Content: FC = () => {
             <Route path={AppRoutes.DetailsProject} Component={DetailsProjectPage} />
             <Route path={AppRoutes.DetailsUser} Component={DetailsUserPage} />
             <Route path={AppRoutes.Profile} Component={ProfilePage} />
-            <Route path={AppRoutes.MessageCenter} Component={MessageCenterPage} />
+            <Route path={AppRoutes.MessageCenter} Component={MessageCenterPage}>
+              <Route path={AppRoutes.DetailsChat} Component={DetailsChatPage} />
+            </Route>
           </Route>
           <Route path={AppRoutes.Root} element={<Navigate to={AppRoutes.Home} />} />
           <Route path={AppRoutes.About} Component={AboutPage} />

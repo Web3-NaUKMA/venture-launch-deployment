@@ -80,11 +80,17 @@ export const fetchAllUsers =
   };
 
 export const fetchUser =
-  (id: string, options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
+  (id: string, queryParams?: any, options?: ActionCreatorOptions) =>
+  async (dispatch: AppDispatch) => {
     dispatch(userSlice.actions.setError({ fetchUser: null }));
 
     try {
-      const response = await axios.get(`users/${id}`);
+      const query = qs.stringify(queryParams, {
+        arrayFormat: 'comma',
+        allowDots: true,
+        commaRoundTrip: true,
+      } as any);
+      const response = await axios.get(`users/${id}${query ? `?${query}` : ``}`);
 
       if (response.status === HttpStatusCode.Ok) {
         options?.onSuccess?.(response.data);
