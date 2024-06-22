@@ -10,10 +10,13 @@ import {
 } from '../../types/redux/chat.types';
 import { Chat } from '../../types/chat.types';
 import qs from 'qs';
+import { Socket } from 'socket.io-client';
 
 const initialState: ChatSliceState = {
   chats: [],
   chat: null,
+  socket: null,
+  chatsUnreadMessagesCount: {},
   errors: {
     fetchAllChats: null,
     fetchChat: null,
@@ -53,6 +56,25 @@ const chatSlice = createSlice({
       action: PayloadAction<ChatSliceStateError>,
     ): ChatSliceState => {
       return { ...state, errors: { ...state.errors, ...action.payload } };
+    },
+    setSocket: (state: ChatSliceState, action: PayloadAction<Socket | null>): ChatSliceState => {
+      if (action.payload === null && state.socket) {
+        state.socket.disconnect?.();
+      }
+
+      return {
+        ...state,
+        socket: action.payload,
+      };
+    },
+    setChatsUnreadMessagesCount: (
+      state: ChatSliceState,
+      action: PayloadAction<{ [key: Chat['id']]: number }>,
+    ): ChatSliceState => {
+      return {
+        ...state,
+        chatsUnreadMessagesCount: action.payload,
+      };
     },
   },
 });
@@ -185,7 +207,19 @@ export const removeChat =
 
 export const selectChats = (state: RootState): Chat[] => state.chat.chats;
 export const selectChat = (state: RootState): Chat | null => state.chat.chat;
+export const selectSocket = (state: RootState): Socket | null => state.chat.socket;
+export const selectChatsUnreadMessagesCount = (state: RootState): { [key: Chat['id']]: number } =>
+  state.chat.chatsUnreadMessagesCount;
 export const selectErrors = (state: RootState): ChatSliceStateErrors => state.chat.errors;
 
-export const { setError, setChat, setChats, addChat, editChat, deleteChat } = chatSlice.actions;
+export const {
+  setError,
+  setChat,
+  setChats,
+  addChat,
+  editChat,
+  deleteChat,
+  setSocket,
+  setChatsUnreadMessagesCount,
+} = chatSlice.actions;
 export default chatSlice.reducer;

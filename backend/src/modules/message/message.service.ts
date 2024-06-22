@@ -41,7 +41,13 @@ export class MessageService {
 
       return await AppDataSource.getRepository(MessageEntity).findOneOrFail({
         where: { id: message.id },
-        relations: { author: true, replies: true, seenBy: true, replyTo: true, chat: true },
+        relations: {
+          author: true,
+          replies: true,
+          seenBy: true,
+          replyTo: { author: true },
+          chat: true,
+        },
       });
     } catch (error: any) {
       throw new DatabaseException('Internal server error', error);
@@ -55,11 +61,17 @@ export class MessageService {
 
       await AppDataSource.getRepository(MessageEntity).update(
         { id },
-        { updatedAt: new Date(), ...rest },
+        { ...(data.content !== undefined && { updatedAt: new Date() }), ...rest },
       );
 
       const message = await AppDataSource.getRepository(MessageEntity).findOneOrFail({
-        relations: { author: true, replies: true, seenBy: true, replyTo: true },
+        relations: {
+          author: true,
+          replies: true,
+          seenBy: true,
+          replyTo: { author: true },
+          chat: true,
+        },
         where: { id },
       });
 
@@ -89,7 +101,13 @@ export class MessageService {
   async remove(id: string): Promise<MessageEntity> {
     try {
       const message = await AppDataSource.getRepository(MessageEntity).findOneOrFail({
-        relations: { author: true, replies: true, seenBy: true, replyTo: true },
+        relations: {
+          author: true,
+          replies: true,
+          seenBy: true,
+          replyTo: { author: true },
+          chat: true,
+        },
         where: { id },
       });
 

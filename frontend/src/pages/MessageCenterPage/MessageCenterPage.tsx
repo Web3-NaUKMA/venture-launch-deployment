@@ -1,20 +1,33 @@
-import { FC, useCallback, useEffect } from 'react';
+import { FC, useCallback, useEffect, useState } from 'react';
 import { Outlet, useLocation, useParams } from 'react-router';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux.hooks';
-import { selectChats, setChats } from '../../redux/slices/chat.slice';
+import {
+  selectChats,
+  selectChatsUnreadMessagesCount,
+  selectSocket,
+  setChats,
+  setChatsUnreadMessagesCount,
+  setSocket,
+} from '../../redux/slices/chat.slice';
 import { useAuth } from '../../hooks/auth.hooks';
 import { fetchUser, setUser } from '../../redux/slices/user.slice';
 import { resolveImage } from '../../utils/file.utils';
 import { AppRoutes } from '../../types/enums/app-routes.enum';
 import { Link } from 'react-router-dom';
 import { StarIcon } from '../../components/atoms/Icons/Icons';
+import { io } from 'socket.io-client';
+import { selectMessages } from '../../redux/slices/message.slice';
 
 const MessageCenterPage: FC = ({}) => {
   const chats = useAppSelector(selectChats);
+  const socket = useAppSelector(selectSocket);
+  const messages = useAppSelector(selectMessages);
+  const chatsUnreadMessagesCount = useAppSelector(selectChatsUnreadMessagesCount);
   const dispatch = useAppDispatch();
   const { authenticatedUser } = useAuth();
   const { id } = useParams();
   const location = useLocation();
+  const [hasUserJoinedChats, setHasUserJoinedChats] = useState(false);
 
   const formatDate = useCallback((date: Date) => {
     switch (true) {
@@ -44,6 +57,19 @@ const MessageCenterPage: FC = ({}) => {
           },
           {
             onSuccess: data => {
+              dispatch(
+                setChatsUnreadMessagesCount(
+                  data.userToChats.reduce((previousValue: any, currentValue: any) => {
+                    previousValue[currentValue.chat.id] = currentValue.chat.messages.filter(
+                      (message: any) =>
+                        !message.seenBy?.find((user: any) => user.id === authenticatedUser.id) &&
+                        message.author.id !== authenticatedUser.id,
+                    ).length;
+
+                    return previousValue;
+                  }, {}),
+                ),
+              );
               dispatch(setChats(data.userToChats.map((userToChat: any) => userToChat.chat)));
               dispatch(setUser(null));
             },
@@ -54,8 +80,108 @@ const MessageCenterPage: FC = ({}) => {
 
     return () => {
       dispatch(setChats([]));
+      dispatch(setChatsUnreadMessagesCount({}));
     };
   }, [authenticatedUser]);
+
+  useEffect(() => {
+    dispatch(
+      setSocket(
+        io(`${import.meta.env.VITE_BACKEND_URI}`, {
+          path: '/api/socket.io',
+        }),
+      ),
+    );
+
+    return () => {
+      dispatch(setSocket(null));
+    };
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (socket && !hasUserJoinedChats && chats.length > 0) {
+      chats.forEach(chat => {
+        socket.emit('join-chat', chat.id);
+      });
+      setHasUserJoinedChats(true);
+    }
+  }, [socket, chats]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('receive-message', payload => {
+        if (payload.author.id !== authenticatedUser?.id) {
+          const chatsUnreadMessagesCountCopy = structuredClone(chatsUnreadMessagesCount);
+          chatsUnreadMessagesCountCopy[payload.chat?.id]++;
+          dispatch(setChatsUnreadMessagesCount(chatsUnreadMessagesCountCopy));
+        }
+        dispatch(
+          setChats(
+            chats
+              .map(chat =>
+                chat.id === payload.chat?.id
+                  ? { ...chat, messages: [payload, ...chat.messages] }
+                  : chat,
+              )
+              .sort(
+                (chatA, chatB) =>
+                  new Date(chatB.messages[0]?.createdAt || 0).getTime() -
+                  new Date(chatA.messages[0]?.createdAt || 0).getTime(),
+              ),
+          ),
+        );
+      });
+
+      socket.on('receive-updated-message', payload => {
+        dispatch(
+          setChats(
+            chats
+              .map(chat =>
+                chat.id === payload.chat?.id
+                  ? {
+                      ...chat,
+                      messages: chat.messages.map(m => (m.id === payload.id ? payload : m)),
+                    }
+                  : chat,
+              )
+              .sort(
+                (chatA, chatB) =>
+                  new Date(chatB.messages[0]?.createdAt || 0).getTime() -
+                  new Date(chatA.messages[0]?.createdAt || 0).getTime(),
+              ),
+          ),
+        );
+      });
+
+      socket.on('receive-removed-message', payload => {
+        dispatch(
+          setChats(
+            chats
+              .map(chat =>
+                chat.id === payload.chat?.id
+                  ? {
+                      ...chat,
+                      messages: chat.messages.filter(m => m.id !== payload.id),
+                    }
+                  : chat,
+              )
+              .sort(
+                (chatA, chatB) =>
+                  new Date(chatB.messages[0]?.createdAt || 0).getTime() -
+                  new Date(chatA.messages[0]?.createdAt || 0).getTime(),
+              ),
+          ),
+        );
+      });
+    }
+
+    return () => {
+      if (socket) {
+        socket?.off('receive-message');
+        socket?.off('receive-updated-message');
+      }
+    };
+  }, [socket, messages, chats, chatsUnreadMessagesCount]);
 
   return (
     <div className='flex flex-col py-5 px-6 flex-1'>
@@ -101,15 +227,11 @@ const MessageCenterPage: FC = ({}) => {
                             </span>
                           </span>
                         )}
-                        <span className='bg-blue-500 min-w-[17px] text-center text-white font-semibold right-0 bottom-0 rounded-full px-1 absolute text-[11px]'>
-                          {
-                            chat.messages.filter(
-                              message =>
-                                !message.seenBy?.find(user => user.id === authenticatedUser?.id) &&
-                                message.author.id !== authenticatedUser?.id,
-                            ).length
-                          }
-                        </span>
+                        {chatsUnreadMessagesCount[chat.id] > 0 && (
+                          <span className='bg-blue-500 min-w-[17px] text-center text-white font-semibold right-0 bottom-0 rounded-full px-1 absolute text-[11px]'>
+                            {chatsUnreadMessagesCount[chat.id]}
+                          </span>
+                        )}
                       </span>
                       <span className='flex flex-col relative'>
                         <h3 className='font-sans font-semibold'>{chatName}</h3>
@@ -122,12 +244,14 @@ const MessageCenterPage: FC = ({}) => {
                             overflow: 'hidden',
                           }}
                         >
-                          {chat.messages[0].content}
+                          {chat.messages[0]?.content || (
+                            <span className='text-stone-400 italic'>No messages in the chat</span>
+                          )}
                         </span>
                       </span>
                       <span className='flex flex-col relative justify-between items-end'>
                         <span className='text-xs'>
-                          {formatDate(new Date(chat.messages[0].createdAt))}
+                          {chat.messages[0] ? formatDate(new Date(chat.messages[0].createdAt)) : ''}
                         </span>
                         <button type='button'>
                           <StarIcon className='size-5 hover:fill-black transition-all duration-300' />

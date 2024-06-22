@@ -15,5 +15,7 @@ export interface ChatSliceStateErrors {
 export interface ChatSliceState {
   chats: Chat[];
   chat: Chat | null;
+  socket: any | null;
+  chatsUnreadMessagesCount: { [key: Chat['id']]: number };
   errors: ChatSliceStateErrors;
 }
