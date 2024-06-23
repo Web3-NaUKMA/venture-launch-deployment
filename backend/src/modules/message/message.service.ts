@@ -2,7 +2,7 @@ import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
 import { MessageEntity } from '../../typeorm/entities/message.entity';
 import AppDataSource from '../../typeorm/index.typeorm';
 import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
-import _ from 'lodash';
+import _, { entries } from 'lodash';
 import { CreateMessageDto, UpdateMessageDto } from '../../DTO/message.dto';
 import { UserEntity } from '../../typeorm/entities/user.entity';
 
@@ -57,12 +57,17 @@ export class MessageService {
   async update(id: string, data: UpdateMessageDto): Promise<MessageEntity> {
     try {
       const { seenBy, ...rest } = data;
-      rest.isPinned = Boolean(rest.isPinned);
 
-      await AppDataSource.getRepository(MessageEntity).update(
-        { id },
-        { ...(data.content !== undefined && { updatedAt: new Date() }), ...rest },
-      );
+      if (rest.isPinned) {
+        rest.isPinned = Boolean(rest.isPinned);
+      }
+
+      if (data.content !== undefined || Object.entries(rest).length > 0) {
+        await AppDataSource.getRepository(MessageEntity).update(
+          { id },
+          { ...(data.content !== undefined && { updatedAt: new Date() }), ...rest },
+        );
+      }
 
       const message = await AppDataSource.getRepository(MessageEntity).findOneOrFail({
         relations: {

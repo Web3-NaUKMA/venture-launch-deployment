@@ -25,11 +25,28 @@ export class UserService {
 
   async findOne(options?: FindOneOptions<UserEntity>): Promise<UserEntity> {
     try {
-      return await AppDataSource.getRepository(UserEntity).findOneOrFail(
+      let removedAt = (options?.where as any)?.userToChats?.chat?.messages?.removedAt;
+      delete (options?.where as any)?.userToChats?.chat?.messages?.removedAt;
+
+      if (!removedAt) removedAt = null;
+
+      const user = await AppDataSource.getRepository(UserEntity).findOneOrFail(
         _.merge(options, {
           relations: { projectLaunches: true, session: true, projectLaunchInvestments: true },
         }),
       );
+
+      if (user.userToChats) {
+        user.userToChats = user.userToChats.map(userToChat => ({
+          ...userToChat,
+          chat: {
+            ...userToChat.chat,
+            messages: userToChat.chat.messages.filter(message => message.removedAt === removedAt),
+          },
+        }));
+      }
+
+      return user;
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException('The user with provided params does not exist', error);

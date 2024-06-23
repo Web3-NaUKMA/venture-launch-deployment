@@ -65,7 +65,7 @@ const DetailsUserPage: FC = () => {
                     type='button'
                     className='inline-flex text-lg font-sans font-medium border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1 transition-[0.3s_ease] rounded-full'
                     onClick={() =>
-                      navigate(AppRoutes.MessageCenter, {
+                      navigate(AppRoutes.MessageCenter.concat('/new-chat'), {
                         state: {
                           notStartedChat: {
                             user: {

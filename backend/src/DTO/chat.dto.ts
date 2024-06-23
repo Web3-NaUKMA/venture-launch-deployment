@@ -17,6 +17,10 @@ export interface UpdateChatDto {
   isGroup?: boolean;
   updatedAt?: Date | null;
   removedAt?: Date | null;
+  addArchivedBy?: ChatUserDto[];
+  addFavouriteFor?: ChatUserDto[];
+  removeArchivedBy?: ChatUserDto[];
+  removeFavouriteFor?: ChatUserDto[];
   usersToAdd?: ChatUserDto[];
   usersToUpdate?: ChatUserDto[];
   usersToRemove?: ChatUserDto[];

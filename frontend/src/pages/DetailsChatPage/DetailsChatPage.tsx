@@ -1,7 +1,8 @@
 import { ChangeEvent, FC, FormEvent, useCallback, useEffect, useRef, useState } from 'react';
-import { useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
 import { useAppDispatch, useAppSelector } from '../../hooks/redux.hooks';
 import {
+  createChat,
   fetchChat,
   selectChat,
   selectChats,
@@ -13,7 +14,7 @@ import {
 } from '../../redux/slices/chat.slice';
 import {
   createMessage,
-  deleteMessage,
+  editMessage,
   selectMessages,
   setMessages,
   updateMessage,
@@ -43,6 +44,7 @@ import { AppRoutes } from '../../types/enums/app-routes.enum';
 
 const DetailsChatPage: FC = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const chat = useAppSelector(selectChat);
   const chats = useAppSelector(selectChats);
@@ -66,13 +68,76 @@ const DetailsChatPage: FC = () => {
     useState<Message | null>(null);
   const [editedMessage, setEditedMessage] = useState<Message | null>(null);
   const [repliedMessage, setRepliedMessage] = useState<Message | null>(null);
+  const [pinnedMessagesState, setPinnedMessagesState] = useState<{
+    messages: Message[];
+    selected: number;
+  }>({ messages: [], selected: 0 });
+  const [isChatMessagesFetched, setIsChatMessagesFetched] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const sendMessageFormRef = useRef<HTMLFormElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<IntersectionObserver | null>(null);
   const messageContextMenuRef = useOutsideClick(() => setContextMenuVisibleForMessage(null));
+  const location = useLocation();
 
   useEffect(() => {
+    if (id) {
+      if (id === 'new-chat') {
+        if (location?.state?.notStartedChat?.user) {
+          setMessages([]);
+          dispatch(
+            setChat({
+              id: 'new-chat',
+              name: `${location.state.notStartedChat.user.username} ${location.state.notStartedChat.user.firstName && location.state.notStartedChat.user.lastName ? `(${location.state.notStartedChat.user.firstName} ${location.state.notStartedChat.user.lastName})` : ''}`,
+              image: location.state.notStartedChat.user.avatar,
+              description: null,
+              isGroup: false,
+              createdAt: new Date(),
+              updatedAt: null,
+              removedAt: null,
+              usersToChat: [],
+              archivedBy: [],
+              favouriteFor: [],
+              messages: [],
+            }),
+          );
+        } else {
+          setNotFound(true);
+        }
+      } else {
+        dispatch(
+          fetchChat(
+            id,
+            {
+              where: { messages: { removedAt: null } },
+              relations: {
+                messages: { author: true, seenBy: true, replyTo: { author: true }, replies: true },
+                usersToChat: { user: true },
+              },
+              order: { messages: { createdAt: 'DESC' } },
+            },
+            {
+              onSuccess: data => {
+                dispatch(setMessages(data.messages));
+                setPinnedMessagesState({
+                  ...pinnedMessagesState,
+                  messages: data.messages
+                    .filter((message: any) => message.isPinned)
+                    .sort(
+                      (messageA: any, messageB: any) =>
+                        new Date(messageB.createdAt).getTime() -
+                        new Date(messageA.createdAt).getTime(),
+                    ),
+                });
+                setIsChatMessagesFetched(true);
+              },
+              onError: () => setNotFound(true),
+            },
+          ),
+        );
+      }
+    }
+
     return () => {
       dispatch(setMessages([]));
       dispatch(setChat(null));
@@ -85,37 +150,59 @@ const DetailsChatPage: FC = () => {
         chat.usersToChat.find(userToChat => userToChat.userId !== authenticatedUser.id)?.user ||
           null,
       );
+
+      if (location?.state?.messageToCreate) {
+        dispatch(
+          createMessage(
+            {
+              author: {
+                id: authenticatedUser.id,
+              },
+              chat: { id: chat.id },
+              content: location.state.messageToCreate,
+              ...(repliedMessage && { replyTo: { id: repliedMessage.id } }),
+            },
+            {
+              onSuccess: data => {
+                textareaRef.current!.value = '';
+                textareaRef.current!.style.height = 'auto';
+
+                if (messagesContainerRef.current) {
+                  messagesContainerRef.current.scrollTop = 0;
+                }
+
+                setRepliedMessage(null);
+                socket?.emit('create-chat', chat.usersToChat);
+                dispatch(
+                  setChats(
+                    chats
+                      .map(chat =>
+                        chat.id === data.chat?.id
+                          ? { ...chat, messages: [data, ...chat.messages] }
+                          : chat,
+                      )
+                      .sort(
+                        (chatA, chatB) =>
+                          new Date(chatB.messages[0]?.createdAt || chatB.createdAt).getTime() -
+                          new Date(chatA.messages[0]?.createdAt || chatA.createdAt).getTime(),
+                      ),
+                  ),
+                );
+              },
+            },
+          ),
+        );
+        navigate(AppRoutes.DetailsChat.replace(':id', chat.id));
+      }
     }
   }, [chat, authenticatedUser]);
 
   useEffect(() => {
-    if (id) {
-      dispatch(
-        fetchChat(
-          id,
-          {
-            where: { messages: { removedAt: null } },
-            relations: {
-              messages: { author: true, seenBy: true, replyTo: { author: true }, replies: true },
-              usersToChat: { user: true },
-            },
-            order: { messages: { createdAt: 'DESC' } },
-          },
-          {
-            onSuccess: data => dispatch(setMessages(data.messages)),
-            onError: () => setNotFound(true),
-          },
-        ),
-      );
-    }
-  }, []);
-
-  useEffect(() => {
     if (socket) {
       socket.on('receive-message', payload => handleSocketReceiveMessage(payload));
+      socket.on('receive-pin-message', payload => handleSocketReceivePinMessage(payload));
       socket.on('receive-updated-message', payload => handleSocketReceiveUpdatedMessage(payload));
       socket.on('receive-removed-message', payload => handleSocketReceiveRemovedMessage(payload));
-
       socket.on('receive-mark-message-as-read', (messageId, user) =>
         handleSocketReceiveMarkAsReadMessage(messageId, user),
       );
@@ -124,6 +211,7 @@ const DetailsChatPage: FC = () => {
     return () => {
       if (socket) {
         socket.off('receive-message');
+        socket.off('receive-pin-message');
         socket.off('receive-updated-message');
         socket.off('receive-removed-message');
         socket.off('receive-mark-message-as-read');
@@ -132,7 +220,7 @@ const DetailsChatPage: FC = () => {
   }, [messages, chats, chatsUnreadMessagesCount, socket]);
 
   useEffect(() => {
-    if (!firstUnreadMessageId && !isScrolledToFirstUnread) {
+    if (isChatMessagesFetched && !firstUnreadMessageId) {
       const firstUnreadMessage = structuredClone(messages)
         .reverse()
         .find(
@@ -144,14 +232,14 @@ const DetailsChatPage: FC = () => {
       if (firstUnreadMessage) {
         setFirstUnreadMessageId(firstUnreadMessage.id);
       }
-    }
 
-    setIsScrolledToFirstUnread(true);
-  }, [messages, firstUnreadMessageId, isScrolledToFirstUnread]);
+      setIsScrolledToFirstUnread(true);
+    }
+  }, [isChatMessagesFetched]);
 
   useEffect(() => {
-    if (firstUnreadMessageId) {
-      const messageElement = messagesContainerRef.current?.querySelector(
+    if (firstUnreadMessageId && messagesContainerRef.current) {
+      const messageElement = messagesContainerRef.current.querySelector(
         `[data-id="${firstUnreadMessageId}"]`,
       );
 
@@ -159,7 +247,7 @@ const DetailsChatPage: FC = () => {
         messageElement.scrollIntoView({ block: 'start' });
       }
     }
-  }, [firstUnreadMessageId]);
+  }, [firstUnreadMessageId, messagesContainerRef]);
 
   const handleInput = (event: ChangeEvent<HTMLTextAreaElement>) => {
     if (textareaRef.current) {
@@ -172,6 +260,21 @@ const DetailsChatPage: FC = () => {
     event.preventDefault();
 
     if (textareaRef.current && textareaRef.current.value?.trim() && authenticatedUser && id) {
+      if (id === 'new-chat' && location?.state?.notStartedChat?.user?.id) {
+        const formData = new FormData();
+        formData.append('usersToAdd[0][id]', authenticatedUser.id);
+        formData.append('usersToAdd[1][id]', location.state.notStartedChat.user.id);
+        dispatch(
+          createChat(formData, {
+            onSuccess: data => {
+              navigate(AppRoutes.DetailsChat.replace(':id', data.id), {
+                state: { messageToCreate: textareaRef.current!.value.trim() },
+              });
+            },
+          }),
+        );
+        return;
+      }
       if (editedMessage && textareaRef.current.value.trim() !== editedMessage.content) {
         dispatch(
           updateMessage(
@@ -189,14 +292,20 @@ const DetailsChatPage: FC = () => {
                 socket?.emit('update-message', data, id);
                 dispatch(
                   setChats(
-                    chats.map(chat =>
-                      chat.id === data.chat?.id
-                        ? {
-                            ...chat,
-                            messages: chat.messages.map(m => (m.id === data.id ? data : m)),
-                          }
-                        : chat,
-                    ),
+                    chats
+                      .map(chat =>
+                        chat.id === data.chat?.id
+                          ? {
+                              ...chat,
+                              messages: chat.messages.map(m => (m.id === data.id ? data : m)),
+                            }
+                          : chat,
+                      )
+                      .sort(
+                        (chatA, chatB) =>
+                          new Date(chatB.messages[0]?.createdAt || chatB.createdAt).getTime() -
+                          new Date(chatA.messages[0]?.createdAt || chatA.createdAt).getTime(),
+                      ),
                   ),
                 );
                 setEditedMessage(null);
@@ -230,11 +339,17 @@ const DetailsChatPage: FC = () => {
               socket?.emit('send-message', data, id);
               dispatch(
                 setChats(
-                  chats.map(chat =>
-                    chat.id === data.chat?.id
-                      ? { ...chat, messages: [data, ...chat.messages] }
-                      : chat,
-                  ),
+                  chats
+                    .map(chat =>
+                      chat.id === data.chat?.id
+                        ? { ...chat, messages: [data, ...chat.messages] }
+                        : chat,
+                    )
+                    .sort(
+                      (chatA, chatB) =>
+                        new Date(chatB.messages[0]?.createdAt || chatB.createdAt).getTime() -
+                        new Date(chatA.messages[0]?.createdAt || chatA.createdAt).getTime(),
+                    ),
                 ),
               );
             },
@@ -277,7 +392,7 @@ const DetailsChatPage: FC = () => {
 
   const handleSocketReceiveMessage = (payload: any) => {
     const chatsUnreadMessagesCountCopy = structuredClone(chatsUnreadMessagesCount);
-    if (payload.author.id !== authenticatedUser?.id) {
+    if (payload.author.id !== authenticatedUser?.id && payload.chat?.id === id) {
       dispatch(
         setMessages([
           payload,
@@ -295,23 +410,52 @@ const DetailsChatPage: FC = () => {
     dispatch(setChatsUnreadMessagesCount(chatsUnreadMessagesCountCopy));
   };
 
-  const handleSocketReceiveUpdatedMessage = (payload: any) => {
-    dispatch(
-      setMessages(
-        messages.map(message =>
-          message.id === payload.id
-            ? payload
-            : payload?.replies.find((r: any) => r.id === message.id)
-              ? { ...message, replyTo: payload }
-              : message,
+  const handleSocketReceivePinMessage = (payload: any) => {
+    if (payload.chat?.id === id) {
+      dispatch(editMessage(payload));
+      setPinnedMessagesState(prevState => ({
+        ...prevState,
+        messages: (payload.isPinned
+          ? [...prevState.messages, payload]
+          : prevState.messages.filter(message => message.id !== payload.id)
+        ).sort(
+          (messageA, messageB) =>
+            new Date(messageB.createdAt).getTime() - new Date(messageA.createdAt).getTime(),
         ),
-      ),
-    );
+      }));
+      setPinnedMessagesState(prevState => ({
+        ...prevState,
+        selected:
+          prevState.messages.length === 1 ? 0 : prevState.selected % prevState.messages.length,
+      }));
+    }
+  };
+
+  const handleSocketReceiveUpdatedMessage = (payload: any) => {
+    if (payload.chat?.id === id) {
+      dispatch(
+        setMessages(
+          messages.map(message =>
+            message.id === payload.id
+              ? payload
+              : payload?.replies.find((r: any) => r.id === message.id)
+                ? { ...message, replyTo: payload }
+                : message,
+          ),
+        ),
+      );
+    }
   };
 
   const handleSocketReceiveRemovedMessage = (payload: any) => {
-    if (payload.author.id !== authenticatedUser?.id) {
-      dispatch(setMessages(messages.filter(message => message.id !== payload.id)));
+    if (payload.author.id !== authenticatedUser?.id && payload.chat?.id === id) {
+      dispatch(
+        setMessages(
+          messages
+            .filter(message => message.id !== payload.id)
+            .map(m => (m.replyTo?.id === payload.id ? { ...m, replyTo: payload } : m)),
+        ),
+      );
     }
   };
 
@@ -331,6 +475,20 @@ const DetailsChatPage: FC = () => {
     }
   };
 
+  const handlePinMessage = (message: Message) => {
+    dispatch(
+      updateMessage(
+        message.id,
+        { isPinned: !message.isPinned },
+        {
+          onSuccess: data => {
+            socket?.emit('pin-message', data, id);
+          },
+        },
+      ),
+    );
+  };
+
   const handleRemoveMessage = (message: Message) => {
     dispatch(
       updateMessage(
@@ -339,17 +497,38 @@ const DetailsChatPage: FC = () => {
         {
           onSuccess: data => {
             socket?.emit('remove-message', data, id);
-            dispatch(deleteMessage(message.id));
+
+            if (data.isPinned) {
+              socket?.emit('pin-message', { ...data, isPinned: false }, id);
+            }
+
+            dispatch(
+              setMessages(
+                messages
+                  .filter(message => message.id !== data.id)
+                  .map(message =>
+                    message.replyTo?.id === data.id ? { ...message, replyTo: data } : message,
+                  ),
+              ),
+            );
             dispatch(
               setChats(
-                chats.map(chat =>
-                  chat.id === data.chat?.id
-                    ? {
-                        ...chat,
-                        messages: chat.messages.filter(m => m.id !== data.id),
-                      }
-                    : chat,
-                ),
+                chats
+                  .map(chat =>
+                    chat.id === data.chat?.id
+                      ? {
+                          ...chat,
+                          messages: chat.messages
+                            .filter(m => m.id !== data.id)
+                            .map(m => (m.replyTo?.id === data.id ? { ...m, replyTo: data } : m)),
+                        }
+                      : chat,
+                  )
+                  .sort(
+                    (chatA, chatB) =>
+                      new Date(chatB.messages[0]?.createdAt || chatB.createdAt).getTime() -
+                      new Date(chatA.messages[0]?.createdAt || chatA.createdAt).getTime(),
+                  ),
               ),
             );
             setRemoveModalVisibleForMessage(null);
@@ -412,30 +591,37 @@ const DetailsChatPage: FC = () => {
   );
 
   useEffect(() => {
-    if (isScrolledToFirstUnread) {
-      observeMessages(messagesContainerRef.current);
-    }
+    observeMessages(messagesContainerRef.current);
 
     return () => {
       if (observerRef.current) {
         observerRef.current.disconnect();
       }
     };
-  }, [observeMessages, isScrolledToFirstUnread]);
+  }, [observeMessages]);
 
   return notFound ? (
-    <p>The chat you are looking for was not found or removed</p>
+    <div className='flex flex-col flex-1 items-center justify-center rounded-xl m-3 border-2 border-dashed border-stone-200'>
+      <span className='font-mono text-stone-400'>
+        The chat you are looking for was not found or removed
+      </span>
+    </div>
   ) : (
     chat && (
       <>
         {seenByModalVisibleForMessage &&
           createPortal(
             <Modal
-              title={'Seen by'}
+              title='Seen by'
               onClose={() => setSeenByModalVisibleForMessage(null)}
               className='max-w-xl'
             >
               <div className='px-5 py-5 flex flex-col gap-1'>
+                {!seenByModalVisibleForMessage.seenBy?.length && (
+                  <span className='flex items-center gap-5 p-5 text-center justify-center font-mono text-stone-600 rounded-xl border-2 border-dashed border-stone-200'>
+                    Nobody has seen this message yet
+                  </span>
+                )}
                 {seenByModalVisibleForMessage.seenBy?.map(user => (
                   <Link
                     to={AppRoutes.DetailsUser.replace(':id', user.id)}
@@ -515,15 +701,57 @@ const DetailsChatPage: FC = () => {
               <span className='inline-flex items-center justify-center bg-stone-300 w-[32px] rounded-full aspect-square'>
                 <span className='text-sm font-bold text-stone-600'>
                   {(chat.name ||
-                    `${anotherChatMember?.firstName} ${anotherChatMember?.lastName}`)[0].toUpperCase()}
+                    `${anotherChatMember?.username} ${anotherChatMember?.firstName && anotherChatMember?.lastName ? `(${anotherChatMember?.firstName} ${anotherChatMember?.lastName})` : ``}`)[0].toUpperCase()}
                 </span>
               </span>
             )}
           </span>
           <span className='font-semibold text-lg'>
-            {chat.name || `${anotherChatMember?.firstName} ${anotherChatMember?.lastName}`}
+            {chat.name ||
+              `${anotherChatMember?.username} ${anotherChatMember?.firstName && anotherChatMember?.lastName ? `(${anotherChatMember?.firstName} ${anotherChatMember?.lastName})` : ``}`}
           </span>
         </button>
+        {pinnedMessagesState.messages.length > 0 && (
+          <div
+            className='flex items-center justify-between px-3 py-1 border-b bg-slate-100 gap-3 cursor-pointer hover:bg-slate-200 transition-all duration-300'
+            onClick={() => {
+              if (messagesContainerRef.current) {
+                const messageElement = messagesContainerRef.current.querySelector(
+                  `.message[data-id="${pinnedMessagesState.messages[(pinnedMessagesState.selected + 1) % pinnedMessagesState.messages.length].id}"]`,
+                ) as HTMLElement | null;
+
+                if (messageElement) {
+                  messagesContainerRef.current.scrollTop = messageElement.offsetTop;
+                }
+              }
+              setPinnedMessagesState({
+                ...pinnedMessagesState,
+                selected: (pinnedMessagesState.selected + 1) % pinnedMessagesState.messages.length,
+              });
+            }}
+          >
+            <div className='flex gap-3 items-center'>
+              <PinFixedIcon className='size-5 text-stone-600' />
+              <div className='flex flex-col'>
+                <h6 className='font-semibold text-xs mb-0.5 text-stone-700'>
+                  Pinned message #{pinnedMessagesState.selected + 1} of{' '}
+                  {pinnedMessagesState.messages.length}
+                </h6>
+                <span
+                  className='text-xs text-stone-600 whitespace-pre-wrap'
+                  style={{
+                    display: '-webkit-box',
+                    WebkitLineClamp: 1,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                  }}
+                >
+                  {pinnedMessagesState.messages[pinnedMessagesState.selected].content}
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
         <div className='flex flex-col flex-1 relative'>
           <div
             ref={messagesContainerRef}
@@ -644,9 +872,24 @@ const DetailsChatPage: FC = () => {
                             <CopyIcon className='size-4 text-zinc-600' />
                             <span>Copy</span>
                           </span>
-                          <span className='px-2 py-1 inline-flex items-center rounded-lg hover:bg-stone-100 transition-all duration-300 cursor-pointer font-medium gap-2'>
-                            <PinFixedIcon className='size-4 text-zinc-600' />
-                            <span>Pin</span>
+                          <span
+                            className='px-2 py-1 inline-flex items-center rounded-lg hover:bg-stone-100 transition-all duration-300 cursor-pointer font-medium gap-2'
+                            onClick={() => {
+                              handlePinMessage(message);
+                              setContextMenuVisibleForMessage(null);
+                            }}
+                          >
+                            {!message.isPinned ? (
+                              <>
+                                <PinFixedIcon className='size-4 text-zinc-600' />
+                                <span>Pin</span>
+                              </>
+                            ) : (
+                              <>
+                                <PinFixedIcon className='size-4 text-zinc-600' />
+                                <span>Unpin</span>
+                              </>
+                            )}
                           </span>
                           <span
                             className='px-2 py-1 inline-flex items-center rounded-lg hover:bg-stone-100 transition-all duration-300 cursor-pointer font-medium gap-2'

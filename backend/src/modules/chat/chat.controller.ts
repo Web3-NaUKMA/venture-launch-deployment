@@ -8,7 +8,6 @@ import _ from 'lodash';
 import { v4 as uuid } from 'uuid';
 import path from 'path';
 import { deleteFolder, uploadMultipleFiles } from '../../utils/file.utils';
-import { IsNull, Not } from 'typeorm';
 
 @Controller()
 export class ChatController {
@@ -37,16 +36,6 @@ export class ChatController {
           qs.parse(request.query as Record<string, any>, { comma: true, allowDots: true }),
         )
       : undefined;
-
-    if (typeof query?.where?.messages?.removedAt === 'object') {
-      if (query?.where?.messages?.removedAt?.not !== undefined) {
-        query.where.messages.removedAt = Not(
-          !query.where.messages.removedAt.not ? IsNull() : query.where.messages.removedAt.not,
-        );
-      }
-    } else if (query?.where?.messages?.removedAt === 0) {
-      query.where.messages.removedAt = IsNull();
-    }
 
     const { id } = request.params as any;
     const chat = await chatService.findOne(

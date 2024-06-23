@@ -20,8 +20,16 @@ export default class Socket {
         console.log(`User joined the chat ${data}`);
       });
 
+      socket.on('create-chat', (payload) => {
+        io.emit('receive-create-chat', payload);
+      });
+
       socket.on('send-message', (payload, chatId) => {
         io.in(chatId).emit('receive-message', payload);
+      });
+
+      socket.on('pin-message', (payload, chatId) => {
+        io.in(chatId).emit('receive-pin-message', payload);
       });
 
       socket.on('update-message', (payload, chatId) => {
