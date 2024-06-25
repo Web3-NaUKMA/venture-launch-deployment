@@ -1,21 +1,11 @@
-export interface ICreateMilestoneDto {
+export interface CreateMilestoneDto {
   mergedPullRequestUrl: string;
   projectId: string;
 }
 
-export interface IUpdateMilestoneDto {
+export interface UpdateMilestoneDto {
   mergedPullRequestUrl?: string;
   isFinal?: boolean;
   isWithdrawn?: boolean;
   transactionApprovalHash?: string;
-}
-
-export interface IFindMilestoneDto {
-  id?: string;
-  projectId?: { id: string };
-  mergedPullRequestUrl?: string;
-  transactionApprovalHash?: string;
-  isFinal?: boolean;
-  isWithdrawn?: boolean;
-  createdAt?: Date;
 }

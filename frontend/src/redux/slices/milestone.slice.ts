@@ -4,13 +4,13 @@ import { HttpStatusCode } from 'axios';
 import { ActionCreatorOptions } from '../../types/redux/store.types';
 import axios from 'axios';
 import {
-  IMilestoneSliceState,
-  IMilestoneSliceStateError,
-  IMilestoneSliceStateErrors,
+  MilestoneSliceState,
+  MilestoneSliceStateError,
+  MilestoneSliceStateErrors,
 } from '../../types/redux/milestone.types';
-import { ICreateMilestone, IMilestone, IUpdateMilestone } from '../../types/milestone.types';
+import { CreateMilestoneDto, Milestone, UpdateMilestoneDto } from '../../types/milestone.types';
 
-const initialState: IMilestoneSliceState = {
+const initialState: MilestoneSliceState = {
   milestones: [],
   milestone: null,
   errors: {
@@ -27,27 +27,27 @@ const milestoneSlice = createSlice({
   initialState,
   reducers: {
     setMilestones: (
-      state: IMilestoneSliceState,
-      action: PayloadAction<IMilestone[]>,
-    ): IMilestoneSliceState => {
+      state: MilestoneSliceState,
+      action: PayloadAction<Milestone[]>,
+    ): MilestoneSliceState => {
       return { ...state, milestones: action.payload };
     },
     setMilestone: (
-      state: IMilestoneSliceState,
-      action: PayloadAction<IMilestone | null>,
-    ): IMilestoneSliceState => {
+      state: MilestoneSliceState,
+      action: PayloadAction<Milestone | null>,
+    ): MilestoneSliceState => {
       return { ...state, milestone: action.payload };
     },
     addMilestone: (
-      state: IMilestoneSliceState,
-      action: PayloadAction<IMilestone>,
-    ): IMilestoneSliceState => {
+      state: MilestoneSliceState,
+      action: PayloadAction<Milestone>,
+    ): MilestoneSliceState => {
       return { ...state, milestones: [action.payload, ...state.milestones] };
     },
     editMilestone: (
-      state: IMilestoneSliceState,
-      action: PayloadAction<IMilestone>,
-    ): IMilestoneSliceState => {
+      state: MilestoneSliceState,
+      action: PayloadAction<Milestone>,
+    ): MilestoneSliceState => {
       return {
         ...state,
         milestones: state.milestones.map(milestone =>
@@ -56,18 +56,18 @@ const milestoneSlice = createSlice({
       };
     },
     deleteMilestone: (
-      state: IMilestoneSliceState,
+      state: MilestoneSliceState,
       action: PayloadAction<string>,
-    ): IMilestoneSliceState => {
+    ): MilestoneSliceState => {
       return {
         ...state,
         milestones: state.milestones.filter(milestone => milestone.id !== action.payload),
       };
     },
     setError: (
-      state: IMilestoneSliceState,
-      action: PayloadAction<IMilestoneSliceStateError>,
-    ): IMilestoneSliceState => {
+      state: MilestoneSliceState,
+      action: PayloadAction<MilestoneSliceStateError>,
+    ): MilestoneSliceState => {
       return { ...state, errors: { ...state.errors, ...action.payload } };
     },
   },
@@ -116,7 +116,7 @@ export const fetchMilestone =
   };
 
 export const createMilestone =
-  (milestone: ICreateMilestone, options?: ActionCreatorOptions) =>
+  (milestone: CreateMilestoneDto, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(milestoneSlice.actions.setError({ createMilestone: null }));
 
@@ -138,7 +138,7 @@ export const createMilestone =
   };
 
 export const updateMilestone =
-  (id: string, milestone: IUpdateMilestone, options?: ActionCreatorOptions) =>
+  (id: string, milestone: UpdateMilestoneDto, options?: ActionCreatorOptions) =>
   async (dispatch: AppDispatch) => {
     dispatch(milestoneSlice.actions.setError({ updateMilestone: null }));
 
@@ -181,10 +181,9 @@ export const removeMilestone =
     }
   };
 
-export const selectMilestones = (state: RootState): IMilestone[] => state.milestone.milestones;
-export const selectMilestone = (state: RootState): IMilestone | null => state.milestone.milestone;
-export const selectErrors = (state: RootState): IMilestoneSliceStateErrors =>
-  state.milestone.errors;
+export const selectMilestones = (state: RootState): Milestone[] => state.milestone.milestones;
+export const selectMilestone = (state: RootState): Milestone | null => state.milestone.milestone;
+export const selectErrors = (state: RootState): MilestoneSliceStateErrors => state.milestone.errors;
 
 export const {
   setError,

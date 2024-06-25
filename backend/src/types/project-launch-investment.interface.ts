@@ -1,10 +1,10 @@
-import { IProjectLaunch } from './project-launch.interface';
-import { IUser } from './user.interface';
+import { ProjectLaunch } from './project-launch.interface';
+import { User } from './user.interface';
 
-export interface IProjectLaunchInvestment {
+export interface ProjectLaunchInvestment {
   id: string;
-  investor: IUser;
-  projectLaunch: IProjectLaunch;
+  investor: User;
+  projectLaunch: ProjectLaunch;
   amount: number;
   createdAt: Date;
 }

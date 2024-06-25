@@ -1,9 +1,10 @@
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { IMilestone } from '../../types/milestone.interface';
-import { Project } from './Project';
+import { Milestone } from '../../types/milestone.interface';
+import { ProjectEntity } from './project.entity';
+import { Project } from '../../types/project.interface';
 
-@Entity()
-export class Milestone implements IMilestone {
+@Entity('milestone')
+export class MilestoneEntity implements Milestone {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -22,7 +23,7 @@ export class Milestone implements IMilestone {
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @ManyToOne(() => Project, project => project.milestones, {
+  @ManyToOne(() => ProjectEntity, project => project.milestones, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })

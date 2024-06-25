@@ -1,5 +1,5 @@
 import { FC, useState } from 'react';
-import { IMilestone } from '../../../types/milestone.types';
+import { Milestone as MilestoneType } from '../../../types/milestone.types';
 import Button from '../../atoms/Button/Button';
 import { EditIcon, RemoveIcon } from '../../atoms/Icons/Icons';
 import { useAppDispatch } from '../../../hooks/redux.hooks';
@@ -14,17 +14,17 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import * as web3 from '@solana/web3.js';
 import { getAssociatedTokenAddress } from '@solana/spl-token';
 import { USDC_MINT, createWithdrawTx, programId } from '../../../utils/venture-launch.utils';
-import { IProjectLaunch } from '../../../types/project-launch.types';
+import { ProjectLaunch } from '../../../types/project-launch.types';
 import { useAuth } from '../../../hooks/auth.hooks';
 import { UserRoleEnum } from '../../../types/enums/user-role.enum';
 import useWeb3Auth from '../../../hooks/web3auth.hooks';
 
-export interface IMilestoneProps {
-  milestone: IMilestone;
-  projectLaunch?: IProjectLaunch;
+export interface MilestoneProps {
+  milestone: MilestoneType;
+  projectLaunch?: ProjectLaunch;
 }
 
-const Milestone: FC<IMilestoneProps> = ({ milestone, projectLaunch }) => {
+const Milestone: FC<MilestoneProps> = ({ milestone, projectLaunch }) => {
   const { publicKey, signTransaction, sendTransaction } = useWallet();
   const { connection } = useConnection();
   const dispatch = useAppDispatch();

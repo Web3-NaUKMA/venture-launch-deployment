@@ -1,5 +1,5 @@
-import { ICreateSessionDto, IUpdateSessionDto } from '../../DTO/session.dto';
-import { Session } from '../../typeorm/models/Session';
+import { CreateSessionDto, UpdateSessionDto } from '../../DTO/session.dto';
+import { SessionEntity } from '../../typeorm/entities/session.entity';
 import AppDataSource from '../../typeorm/index.typeorm';
 import {
   ConflictException,
@@ -10,9 +10,9 @@ import { EntityNotFoundError, FindManyOptions } from 'typeorm';
 import _ from 'lodash';
 
 export class SessionService {
-  async findMany(options?: FindManyOptions<Session>): Promise<Session[]> {
+  async findMany(options?: FindManyOptions<SessionEntity>): Promise<SessionEntity[]> {
     try {
-      return await AppDataSource.getRepository(Session).find(
+      return await AppDataSource.getRepository(SessionEntity).find(
         _.merge(options, {
           relations: { user: true },
         }),
@@ -22,9 +22,9 @@ export class SessionService {
     }
   }
 
-  async findOne(options?: FindManyOptions<Session>): Promise<Session> {
+  async findOne(options?: FindManyOptions<SessionEntity>): Promise<SessionEntity> {
     try {
-      return await AppDataSource.getRepository(Session).findOneOrFail(
+      return await AppDataSource.getRepository(SessionEntity).findOneOrFail(
         _.merge(options, {
           relations: { user: true },
         }),
@@ -38,9 +38,9 @@ export class SessionService {
     }
   }
 
-  async create(data: ICreateSessionDto): Promise<Session> {
+  async create(data: CreateSessionDto): Promise<SessionEntity> {
     try {
-      const exists = await AppDataSource.getRepository(Session).exists({
+      const exists = await AppDataSource.getRepository(SessionEntity).exists({
         where: [{ sessionId: data.sessionId }, { user: { id: data.userId } }],
       });
 
@@ -50,7 +50,7 @@ export class SessionService {
         );
       }
 
-      return await AppDataSource.getRepository(Session).save({
+      return await AppDataSource.getRepository(SessionEntity).save({
         sessionId: data.sessionId,
         user: { id: data.userId },
         expiresAt: data.expiresAt,
@@ -64,11 +64,11 @@ export class SessionService {
     }
   }
 
-  async update(sessionId: string, data: IUpdateSessionDto): Promise<Session> {
+  async update(sessionId: string, data: UpdateSessionDto): Promise<SessionEntity> {
     try {
-      await AppDataSource.getRepository(Session).update({ sessionId }, data);
+      await AppDataSource.getRepository(SessionEntity).update({ sessionId }, data);
 
-      return await AppDataSource.getRepository(Session).findOneOrFail({
+      return await AppDataSource.getRepository(SessionEntity).findOneOrFail({
         relations: { user: true },
         where: { sessionId: data.sessionId ? data.sessionId : sessionId },
       });
@@ -84,14 +84,14 @@ export class SessionService {
     }
   }
 
-  async remove(sessionId: string): Promise<Session> {
+  async remove(sessionId: string): Promise<SessionEntity> {
     try {
-      const session = await AppDataSource.getRepository(Session).findOneOrFail({
+      const session = await AppDataSource.getRepository(SessionEntity).findOneOrFail({
         relations: { user: true },
         where: { sessionId },
       });
 
-      await AppDataSource.getRepository(Session).remove(structuredClone(session));
+      await AppDataSource.getRepository(SessionEntity).remove(structuredClone(session));
       return session;
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {

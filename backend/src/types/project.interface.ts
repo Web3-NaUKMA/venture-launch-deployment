@@ -1,6 +1,6 @@
-import { IProjectLaunch } from './project-launch.interface';
+import { ProjectLaunch } from './project-launch.interface';
 
-export interface IProject {
+export interface Project {
   id: string;
   projectLaunchName: string;
   projectLaunchDescription: string;
@@ -8,5 +8,5 @@ export interface IProject {
   milestoneNumber: number;
   isFinal: boolean;
   createdAt: Date;
-  projectLaunch: IProjectLaunch;
+  projectLaunch: ProjectLaunch;
 }

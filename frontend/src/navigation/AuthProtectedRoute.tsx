@@ -4,11 +4,11 @@ import { useAuth } from '../hooks/auth.hooks';
 import { AppRoutes } from '../types/enums/app-routes.enum';
 import { UserRoleEnum } from '../types/enums/user-role.enum';
 
-export interface IAuthProtectedRouteProps {
+export interface AuthProtectedRouteProps {
   roles?: UserRoleEnum[];
 }
 
-const AuthProtectedRoute: FC<IAuthProtectedRouteProps> = ({
+const AuthProtectedRoute: FC<AuthProtectedRouteProps> = ({
   roles = Object.values(UserRoleEnum),
 }) => {
   const { fetchLatestAuthInfo, signOut } = useAuth();

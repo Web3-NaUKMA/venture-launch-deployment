@@ -1,3 +1,3 @@
-export interface IUploadFileOptions {
+export interface UploadFileOptions {
   destination?: string;
 }

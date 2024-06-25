@@ -28,6 +28,7 @@ export class UserController {
           qs.parse(request.query as Record<string, any>, { comma: true, allowDots: true }),
         )
       : undefined;
+
     const { id } = request.params;
     const user = await userService.findOne(_.merge(query, { where: { id } }));
 

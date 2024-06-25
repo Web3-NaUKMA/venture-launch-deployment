@@ -8,17 +8,17 @@ import {
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { IProjectLaunch } from '../../types/project-launch.interface';
-import { IProject } from '../../types/project.interface';
-import { Project } from './Project';
-import { ProjectLaunchInvestment } from './ProjectLaunchInvestment';
-import { IProjectLaunchInvestment } from '../../types/project-launch-investment.interface';
-import { IUser } from '../../types/user.interface';
-import { User } from './User';
+import { ProjectLaunch } from '../../types/project-launch.interface';
+import { Project } from '../../types/project.interface';
+import { ProjectEntity } from './project.entity';
+import { ProjectLaunchInvestmentEntity } from './project-launch-investment.entity';
+import { ProjectLaunchInvestment } from '../../types/project-launch-investment.interface';
+import { User } from '../../types/user.interface';
+import { UserEntity } from './user.entity';
 
-@Entity()
+@Entity('project_launch')
 @Index(['name', 'author.id'], { unique: true })
-export class ProjectLaunch implements IProjectLaunch {
+export class ProjectLaunchEntity implements ProjectLaunch {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -58,9 +58,9 @@ export class ProjectLaunch implements IProjectLaunch {
   @Column({ type: 'jsonb', default: '{}' })
   roundDetails: JSON;
 
-  @OneToOne(() => Project)
+  @OneToOne(() => ProjectEntity)
   @JoinColumn({ name: 'projectId', referencedColumnName: 'id' })
-  project: IProject | null;
+  project: Project | null;
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
@@ -71,21 +71,24 @@ export class ProjectLaunch implements IProjectLaunch {
   @Column({ type: 'text' })
   cryptoTrackerAccount: string;
 
-  @ManyToOne(() => User, user => user.projectLaunches, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
-  author: IUser;
+  @ManyToOne(() => UserEntity, user => user.projectLaunches, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
+  author: User;
 
   @OneToMany(
-    () => ProjectLaunchInvestment,
+    () => ProjectLaunchInvestmentEntity,
     projectLaunchInvestment => projectLaunchInvestment.projectLaunch,
   )
-  projectLaunchInvestments?: IProjectLaunchInvestment[] | undefined;
+  projectLaunchInvestments?: ProjectLaunchInvestment[] | undefined;
 
   @Column({ type: 'text', default: null })
   businessAnalystReview: string | null;
 
-  @ManyToOne(() => User, user => user.approvedProjectLaunches, {
+  @ManyToOne(() => UserEntity, user => user.approvedProjectLaunches, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })
-  approver: IUser;
+  approver: User;
 }

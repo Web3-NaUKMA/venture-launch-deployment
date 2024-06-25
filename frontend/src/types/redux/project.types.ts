@@ -1,10 +1,10 @@
-import { IProject } from '../project.types';
+import { Project } from '../project.types';
 
-export interface IProjectSliceStateError {
+export interface ProjectSliceStateError {
   [key: string]: string | null;
 }
 
-export interface IProjectSliceStateErrors {
+export interface ProjectSliceStateErrors {
   fetchAllProjects: string | null;
   fetchProject: string | null;
   createProject: string | null;
@@ -12,8 +12,8 @@ export interface IProjectSliceStateErrors {
   removeProject: string | null;
 }
 
-export interface IProjectSliceState {
-  projects: IProject[];
-  project: IProject | null;
-  errors: IProjectSliceStateErrors;
+export interface ProjectSliceState {
+  projects: Project[];
+  project: Project | null;
+  errors: ProjectSliceStateErrors;
 }

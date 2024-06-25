@@ -1,8 +1,4 @@
-import { IUser } from '../types/user.interface';
-import { IFindProjectLaunchInvestmentDto } from './project-launch-investment.dto';
-import { IFindProjectDto } from './project.dto';
-
-export interface ICreateProjectLaunchDto {
+export interface CreateProjectLaunchDto {
   name: string;
   description: string;
   logo: string | null;
@@ -18,7 +14,7 @@ export interface ICreateProjectLaunchDto {
   cryptoTrackerAccount: string;
 }
 
-export interface IUpdateProjectLaunchDto {
+export interface UpdateProjectLaunchDto {
   name?: string;
   description?: string;
   logo?: string | null;
@@ -35,27 +31,4 @@ export interface IUpdateProjectLaunchDto {
   vaultTokenAccount?: string;
   cryptoTrackerAccount?: string;
   businessAnalystReview?: string | null;
-}
-
-export interface IFindProjectLaunchDto {
-  id?: string;
-  name?: string;
-  description?: string;
-  isFundraised?: boolean;
-  approverId?: string;
-  fundraiseAmount?: number;
-  fundraiseProgress?: number;
-  fundraiseDeadline?: Date;
-  projectDocuments?: string[];
-  projectLaunchInvestments?: Partial<IFindProjectLaunchInvestmentDto>;
-  team?: JSON;
-  businessModel?: string;
-  tokenomics?: string;
-  roundDetails?: JSON;
-  author?: Partial<IUser>;
-  approver?: Partial<IUser>;
-  project?: Partial<IFindProjectDto>;
-  createdAt?: Date;
-  vaultTokenAccount?: string;
-  cryptoTrackerAccount?: string;
 }

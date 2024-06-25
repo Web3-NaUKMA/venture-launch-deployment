@@ -1,8 +1,10 @@
 import React, { FC } from 'react';
 
-export interface IconProps extends React.SVGAttributes<SVGElement> {}
+export interface IconProps extends React.SVGAttributes<SVGElement> {
+  solid?: boolean;
+}
 
-export const CubeIcon: FC<IconProps> = props => {
+export const CubeIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -21,7 +23,7 @@ export const CubeIcon: FC<IconProps> = props => {
   );
 };
 
-export const IdentificationIcon: FC<IconProps> = props => {
+export const IdentificationIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -40,7 +42,7 @@ export const IdentificationIcon: FC<IconProps> = props => {
   );
 };
 
-export const ExitIcon: FC<IconProps> = props => {
+export const ExitIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -59,7 +61,7 @@ export const ExitIcon: FC<IconProps> = props => {
   );
 };
 
-export const UserCircleIcon: FC<IconProps> = props => {
+export const UserCircleIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -78,7 +80,7 @@ export const UserCircleIcon: FC<IconProps> = props => {
   );
 };
 
-export const BurgerMenuIcon: FC<IconProps> = props => {
+export const BurgerMenuIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -97,7 +99,7 @@ export const BurgerMenuIcon: FC<IconProps> = props => {
   );
 };
 
-export const DotsIcon: FC<IconProps> = props => {
+export const DotsIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -116,7 +118,7 @@ export const DotsIcon: FC<IconProps> = props => {
   );
 };
 
-export const EditIcon: FC<IconProps> = props => {
+export const EditIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -135,7 +137,7 @@ export const EditIcon: FC<IconProps> = props => {
   );
 };
 
-export const RemoveIcon: FC<IconProps> = props => {
+export const RemoveIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -154,7 +156,121 @@ export const RemoveIcon: FC<IconProps> = props => {
   );
 };
 
-export const GoogleIcon: FC<IconProps> = props => {
+export const ReplyIcon: FC<IconProps> = ({ solid, ...props }) => {
+  return (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 24 24'
+      strokeWidth={1.5}
+      stroke='currentColor'
+      {...props}
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3'
+      />
+    </svg>
+  );
+};
+
+export const EyeIcon: FC<IconProps> = ({ solid, ...props }) => {
+  return (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 24 24'
+      strokeWidth={1.5}
+      stroke='currentColor'
+      {...props}
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z'
+      />
+      <path strokeLinecap='round' strokeLinejoin='round' d='M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z' />
+    </svg>
+  );
+};
+
+export const PinFixedIcon: FC<IconProps> = ({ solid, ...props }) => {
+  return (
+    <svg
+      width='24'
+      height='24'
+      viewBox='0 0 24 24'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+      {...props}
+    >
+      <path
+        d='M3.24956 22C3.41383 22.0003 3.57654 21.9681 3.72828 21.9052C3.88002 21.8422 4.01778 21.7499 4.13361 21.6334L9.09125 16.6724L9.69784 17.2998C10.5038 18.1459 11.6126 18.6374 12.7807 18.6663C13.1829 18.667 13.5822 18.5991 13.9614 18.4655C14.5505 18.2576 15.068 17.8857 15.4527 17.3935C15.8374 16.9013 16.0734 16.3094 16.1328 15.6875C16.2196 14.8669 16.1595 14.0374 15.9553 13.2379L15.9203 13.0712L18.7433 10.2491L19.1199 10.6266C19.397 10.9177 19.768 11.1017 20.1675 11.1463C20.5669 11.1908 20.9693 11.0929 21.3037 10.8699C21.4996 10.7299 21.6627 10.5491 21.7817 10.3399C21.9007 10.1306 21.9727 9.89803 21.9929 9.65817C22.013 9.41831 21.9807 9.17695 21.8983 8.9508C21.8158 8.72466 21.6852 8.51916 21.5154 8.34855L15.7103 2.53019C15.4332 2.23904 15.0622 2.05501 14.6628 2.0105C14.2633 1.96599 13.8609 2.06387 13.5265 2.28689C13.3306 2.42681 13.1675 2.60765 13.0485 2.81689C12.9296 3.02612 12.8575 3.25873 12.8374 3.49858C12.8172 3.73844 12.8495 3.97981 12.932 4.20595C13.0144 4.43209 13.145 4.63759 13.3148 4.80821L13.7481 5.24565L10.9318 8.06276C10.1144 7.84856 9.26496 7.78447 8.42468 7.87362C7.77616 7.94031 7.16026 8.19118 6.64971 8.59661C6.13917 9.00203 5.75529 9.54508 5.54341 10.1616C5.31487 10.7898 5.27006 11.47 5.41423 12.1227C5.5584 12.7754 5.88559 13.3735 6.35747 13.847L7.35733 14.8768L2.36552 19.867C2.1909 20.0418 2.07202 20.2645 2.02391 20.5068C1.97581 20.7492 2.00063 21.0004 2.09524 21.2287C2.18984 21.457 2.35 21.6521 2.55546 21.7894C2.76091 21.9266 3.00246 21.9999 3.24956 22ZM7.89975 10.9949C7.95518 10.8245 8.05883 10.6738 8.19813 10.5611C8.33744 10.4484 8.50643 10.3785 8.68464 10.3599C9.23072 10.3028 9.78263 10.3451 10.3136 10.4849L11.0043 10.6607C11.2144 10.7142 11.4348 10.7122 11.6438 10.6548C11.8529 10.5974 12.0434 10.4866 12.1967 10.3333L15.5145 7.01373L16.976 8.4802L13.6731 11.7839C13.5262 11.9309 13.4183 12.1121 13.3591 12.3113C13.2999 12.5105 13.2913 12.7212 13.334 12.9246L13.5215 13.8103C13.6596 14.3378 13.7014 14.886 13.6448 15.4284C13.6369 15.5812 13.5829 15.728 13.49 15.8495C13.397 15.971 13.2694 16.0615 13.124 16.1091C12.8249 16.1795 12.5119 16.164 12.2211 16.0646C11.9303 15.9651 11.6735 15.7856 11.4801 15.5467L8.14055 12.093C7.99974 11.9521 7.90223 11.7738 7.85955 11.5792C7.81688 11.3845 7.83083 11.1818 7.89975 10.9949Z'
+        fill='currentColor'
+      />
+    </svg>
+  );
+};
+
+export const CopyIcon: FC<IconProps> = ({ solid, ...props }) => {
+  return (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 24 24'
+      strokeWidth={1.5}
+      stroke='currentColor'
+      {...props}
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z'
+      />
+    </svg>
+  );
+};
+
+export const ArchiveIcon: FC<IconProps> = ({ solid, ...props }) => {
+  return (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 24 24'
+      strokeWidth={1.5}
+      stroke='currentColor'
+      {...props}
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='m20.25 7.5-.625 10.632a2.25 2.25 0 0 1-2.247 2.118H6.622a2.25 2.25 0 0 1-2.247-2.118L3.75 7.5m8.25 3v6.75m0 0-3-3m3 3 3-3M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z'
+      />
+    </svg>
+  );
+};
+
+export const PencilIcon: FC<IconProps> = ({ solid, ...props }) => {
+  return (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 24 24'
+      strokeWidth={1.5}
+      stroke='currentColor'
+      {...props}
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125'
+      />
+    </svg>
+  );
+};
+
+export const GoogleIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       width='48'
@@ -184,7 +300,7 @@ export const GoogleIcon: FC<IconProps> = props => {
   );
 };
 
-export const EmptyLogoIcon: FC<IconProps> = props => {
+export const EmptyLogoIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       width='71'
@@ -202,7 +318,7 @@ export const EmptyLogoIcon: FC<IconProps> = props => {
   );
 };
 
-export const CloseIcon: FC<IconProps> = props => {
+export const CloseIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       className='w-3 h-3'
@@ -223,7 +339,7 @@ export const CloseIcon: FC<IconProps> = props => {
   );
 };
 
-export const PlusIcon: FC<IconProps> = props => {
+export const PlusIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -238,7 +354,7 @@ export const PlusIcon: FC<IconProps> = props => {
   );
 };
 
-export const ImageIcon: FC<IconProps> = props => {
+export const ImageIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -257,7 +373,7 @@ export const ImageIcon: FC<IconProps> = props => {
   );
 };
 
-export const VideoIcon: FC<IconProps> = props => {
+export const VideoIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -276,7 +392,7 @@ export const VideoIcon: FC<IconProps> = props => {
   );
 };
 
-export const FileIcon: FC<IconProps> = props => {
+export const FileIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -295,7 +411,7 @@ export const FileIcon: FC<IconProps> = props => {
   );
 };
 
-export const PlanetIcon: FC<IconProps> = props => {
+export const PlanetIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -314,7 +430,7 @@ export const PlanetIcon: FC<IconProps> = props => {
   );
 };
 
-export const LinkedInIcon: FC<IconProps> = props => {
+export const LinkedInIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       width='48'
@@ -339,7 +455,77 @@ export const LinkedInIcon: FC<IconProps> = props => {
   );
 };
 
-export const StarIcon: FC<IconProps> = props => {
+export const PaperClipIcon: FC<IconProps> = ({ solid, ...props }) => {
+  return (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 24 24'
+      strokeWidth={1.5}
+      stroke='currentColor'
+      {...props}
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13'
+      />
+    </svg>
+  );
+};
+
+export const PaperAirplaneIcon: FC<IconProps> = ({ solid, ...props }) => {
+  return (
+    <svg
+      xmlns='http://www.w3.org/2000/svg'
+      fill='none'
+      viewBox='0 0 24 24'
+      strokeWidth={1.5}
+      stroke='currentColor'
+      {...props}
+    >
+      <path
+        strokeLinecap='round'
+        strokeLinejoin='round'
+        d='M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5'
+      />
+    </svg>
+  );
+};
+
+export const CheckIcon: FC<IconProps> = ({ solid, ...props }) => {
+  return (
+    <svg
+      width='24'
+      height='24'
+      viewBox='0 0 24 24'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+      {...props}
+    >
+      <path
+        fillRule='evenodd'
+        clipRule='evenodd'
+        d='M20.0485 6.35147C20.5171 6.8201 20.5171 7.5799 20.0485 8.04853L10.4485 17.6485C9.97988 18.1172 9.22008 18.1172 8.75145 17.6485L3.95145 12.8485C3.48282 12.3799 3.48282 11.6201 3.95145 11.1515C4.42008 10.6828 5.17987 10.6828 5.6485 11.1515L9.59998 15.1029L18.3514 6.35147C18.8201 5.88284 19.5799 5.88284 20.0485 6.35147Z'
+        fill='currentColor'
+      />
+    </svg>
+  );
+};
+
+export const StarIcon: FC<IconProps> = ({ solid, ...props }) => {
+  if (solid) {
+    return (
+      <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor' {...props}>
+        <path
+          fillRule='evenodd'
+          d='M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z'
+          clipRule='evenodd'
+        />
+      </svg>
+    );
+  }
+
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -358,7 +544,7 @@ export const StarIcon: FC<IconProps> = props => {
   );
 };
 
-export const ShareIcon: FC<IconProps> = props => {
+export const ShareIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'
@@ -377,7 +563,7 @@ export const ShareIcon: FC<IconProps> = props => {
   );
 };
 
-export const UserIcon: FC<IconProps> = props => {
+export const UserIcon: FC<IconProps> = ({ solid, ...props }) => {
   return (
     <svg
       width='47'

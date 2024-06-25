@@ -5,18 +5,22 @@ import {
   selectProjectLaunches,
 } from '../../redux/slices/project-launch.slice';
 import { UserIcon } from '../../components/atoms/Icons/Icons';
-import { useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 import { Project } from '../../components/molecules/Project/Project';
 import { resolveImage } from '../../utils/file.utils';
 import { fetchUser, selectUser, setUser } from '../../redux/slices/user.slice';
 import NotFoundPage from '../NotFoundPage/NotFoundPage';
+import { AppRoutes } from '../../types/enums/app-routes.enum';
+import { useAuth } from '../../hooks/auth.hooks';
 
 const DetailsUserPage: FC = () => {
   const [notFound, setNotFound] = useState(false);
   const projects = useAppSelector(selectProjectLaunches);
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
+  const navigate = useNavigate();
   const { id } = useParams();
+  const { authenticatedUser } = useAuth();
 
   useEffect(() => {
     if (id) dispatch(fetchUser(id, { onError: () => setNotFound(true) }));
@@ -54,6 +58,32 @@ const DetailsUserPage: FC = () => {
                   </div>
                 )}
                 <span className='font-sans font-semibold text-2xl'>{user.username}</span>
+              </div>
+              <div className='flex gap-2'>
+                {user.id !== authenticatedUser?.id && (
+                  <button
+                    type='button'
+                    className='inline-flex text-lg font-sans font-medium border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1 transition-[0.3s_ease] rounded-full'
+                    onClick={() =>
+                      navigate(AppRoutes.MessageCenter.concat('/new-chat'), {
+                        state: {
+                          notStartedChat: {
+                            user: {
+                              id: user.id,
+                              username: user.username,
+                              firstName: user.firstName,
+                              lastName: user.lastName,
+                              role: user.role,
+                              avatar: user.avatar,
+                            },
+                          },
+                        },
+                      })
+                    }
+                  >
+                    Message
+                  </button>
+                )}
               </div>
             </div>
             <hr />

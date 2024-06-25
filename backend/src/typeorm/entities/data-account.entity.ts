@@ -1,16 +1,17 @@
 import { Column, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Project } from './Project';
-import { IDataAccount } from '../../types/data-account.interface';
+import { ProjectEntity } from './project.entity';
+import { DataAccount } from '../../types/data-account.interface';
+import { Project } from '../../types/project.interface';
 
-@Entity()
-export class DataAccount implements IDataAccount {
+@Entity('data_account')
+export class DataAccountEntity implements DataAccount {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'varchar', length: 255 })
   accountHash: string;
 
-  @OneToOne(() => Project, project => project.id, {
+  @OneToOne(() => ProjectEntity, project => project.id, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
   })

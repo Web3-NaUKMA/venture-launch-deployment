@@ -1,29 +1,29 @@
 import { FC, FormEvent, useEffect, useRef, useState } from 'react';
-import Modal, { IModalProps } from '../../molecules/Modal/Modal';
+import Modal, { ModalProps } from '../../molecules/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
 import { createMilestone, selectErrors, setError } from '../../../redux/slices/milestone.slice';
-import { IProject } from '../../../types/project.types';
-import { ICreateMilestone } from '../../../types/milestone.types';
+import { Project } from '../../../types/project.types';
+import { CreateMilestoneDto } from '../../../types/milestone.types';
 
-export interface ICreateMilestoneModalProps extends IModalProps {
-  project: IProject;
+export interface CreateMilestoneModalProps extends ModalProps {
+  project: Project;
 }
 
-interface ICreateMilestoneModalState {
+interface CreateMilestoneModalState {
   data: {
     mergedPullRequestUrl?: string;
   };
   error: string | null;
 }
 
-const initialState: ICreateMilestoneModalState = {
+const initialState: CreateMilestoneModalState = {
   data: {
     mergedPullRequestUrl: undefined,
   },
   error: null,
 };
 
-const CreateMilestoneModal: FC<ICreateMilestoneModalProps> = ({
+const CreateMilestoneModal: FC<CreateMilestoneModalProps> = ({
   project,
   title,
   onClose,
@@ -43,7 +43,7 @@ const CreateMilestoneModal: FC<ICreateMilestoneModalProps> = ({
     setState({ ...state, error: errors.createMilestone });
   }, [errors.createMilestone]);
 
-  const isDataValid = (data: ICreateMilestoneModalState['data']): boolean => {
+  const isDataValid = (data: CreateMilestoneModalState['data']): boolean => {
     if (!data.mergedPullRequestUrl?.trim()) {
       setState({ ...state, error: 'Milestone merged pull request url cannot be empty.' });
       return false;
@@ -57,7 +57,7 @@ const CreateMilestoneModal: FC<ICreateMilestoneModalProps> = ({
 
     if (isDataValid(state.data)) {
       dispatch(
-        createMilestone({ ...state.data, projectId: project.id } as ICreateMilestone, {
+        createMilestone({ ...state.data, projectId: project.id } as CreateMilestoneDto, {
           onSuccess: () => onProcess?.(),
         }),
       );

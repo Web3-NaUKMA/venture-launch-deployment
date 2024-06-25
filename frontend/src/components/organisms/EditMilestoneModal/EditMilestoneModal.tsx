@@ -1,28 +1,28 @@
 import { FC, FormEvent, useEffect, useRef, useState } from 'react';
-import Modal, { IModalProps } from '../../molecules/Modal/Modal';
+import Modal, { ModalProps } from '../../molecules/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
 import { updateMilestone, selectErrors, setError } from '../../../redux/slices/milestone.slice';
-import { IMilestone, IUpdateMilestone } from '../../../types/milestone.types';
+import { Milestone, UpdateMilestoneDto } from '../../../types/milestone.types';
 
-export interface IEditMilestoneModalProps extends IModalProps {
-  milestone: IMilestone;
+export interface EditMilestoneModalProps extends ModalProps {
+  milestone: Milestone;
 }
 
-interface IEditMilestoneModalState {
+interface EditMilestoneModalState {
   data: {
     mergedPullRequestUrl?: string;
   };
   error: string | null;
 }
 
-const initialState: IEditMilestoneModalState = {
+const initialState: EditMilestoneModalState = {
   data: {
     mergedPullRequestUrl: undefined,
   },
   error: null,
 };
 
-const EditMilestoneModal: FC<IEditMilestoneModalProps> = ({
+const EditMilestoneModal: FC<EditMilestoneModalProps> = ({
   milestone,
   title,
   onClose,
@@ -45,7 +45,7 @@ const EditMilestoneModal: FC<IEditMilestoneModalProps> = ({
     setState({ ...state, error: errors.updateMilestone });
   }, [errors.updateMilestone]);
 
-  const isDataValid = (data: IEditMilestoneModalState['data']): boolean => {
+  const isDataValid = (data: EditMilestoneModalState['data']): boolean => {
     if (!data.mergedPullRequestUrl?.trim()) {
       setState({ ...state, error: 'Milestone merged pull request url cannot be empty.' });
       return false;
@@ -59,7 +59,7 @@ const EditMilestoneModal: FC<IEditMilestoneModalProps> = ({
 
     if (isDataValid(state.data)) {
       dispatch(
-        updateMilestone(milestone.id, state.data as IUpdateMilestone, {
+        updateMilestone(milestone.id, state.data as UpdateMilestoneDto, {
           onSuccess: () => onProcess?.(),
         }),
       );

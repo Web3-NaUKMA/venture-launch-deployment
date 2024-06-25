@@ -1,12 +1,12 @@
 import { FC, FormEvent, useState } from 'react';
-import Modal, { IModalProps } from '../../molecules/Modal/Modal';
-import { IProjectLaunch } from '../../../types/project-launch.types';
+import Modal, { ModalProps } from '../../molecules/Modal/Modal';
+import { ProjectLaunch } from '../../../types/project-launch.types';
 import { useAuth } from '../../../hooks/auth.hooks';
 import { useAppDispatch } from '../../../hooks/redux.hooks';
 import { updateProjectLaunch } from '../../../redux/slices/project-launch.slice';
 
-export interface ApproveProjectLaunchModalProps extends IModalProps {
-  projectLaunch: IProjectLaunch;
+export interface ApproveProjectLaunchModalProps extends ModalProps {
+  projectLaunch: ProjectLaunch;
 }
 
 export interface ApproveProjectLaunchModalState {

@@ -7,7 +7,8 @@ export enum AppRoutes {
   Portfolio = '/portfolio',
   DetailsProject = '/projects/:id',
   DetailsUser = '/users/:id',
-  AccountRegistration = '/create-account',
+  MessageCenter = '/chats',
+  DetailsChat = '/chats/:id',
   About = '/about',
   Profile = '/profile',
 }

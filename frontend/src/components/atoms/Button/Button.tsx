@@ -1,8 +1,8 @@
 import { FC } from 'react';
 
-export interface IButtonProps extends React.ButtonHTMLAttributes<HTMLElement> {}
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLElement> {}
 
-const Button: FC<IButtonProps> = props => {
+const Button: FC<ButtonProps> = props => {
   return <button {...props}>{props.children}</button>;
 };
 

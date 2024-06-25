@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
-import Modal, { IModalProps } from '../../molecules/Modal/Modal';
-import { IProjectLaunch } from '../../../types/project-launch.types';
+import Modal, { ModalProps } from '../../molecules/Modal/Modal';
+import { ProjectLaunch } from '../../../types/project-launch.types';
 import Button from '../../atoms/Button/Button';
 import axios, { HttpStatusCode } from 'axios';
 import {
@@ -19,12 +19,12 @@ import { resolveImage } from '../../../utils/file.utils';
 import ProgressBar from '../../molecules/ProgressBar/ProgressBar';
 import { AppRoutes } from '../../../types/enums/app-routes.enum';
 
-export interface IProjectLaunchInfoModalProps extends IModalProps {
-  projectLaunch: IProjectLaunch;
+export interface ProjectLaunchInfoModalProps extends ModalProps {
+  projectLaunch: ProjectLaunch;
   setIsCreateProjectLaunchInvestmentModalVisible: (...args: any[]) => any;
 }
 
-const ProjectLaunchInfoModal: FC<IProjectLaunchInfoModalProps> = ({
+const ProjectLaunchInfoModal: FC<ProjectLaunchInfoModalProps> = ({
   projectLaunch,
   title,
   onClose,

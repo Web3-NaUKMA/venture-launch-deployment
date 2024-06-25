@@ -1,14 +1,8 @@
-export interface ICreateDataAccountDto {
+export interface CreateDataAccountDto {
   accountHash: string;
   projectId: string;
 }
 
-export interface IUpdateDataAccountDto {
+export interface UpdateDataAccountDto {
   accountHash: string;
-}
-
-export interface IFindDataAccountDto {
-  id?: string;
-  projectId?: { id: string };
-  accountHash?: string;
 }

@@ -1,10 +1,10 @@
-import { IMilestone } from '../milestone.types';
+import { Milestone } from '../milestone.types';
 
-export interface IMilestoneSliceStateError {
+export interface MilestoneSliceStateError {
   [key: string]: string | null;
 }
 
-export interface IMilestoneSliceStateErrors {
+export interface MilestoneSliceStateErrors {
   fetchAllMilestones: string | null;
   fetchMilestone: string | null;
   createMilestone: string | null;
@@ -12,8 +12,8 @@ export interface IMilestoneSliceStateErrors {
   removeMilestone: string | null;
 }
 
-export interface IMilestoneSliceState {
-  milestones: IMilestone[];
-  milestone: IMilestone | null;
-  errors: IMilestoneSliceStateErrors;
+export interface MilestoneSliceState {
+  milestones: Milestone[];
+  milestone: Milestone | null;
+  errors: MilestoneSliceStateErrors;
 }

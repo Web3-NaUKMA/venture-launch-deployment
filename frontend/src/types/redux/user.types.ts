@@ -1,10 +1,10 @@
-import { IUser } from '../user.types';
+import { User } from '../user.types';
 
-export interface IUserSliceStateError {
+export interface UserSliceStateError {
   [key: string]: string | null;
 }
 
-export interface IUserSliceStateErrors {
+export interface UserSliceStateErrors {
   fetchAllUsers: string | null;
   fetchUser: string | null;
   createUser: string | null;
@@ -12,8 +12,8 @@ export interface IUserSliceStateErrors {
   removeUser: string | null;
 }
 
-export interface IUserSliceState {
-  users: IUser[];
-  user: IUser | null;
-  errors: IUserSliceStateErrors;
+export interface UserSliceState {
+  users: User[];
+  user: User | null;
+  errors: UserSliceStateErrors;
 }

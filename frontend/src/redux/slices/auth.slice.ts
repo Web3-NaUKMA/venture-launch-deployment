@@ -1,10 +1,10 @@
 import { PayloadAction, createSlice } from '@reduxjs/toolkit';
 import {
-  IAuthSliceState,
-  IAuthSliceStateError,
-  IAuthSliceStateErrors,
+  AuthSliceState,
+  AuthSliceStateError,
+  AuthSliceStateErrors,
 } from '../../types/redux/auth.types';
-import { IUser } from '../../types/user.types';
+import { User } from '../../types/user.types';
 import { AppDispatch, RootState } from '../store';
 import { HttpStatusCode } from 'axios';
 import { ActionCreatorOptions } from '../../types/redux/store.types';
@@ -13,7 +13,7 @@ import { AccountRegistrationData } from '../../types/auth.types';
 import bs58 from 'bs58';
 import axios from 'axios';
 
-const initialState: IAuthSliceState = {
+const initialState: AuthSliceState = {
   user: null,
   errors: {
     login: null,
@@ -28,18 +28,18 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setAuthenticatedUser: (
-      state: IAuthSliceState,
-      action: PayloadAction<IUser | null>,
-    ): IAuthSliceState => {
+      state: AuthSliceState,
+      action: PayloadAction<User | null>,
+    ): AuthSliceState => {
       return { ...state, user: action.payload };
     },
-    unsetAuthenticatedUser: (state: IAuthSliceState): IAuthSliceState => {
+    unsetAuthenticatedUser: (state: AuthSliceState): AuthSliceState => {
       return { ...state, user: null };
     },
     setError: (
-      state: IAuthSliceState,
-      action: PayloadAction<IAuthSliceStateError>,
-    ): IAuthSliceState => {
+      state: AuthSliceState,
+      action: PayloadAction<AuthSliceStateError>,
+    ): AuthSliceState => {
       return { ...state, errors: { ...state.errors, ...action.payload } };
     },
   },
@@ -176,8 +176,8 @@ export const logout = (options?: ActionCreatorOptions) => async (dispatch: AppDi
   }
 };
 
-export const selectAuthenticatedUser = (state: RootState): IUser | null => state.auth.user;
-export const selectErrors = (state: RootState): IAuthSliceStateErrors => state.auth.errors;
+export const selectAuthenticatedUser = (state: RootState): User | null => state.auth.user;
+export const selectErrors = (state: RootState): AuthSliceStateErrors => state.auth.errors;
 
 export const { setAuthenticatedUser, unsetAuthenticatedUser } = authSlice.actions;
 export default authSlice.reducer;

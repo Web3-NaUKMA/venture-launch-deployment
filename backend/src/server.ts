@@ -12,6 +12,8 @@ import path from 'path';
 import { applicationLogger } from './middleware/logging.middleware';
 import { exceptionsFilter } from './middleware/exceptions.middleware';
 
+import Socket from './socket';
+
 dotenv.config();
 
 const port = process.env.BACKEND_PORT || 8000;
@@ -45,6 +47,9 @@ app.use(
 app.use(routes);
 app.use(exceptionsFilter);
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Application started on port ${port}!`);
 });
+
+const socket = new Socket(server);
+socket.configure();

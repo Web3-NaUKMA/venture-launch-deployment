@@ -1,13 +1,13 @@
-import { IUser } from '../user.interface';
+import { User } from '../user.interface';
 
 export interface LoginWithGoogleResponse {
   accessToken: string;
-  user: IUser;
+  user: User;
 }
 
 export interface LoginWithCredentialsResponse {
   accessToken: string;
-  user: IUser;
+  user: User;
 }
 
 export interface GenerateJwtTokensResponse {

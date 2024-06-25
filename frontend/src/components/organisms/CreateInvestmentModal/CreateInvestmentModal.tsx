@@ -1,13 +1,13 @@
 import { FC, FormEvent, useEffect, useRef, useState } from 'react';
-import Modal, { IModalProps } from '../../molecules/Modal/Modal';
+import Modal, { ModalProps } from '../../molecules/Modal/Modal';
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux.hooks';
-import { IProjectLaunch } from '../../../types/project-launch.types';
+import { ProjectLaunch } from '../../../types/project-launch.types';
 import {
   createProjectLaunchInvestment,
   selectErrors,
   setError,
 } from '../../../redux/slices/project-launch.slice';
-import { ICreateProjectLaunchInvestment } from '../../../types/project-launch-investment.types';
+import { CreateProjectLaunchInvestmentDto } from '../../../types/project-launch-investment.types';
 import { useAuth } from '../../../hooks/auth.hooks';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import {
@@ -19,25 +19,25 @@ import {
 import { PublicKey } from '@solana/web3.js';
 import useWeb3Auth from '../../../hooks/web3auth.hooks';
 
-export interface ICreateInvestmentModalProps extends IModalProps {
-  projectLaunch: IProjectLaunch;
+export interface CreateInvestmentModalProps extends ModalProps {
+  projectLaunch: ProjectLaunch;
 }
 
-interface ICreateInvestmentModalState {
+interface CreateInvestmentModalState {
   data: {
     amount?: number;
   };
   error: string | null;
 }
 
-const initialState: ICreateInvestmentModalState = {
+const initialState: CreateInvestmentModalState = {
   data: {
     amount: undefined,
   },
   error: null,
 };
 
-const CreateInvestmentModal: FC<ICreateInvestmentModalProps> = ({
+const CreateInvestmentModal: FC<CreateInvestmentModalProps> = ({
   projectLaunch,
   title,
   onClose,
@@ -61,7 +61,7 @@ const CreateInvestmentModal: FC<ICreateInvestmentModalProps> = ({
     setState({ ...state, error: errors.createProjectLaunchInvestment });
   }, [errors.createProjectLaunchInvestment]);
 
-  const isDataValid = (data: ICreateInvestmentModalState['data']): boolean => {
+  const isDataValid = (data: CreateInvestmentModalState['data']): boolean => {
     if (!data.amount || data.amount < 0) {
       setState({ ...state, error: 'Project launch investment cannot be empty or less than 0.' });
       return false;
@@ -96,7 +96,7 @@ const CreateInvestmentModal: FC<ICreateInvestmentModalProps> = ({
             ...state.data,
             projectLaunchId: projectLaunch.id,
             investorId: authenticatedUser.id,
-          } as ICreateProjectLaunchInvestment,
+          } as CreateProjectLaunchInvestmentDto,
           {
             onSuccess: () => onProcess?.(),
           },

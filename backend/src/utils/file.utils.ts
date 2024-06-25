@@ -1,8 +1,8 @@
 import path from 'path';
-import { IUploadFileOptions } from '../types/core/file.types';
+import { UploadFileOptions } from '../types/core/file.types';
 import { mkdirSync, rmSync, writeFile } from 'fs';
 
-export const uploadSingleFile = async (file: Express.Multer.File, options?: IUploadFileOptions) => {
+export const uploadSingleFile = async (file: Express.Multer.File, options?: UploadFileOptions) => {
   mkdirSync(
     path.join(`./src/public`, options?.destination ? `uploads/${options.destination}` : file.path),
     {
@@ -26,7 +26,7 @@ export const uploadSingleFile = async (file: Express.Multer.File, options?: IUpl
 
 export const uploadMultipleFiles = async (
   files: Express.Multer.File[],
-  options?: IUploadFileOptions,
+  options?: UploadFileOptions,
 ) => {
   for (const file of files) {
     await uploadSingleFile(file, options);

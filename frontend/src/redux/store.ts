@@ -4,6 +4,8 @@ import projectReducer from './slices/project.slice';
 import projectLaunchReducer from './slices/project-launch.slice';
 import milestoneReducer from './slices/milestone.slice';
 import userReducer from './slices/user.slice';
+import chatReducer from './slices/chat.slice';
+import messageReducer from './slices/message.slice';
 
 export const store = configureStore({
   reducer: {
@@ -12,7 +14,10 @@ export const store = configureStore({
     milestone: milestoneReducer,
     user: userReducer,
     projectLaunch: projectLaunchReducer,
+    chat: chatReducer,
+    message: messageReducer,
   },
+  middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;

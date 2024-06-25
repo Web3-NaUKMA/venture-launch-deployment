@@ -1,17 +1,11 @@
-export interface ICreateSessionDto {
+export interface CreateSessionDto {
   sessionId: string;
   userId: string;
   expiresAt: Date;
 }
 
-export interface IUpdateSessionDto {
+export interface UpdateSessionDto {
   sessionId?: string;
   userId?: string;
-  expiresAt?: Date;
-}
-
-export interface IFindSessionDto {
-  sessionId?: string;
-  user?: { id: string };
   expiresAt?: Date;
 }

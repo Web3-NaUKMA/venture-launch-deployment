@@ -1,17 +1,17 @@
-import { IUser } from '../user.types';
+import { User } from '../user.types';
 
-export interface IAuthSliceStateError {
+export interface AuthSliceStateError {
   [key: string]: string | null;
 }
 
-export interface IAuthSliceStateErrors {
+export interface AuthSliceStateErrors {
   login: string | null;
   fetchAuthenticatedUser: string | null;
   logout: string | null;
   register: string | null;
 }
 
-export interface IAuthSliceState {
-  user: IUser | null;
-  errors: IAuthSliceStateErrors;
+export interface AuthSliceState {
+  user: User | null;
+  errors: AuthSliceStateErrors;
 }
