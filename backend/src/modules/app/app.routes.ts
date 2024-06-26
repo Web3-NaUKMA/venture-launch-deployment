@@ -8,6 +8,7 @@ import milestoneRoutes from '../milestone/milestone.routes';
 import fileRoutes from '../file/file.routes';
 import chatRoutes from '../chat/chat.routes';
 import messageRoutes from '../message/message.routes';
+import daoRoutes from '../dao/dao.routes';
 
 export default [
   authRoutes,
@@ -20,4 +21,5 @@ export default [
   fileRoutes,
   chatRoutes,
   messageRoutes,
+  daoRoutes
 ];
