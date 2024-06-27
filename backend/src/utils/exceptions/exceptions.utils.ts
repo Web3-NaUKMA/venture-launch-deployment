@@ -8,6 +8,13 @@ export class Exception extends Error {
   }
 }
 
+export class RabbitMQException extends Exception {
+  constructor(message: string, cause?: Error | string) {
+    super(message, cause);
+    this.name = 'RabbitMQException';
+  }
+}
+
 export class AuthException extends Exception {
   constructor(message: string, cause?: Error | string) {
     super(message, cause);
