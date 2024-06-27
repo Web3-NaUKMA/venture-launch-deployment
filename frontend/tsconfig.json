@@ -21,7 +21,8 @@
     "noFallthroughCasesInSwitch": true,
 
     "types": ["vite/client"],
-    "plugins": [{ "name": "typescript-plugin-css-modules" }]
+    "plugins": [{ "name": "typescript-plugin-css-modules" }],
+    "baseUrl": "src"
   },
   "include": ["src"],
   "exclude": ["node_modules"],

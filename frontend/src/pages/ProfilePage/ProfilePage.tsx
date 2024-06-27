@@ -13,6 +13,8 @@ import { AppRoutes } from '../../types/enums/app-routes.enum';
 import { useNavigate } from 'react-router';
 import { Project } from '../../components/molecules/Project/Project';
 import { resolveImage } from '../../utils/file.utils';
+// import Transaction from '../../components/molecules/Transaction/Transaction';
+// import Image from '../../components/atoms/Image/Image';
 
 const ProfilePage: FC = () => {
   const { authenticatedUser, fetchLatestAuthInfo, signOut } = useAuth();
@@ -45,6 +47,27 @@ const ProfilePage: FC = () => {
             document.getElementById('root')!,
           )}
         <div className='flex mt-3 px-6 flex-col justify-start align-center'>
+          {/* <Transaction
+            image={<Image src='/logo.png' className='aspect-square w-12 rounded-xl' />}
+            data={{
+              type: 'Send',
+              walletId: authenticatedUser.walletId,
+              createdAt: new Date(),
+              executedAt: null,
+              description: `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
+                incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud
+                exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure
+                dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt
+                mollit anim id est laborum.`,
+              projectId: 'd24f6cbf-d516-4b67-8a9f-40a6a122fad8',
+              transactionLink: 'https://google.com',
+              results: {
+                confirmed: 5,
+                rejected: 10,
+              },
+            }}
+          /> */}
           <h3 className='px-2 text-3xl font-serif mb-10'>User profile</h3>
           <div className='flex flex-col max-w-[1440px] w-full bg-white shadow-[0_0_15px_-7px_gray] rounded-xl'>
             <div className='flex items-center justify-between px-10 py-5'>
