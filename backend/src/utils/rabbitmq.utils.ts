@@ -8,11 +8,15 @@ export enum RabbitMQExchangeNames {
   Headers = 'headers',
 }
 
-export class RabbitMQProducer {
+export class RabbitMQ {
   private channel: Channel;
 
   constructor() {
-    amqp.connect(process.env.RABBITMQ_URI || '').then(async connection => {
+    if (!process.env.RABBITMQ_URI) {
+      throw new RabbitMQException('Cannot connect to the RabbitMQ due to invalid RabbitMQ url');
+    }
+
+    amqp.connect(process.env.RABBITMQ_URI).then(async connection => {
       this.channel = await connection.createChannel();
     });
   }
@@ -39,6 +43,41 @@ export class RabbitMQProducer {
       Buffer.from(JSON.stringify({ type: routingKey, message, datetime: Date.now() })),
     );
   }
+
+  public async receive(
+    queueName: string,
+    bindingKey: string,
+    callback?: (message: unknown, error?: any) => any,
+  ) {
+    if (!this.channel) {
+      throw new RabbitMQException('Cannot receive the message due to the channel is not connected');
+    }
+
+    if (!process.env.RABBITMQ_EXCHANGE_NAME) {
+      throw new RabbitMQException(
+        'Cannot receive the message due to the exchange name was not provided',
+      );
+    }
+
+    await this.channel.assertExchange(
+      process.env.RABBITMQ_EXCHANGE_NAME,
+      RabbitMQExchangeNames.Direct,
+    );
+
+    const queue = await this.channel.assertQueue(queueName);
+
+    await this.channel.bindQueue(queue.queue, process.env.RABBITMQ_EXCHANGE_NAME, bindingKey);
+
+    this.channel.consume(queue.queue, message => {
+      if (message) {
+        const data = JSON.parse(message.content.toString());
+        this.channel.ack(message);
+        callback?.(data);
+      } else {
+        callback?.(null, 'The message is empty');
+      }
+    });
+  }
 }
 
-export const producer = new RabbitMQProducer();
+export const rabbitMQ = new RabbitMQ();
