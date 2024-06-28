@@ -1,0 +1,24 @@
+version: "3.8"
+services:
+
+  database:
+    image: postgres:latest
+    container_name: venture-launch-database
+    networks:
+      - venture-launch-network
+    environment:
+        POSTGRES_USER: venture-launch
+        POSTGRES_DATABASE: venture-launch
+        POSTGRES_PASSWORD: 7f8f73e0e2c891ca14f7e814b948361be839dac1241a2a2c1b1450eae1005137
+    ports:
+      - 5432:5432
+    volumes:
+      - database_data:/var/lib/postgresql/data
+    restart: on-failure
+
+networks:
+  venture-launch-network:
+    driver: bridge
+
+volumes:
+  database_data:

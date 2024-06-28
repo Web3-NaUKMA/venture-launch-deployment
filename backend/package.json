@@ -17,6 +17,7 @@
   "author": "Venture Launch",
   "license": "UNLICENSED",
   "devDependencies": {
+    "@types/amqplib": "^0.10.5",
     "@types/cookie-parser": "^1.4.7",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
@@ -32,6 +33,7 @@
   "dependencies": {
     "@thirdweb-dev/storage": "^2.0.11",
     "@types/bcrypt": "^5.0.2",
+    "amqplib": "^0.10.4",
     "axios": "^1.6.7",
     "bcrypt": "^5.1.1",
     "bs58": "^5.0.0",

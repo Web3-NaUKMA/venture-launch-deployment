@@ -50,6 +50,8 @@ services:
         PASSWORD_SALT_SUFFIX: ${PASSWORD_SALT_SUFFIX}
         GOOGLE_OAUTH2_CLIENT_ID: ${GOOGLE_OAUTH2_CLIENT_ID}
         GOOGLE_OAUTH2_CLIENT_SECRET: ${GOOGLE_OAUTH2_CLIENT_SECRET}
+        RABBITMQ_URI: ${RABBITMQ_URI}
+        RABBITMQ_EXCHANGE_NAME: ${RABBITMQ_EXCHANGE_NAME}
         POSTGRES_USER: ${POSTGRES_USER}
         POSTGRES_DATABASE: ${POSTGRES_DATABASE}
         POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -84,6 +86,20 @@ services:
       - database_data:/var/lib/postgresql/data
       - ./backups:/backups
     restart: on-failure
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: venture-launch-rabbitmq
+    networks:
+      - venture-launch-network
+    env_file:
+      - ./.env.prod
+    ports:
+      - ${INTERNAL_RABBITMQ_PORT_A}:5672
+      - ${INTERNAL_RABBITMQ_PORT_B}:15672
+    expose:
+      - ${INTERNAL_RABBITMQ_PORT_A}
+      - ${INTERNAL_RABBITMQ_PORT_B}
 
   nginx:
     image: nginx:latest
