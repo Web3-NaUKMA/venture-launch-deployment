@@ -1,6 +1,7 @@
 import amqp, { Channel } from 'amqplib';
 import { RabbitMQException } from './exceptions/exceptions.utils';
 
+console.log(process.env.RABBITMQ_URI)
 export enum RabbitMQExchangeNames {
   Fanout = 'fanout',
   Direct = 'direct',
@@ -21,7 +22,7 @@ export class RabbitMQ {
     });
   }
 
-  public async publish(routingKey: string, message: unknown) {
+  public async publish(routingKey: string, message: unknown, commandType: string) {
     if (!this.channel) {
       throw new RabbitMQException('Cannot publish the message due to the channel is not connected');
     }
@@ -37,10 +38,13 @@ export class RabbitMQ {
       RabbitMQExchangeNames.Direct,
     );
 
+    await this.channel.bindQueue('request_exchange', 'request_exchange', 'request_exchange');
     await this.channel.publish(
       process.env.RABBITMQ_EXCHANGE_NAME,
       routingKey,
-      Buffer.from(JSON.stringify({ type: routingKey, message, datetime: Date.now() })),
+      Buffer.from(JSON.stringify(message)),
+      { persistent: true, headers: { "command": commandType } }
+
     );
   }
 
