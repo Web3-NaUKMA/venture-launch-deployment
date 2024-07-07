@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC, HTMLAttributes, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '../../../types/enums/app-routes.enum';
 import Button from '../../atoms/Button/Button';
@@ -20,12 +20,16 @@ import ProgressBar from '../ProgressBar/ProgressBar';
 import { resolveImage } from '../../../utils/file.utils';
 import ApproveProjectLaunchModal from '../../organisms/ApproveProjectLaunchModal/ApproveProjectLaunchModal';
 
-export interface ProjectProps {
+export interface ProjectProps extends HTMLAttributes<HTMLDivElement> {
   project: ProjectLaunch;
-  variant?: 'extended' | 'short';
+  variant?: 'extended' | 'short' | 'tiny';
 }
 
-export const Project: FC<ProjectProps> = ({ project: projectLaunch, variant = 'extended' }) => {
+export const Project: FC<ProjectProps> = ({
+  project: projectLaunch,
+  variant = 'extended',
+  ...props
+}) => {
   const dispatch = useAppDispatch();
   const [isSettingsDropdownVisible, setIsSettingsDropdownVisible] = useState(false);
   const [isRemoveProjectModalVisible, setIsRemoveProjectModalVisible] = useState(false);
@@ -117,7 +121,10 @@ export const Project: FC<ProjectProps> = ({ project: projectLaunch, variant = 'e
           />,
           document.getElementById('root')!,
         )}
-      <div className='flex flex-col justify-between items-start bg-white py-7 px-14 rounded-xl shadow-[0_0_15px_-7px_gray]'>
+      <div
+        className='flex flex-col justify-between items-start bg-white py-7 px-14 rounded-xl shadow-[0_0_15px_-7px_gray]'
+        {...props}
+      >
         <div className='flex flex-col w-full flex-1'>
           <div className='flex justify-between items-start pb-5'>
             <div className='flex items-center w-full'>
@@ -127,12 +134,14 @@ export const Project: FC<ProjectProps> = ({ project: projectLaunch, variant = 'e
                   currentTarget.onerror = null;
                   currentTarget.src = '/logo.png';
                 }}
-                className='w-[6em] aspect-square rounded-xl object-cover'
+                className={`${variant === 'tiny' ? 'w-[3em]' : 'w-[6em]'} aspect-square rounded-xl object-cover`}
               />
-              <div className='flex flex-col ms-5 w-full'>
-                <h4 className='font-semibold text-2xl'>{projectLaunch.name}</h4>
-                {variant === 'short' && (
-                  <div className='flex items-center gap-0.5 mt-3'>
+              <div className={`flex flex-col w-full ${variant === 'tiny' ? 'ms-3' : 'ms-5'}`}>
+                <h4 className={`font-semibold ${variant === 'tiny' ? 'text-lg' : 'text-2xl'}`}>
+                  {projectLaunch.name}
+                </h4>
+                {variant !== 'extended' && (
+                  <div className={`flex items-center ${variant === 'tiny' ? '' : 'mt-3 gap-0.5'}`}>
                     {projectLaunch.approver !== null && !projectLaunch.isFundraised ? (
                       <span className='font-medium text-white bg-red rounded-full text-xs bg-blue-500 px-2 py-0.5'>
                         Approved
@@ -154,15 +163,15 @@ export const Project: FC<ProjectProps> = ({ project: projectLaunch, variant = 'e
                     )}
                     <button
                       type='button'
-                      className='ms-2 h-full rounded-full hover:bg-neutral-100 transition-all duration-300 aspect-square w-[32px] inline-flex items-center justify-center'
+                      className={`h-full rounded-full hover:bg-neutral-100 transition-all duration-300 aspect-square ${variant === 'tiny' ? 'w-[26px] ms-1' : 'w-[32px] ms-2'} inline-flex items-center justify-center`}
                     >
-                      <StarIcon className='size-5' />
+                      <StarIcon className={variant === 'tiny' ? 'size-4' : 'size-5'} />
                     </button>
                     <button
                       type='button'
-                      className='rounded-full hover:bg-neutral-100 transition-all duration-300 aspect-square w-[32px] inline-flex items-center justify-center'
+                      className={`rounded-full hover:bg-neutral-100 transition-all duration-300 aspect-square ${variant === 'tiny' ? 'w-[26px]' : 'w-[32px]'} inline-flex items-center justify-center`}
                     >
-                      <ShareIcon className='size-5' />
+                      <ShareIcon className={variant === 'tiny' ? 'size-4' : 'size-5'} />
                     </button>
                     {authenticatedUser?.id ===
                       (projectLaunch.author?.id ?? projectLaunch.authorId ?? '') &&
@@ -196,20 +205,20 @@ export const Project: FC<ProjectProps> = ({ project: projectLaunch, variant = 'e
                   </div>
                 )}
               </div>
-              {variant === 'short' && (
+              {variant !== 'extended' && (
                 <div className='grid auto-cols-max gap-2'>
                   {projectLaunch.isFundraised &&
                     projectLaunch.approver !== null &&
                     projectLaunch.project && (
                       <Link
                         to={AppRoutes.DetailsProject.replace(':id', projectLaunch.project.id)}
-                        className='inline-flex text-center justify-center items-center font-medium font-sans text-lg hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white px-10 py-1 transition-all duration-300 rounded-full'
+                        className={`inline-flex text-center justify-center items-center font-medium font-sans hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white transition-all duration-300 rounded-full ${variant === 'tiny' ? 'text-sm px-4 py-0.5' : 'text-lg px-10 py-1'}`}
                       >
                         Details
                       </Link>
                     )}
                   <Button
-                    className='inline-flex text-center justify-center items-center font-medium font-sans text-lg hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white px-10 py-1 transition-all duration-300 rounded-full'
+                    className={`inline-flex text-center justify-center items-center font-medium font-sans hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white transition-all duration-300 rounded-full ${variant === 'tiny' ? 'text-sm px-4 py-0.5' : 'text-lg px-10 py-1'}`}
                     onClick={() => setIsShowProjectLaunchInfoModalVisible(true)}
                   >
                     Launch info
@@ -221,7 +230,7 @@ export const Project: FC<ProjectProps> = ({ project: projectLaunch, variant = 'e
                           role => role === UserRoleEnum.BusinessAnalyst,
                         ) && (
                           <Button
-                            className='inline-flex text-center justify-center items-center font-medium font-sans text-lg border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1 transition-all duration-300 rounded-full'
+                            className={`inline-flex text-center justify-center items-center font-medium font-sans hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white transition-all duration-300 rounded-full ${variant === 'tiny' ? 'text-sm px-4 py-0.5' : 'text-lg px-10 py-1'}`}
                             onClick={() => setIsApproveProjectLaunchModalVisible(true)}
                           >
                             Approve
@@ -232,7 +241,7 @@ export const Project: FC<ProjectProps> = ({ project: projectLaunch, variant = 'e
                       ) &&
                         projectLaunch.approver !== null && (
                           <Button
-                            className='inline-flex text-center justify-center items-center font-medium font-sans text-lg border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1 transition-all duration-300 rounded-full'
+                            className={`inline-flex text-center justify-center items-center font-medium font-sans hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white transition-all duration-300 rounded-full ${variant === 'tiny' ? 'text-sm px-4 py-0.5' : 'text-lg px-10 py-1'}`}
                             onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}
                           >
                             Invest now
@@ -328,8 +337,9 @@ export const Project: FC<ProjectProps> = ({ project: projectLaunch, variant = 'e
               </div>
             </>
           )}
-          <div className='py-5 flex'>
+          <div className={`${variant === 'tiny' ? '' : 'py-5'} flex`}>
             <ProgressBar
+              variant={variant === 'tiny' ? 'tiny' : undefined}
               className='w-full'
               progress={projectLaunch.fundraiseProgress}
               goal={projectLaunch.fundraiseAmount}
