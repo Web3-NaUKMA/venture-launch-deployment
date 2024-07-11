@@ -65,7 +65,9 @@ services:
       - ${INTERNAL_BACKEND_PORT}:8000
     volumes:
       - ./backend/src:/app/src
+    restart: on-failure
     depends_on:
+      - rabbitmq
       - database
 
   database:
@@ -94,6 +96,9 @@ services:
       - venture-launch-network
     env_file:
       - ./.env.prod
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_DEFAULT_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_DEFAULT_PASS}
     ports:
       - ${INTERNAL_RABBITMQ_PORT_A}:5672
       - ${INTERNAL_RABBITMQ_PORT_B}:15672
