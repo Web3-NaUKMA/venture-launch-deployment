@@ -1,13 +1,15 @@
 import amqp, { Channel } from 'amqplib';
 import { RabbitMQException } from './exceptions/exceptions.utils';
 import { COMMAND_TYPE } from './command_type.enum';
-
+import * as dotenv from 'dotenv';
 export enum RabbitMQExchangeNames {
   Fanout = 'fanout',
   Direct = 'direct',
   Topic = 'topic',
   Headers = 'headers',
 }
+
+dotenv.config();
 
 export class RabbitMQ {
   private channel: Channel;
