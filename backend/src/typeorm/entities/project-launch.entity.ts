@@ -15,6 +15,8 @@ import { ProjectLaunchInvestmentEntity } from './project-launch-investment.entit
 import { ProjectLaunchInvestment } from '../../types/project-launch-investment.interface';
 import { User } from '../../types/user.interface';
 import { UserEntity } from './user.entity';
+import { DaoEntity } from './dao.entity';
+import { Dao } from '../../types/dao.interface';
 
 @Entity('project_launch')
 @Index(['name', 'author.id'], { unique: true })
@@ -91,4 +93,7 @@ export class ProjectLaunchEntity implements ProjectLaunch {
     onUpdate: 'CASCADE',
   })
   approver: User;
+
+  @OneToOne(() => DaoEntity, dao => dao.projectLaunch)
+  dao: Dao;
 }

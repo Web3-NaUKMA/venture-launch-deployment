@@ -2,14 +2,9 @@ import { Request, Response } from 'express';
 import { Controller } from '../../decorators/app.decorators';
 import { HttpStatusCode } from 'axios';
 import daoService from './dao.service';
-import { ChangeThresholdDto } from '../../DTO/dao.dto';
 
 @Controller()
 export class DAOController {
-  async findOne(request: Request, response: Response) {
-    await daoService.findOne();
-    return response.status(HttpStatusCode.Ok).json('heh');
-  }
   async create(request: Request, response: Response) {
     await daoService.create(request.body);
     return response.status(HttpStatusCode.Ok).json('created');
