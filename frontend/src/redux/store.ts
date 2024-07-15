@@ -6,6 +6,7 @@ import milestoneReducer from './slices/milestone.slice';
 import userReducer from './slices/user.slice';
 import chatReducer from './slices/chat.slice';
 import messageReducer from './slices/message.slice';
+import dashboardReducer from './slices/dashboard.slice';
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     projectLaunch: projectLaunchReducer,
     chat: chatReducer,
     message: messageReducer,
+    dashboard: dashboardReducer,
   },
   middleware: getDefaultMiddleware => getDefaultMiddleware({ serializableCheck: false }),
 });

@@ -2,7 +2,6 @@ import amqp, { Channel } from 'amqplib';
 import { RabbitMQException } from './exceptions/exceptions.utils';
 import { COMMAND_TYPE } from './command_type.enum';
 
-console.log(process.env.RABBITMQ_URI)
 export enum RabbitMQExchangeNames {
   Fanout = 'fanout',
   Direct = 'direct',
@@ -44,8 +43,7 @@ export class RabbitMQ {
       process.env.RABBITMQ_EXCHANGE_NAME,
       routingKey,
       Buffer.from(JSON.stringify(message)),
-      { persistent: true, headers: { "command": commandType } }
-
+      { persistent: true, headers: { command: commandType } },
     );
   }
 

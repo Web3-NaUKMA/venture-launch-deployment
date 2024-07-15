@@ -1,4 +1,5 @@
 import { Chat } from './chat.interface';
+import { Dao } from './dao.interface';
 import { UserRoleEnum } from './enums/user-role.enum';
 import { Message } from './message.interface';
 import { ProjectLaunchInvestment } from './project-launch-investment.interface';
@@ -33,4 +34,5 @@ export interface User {
   favouriteChats: Chat[];
   messages: Message[];
   seenMessages: Message[];
+  daos: Dao[];
 }

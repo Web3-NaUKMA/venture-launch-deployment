@@ -1,9 +1,7 @@
 import express from 'express';
-import { auth } from '../../middleware/auth.middleware';
 import daoController from './dao.controller';
 
 const router = express.Router();
-router.get('/dao/:id', daoController.findOne);
 router.post('/dao', daoController.create);
 router.post('/dao/addMember', daoController.addMember);
 router.post('/dao/removeMember', daoController.removeMember);

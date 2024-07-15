@@ -14,6 +14,9 @@ export class MilestoneEntity implements Milestone {
   @Column({ type: 'varchar', length: 511, default: null })
   transactionApprovalHash: string | null;
 
+  @Column({ type: 'text', default: '' })
+  description: string;
+
   @Column({ type: 'boolean', default: false })
   isFinal: boolean;
 

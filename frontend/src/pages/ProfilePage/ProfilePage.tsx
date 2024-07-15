@@ -13,6 +13,9 @@ import { AppRoutes } from '../../types/enums/app-routes.enum';
 import { useNavigate } from 'react-router';
 import { Project } from '../../components/molecules/Project/Project';
 import { resolveImage } from '../../utils/file.utils';
+import { UserRoleEnum } from 'types/enums/user-role.enum';
+import StartupOrInvestorDashboard from 'components/organisms/SturtupOrInvestorDashboardSection/StartupOrInvestorDashboard';
+import BusinessAnalystDashboard from 'components/organisms/BusinessAnalystDashboard/BusinessAnalystDashboard';
 
 const ProfilePage: FC = () => {
   const { authenticatedUser, fetchLatestAuthInfo, signOut } = useAuth();
@@ -131,6 +134,18 @@ const ProfilePage: FC = () => {
             </div>
           </div>
         </div>
+
+        {!authenticatedUser.role.includes(UserRoleEnum.BusinessAnalyst) ? (
+          <div className='mt-10 px-6 min-h-[80vh] flex flex-col'>
+            <h4 className='px-2 text-3xl font-serif mb-10'>Dashboard</h4>
+            <StartupOrInvestorDashboard />
+          </div>
+        ) : (
+          <div className='mt-10 px-6 min-h-[90vh] flex flex-col'>
+            <h4 className='px-2 text-3xl font-serif mb-10'>Dashboard</h4>
+            <BusinessAnalystDashboard />
+          </div>
+        )}
         <div className='my-10 px-6'>
           <h4 className='px-2 text-3xl font-serif mb-10'>My projects</h4>
           {projects.length > 0 ? (
