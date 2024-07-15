@@ -8,7 +8,7 @@
     "prod": "node ./dist/server.js",
     "dev:nodemon": "./node_modules/nodemon/bin/nodemon.js",
     "build": "npx tsc",
-    "database:migration:create": "npm run typeorm -- migration:create src/typeorm/migrations/${npm_config_name} -d src/typeorm/index.typeorm.ts",
+    "database:migration:create": "npm run typeorm -- migration:create src/typeorm/migrations/${npm_config_name}",
     "database:migration:generate": "npm run typeorm -- migration:generate src/typeorm/migrations/${npm_config_name} -d src/typeorm/index.typeorm.ts",
     "database:migration:run": "npm run typeorm -- migration:run -d src/typeorm/index.typeorm.ts",
     "database:migration:revert": "npm run typeorm -- migration:revert -d src/typeorm/index.typeorm.ts",
