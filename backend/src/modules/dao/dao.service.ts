@@ -5,7 +5,7 @@ import { removeChat } from '../../../../frontend/src/redux/slices/chat.slice';
 
 export class DAOService {
   async findOne() {
-    rabbitMQ.publish('request_exchange', {project_id: "5"}, 'create_dao');
+    rabbitMQ.publish('request_exchange', {project_id: "5"}, 'unknown');
     // rabbitMQ.receive(
     //   'request.rs',
     //   'request_exchange',
@@ -18,12 +18,30 @@ export class DAOService {
 
   async create(dao: CreateDAODto){
     rabbitMQ.publish('request_exchange', dao, COMMAND_TYPE.CREATE_DAO);
+
+    rabbitMQ.receive(
+      "response_exchange",
+      "response_exchange",
+      (message: unknown, error: any) => {
+            console.log(message);
+            console.log(error);
+          },
+    );
   }
 
   async addMember(memberDto: AddMemberDto){
     console.log("project ", memberDto.project_id);
     console.log("adding ",memberDto.pubkey);
     rabbitMQ.publish('request_exchange', memberDto, COMMAND_TYPE.ADD_MEMBER);
+
+    rabbitMQ.receive(
+      "response_exchange",
+      "response_exchange",
+      (message: unknown, error: any) => {
+            console.log(message);
+            console.log(error);
+          },
+    );
   }
 
   async removeMember(memberDto: RemoveMemberDto){

@@ -5,6 +5,6 @@ export enum COMMAND_TYPE {
     WITHDRAW = "withdraw",
     PROPOSAL_EXECUTE = "proposal_execute",
     VOTE = "vote",
-    EXECUTE = "execute",
+    WITHDRAW_EXECUTE = "execute",
     CHANGE_THRESHOLD = "change_threshold"
 }

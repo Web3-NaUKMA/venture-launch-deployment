@@ -1,5 +1,6 @@
 import amqp, { Channel } from 'amqplib';
 import { RabbitMQException } from './exceptions/exceptions.utils';
+import { COMMAND_TYPE } from './command_type.enum';
 
 console.log(process.env.RABBITMQ_URI)
 export enum RabbitMQExchangeNames {
@@ -76,6 +77,54 @@ export class RabbitMQ {
       if (message) {
         const data = JSON.parse(message.content.toString());
         this.channel.ack(message);
+
+        switch (data.command_type) {
+          case COMMAND_TYPE.CREATE_DAO : {
+            console.log(data.command_type);
+
+            break;
+          }
+          case COMMAND_TYPE.ADD_MEMBER : {
+            console.log(data.command_type);
+
+            break;
+          }
+          case COMMAND_TYPE.REMOVE_MEMBER : {
+            console.log(data.command_type);
+
+            break;
+          }
+          case COMMAND_TYPE.CHANGE_THRESHOLD : {
+            console.log(data.command_type);
+
+            break;
+          }
+          case COMMAND_TYPE.VOTE : {
+            console.log(data.command_type);
+
+            break;
+          }
+          case COMMAND_TYPE.PROPOSAL_EXECUTE : {
+            console.log(data.command_type);
+
+            break;
+          }
+          case COMMAND_TYPE.WITHDRAW : {
+            console.log(data.command_type);
+
+            break;
+          }
+          case COMMAND_TYPE.WITHDRAW_EXECUTE : {
+            console.log(data.command_type);
+
+            break;
+          }
+          default : {
+            console.log("incorrect command type");
+
+            break;
+          }
+        }
         callback?.(data);
       } else {
         callback?.(null, 'The message is empty');
