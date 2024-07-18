@@ -1,4 +1,12 @@
-import { Column, Entity, JoinTable, ManyToMany, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  JoinTable,
+  ManyToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Dao } from '../../types/dao.interface';
 import { User } from '../../types/user.interface';
 import { UserEntity } from './user.entity';
@@ -19,11 +27,16 @@ export class DaoEntity implements Dao {
   @Column({ type: 'int8', default: 0 })
   threshold: number;
 
-  @OneToOne(() => ProjectLaunchEntity, projectLaunch => projectLaunch.dao)
+  @OneToOne(() => ProjectLaunchEntity, projectLaunch => projectLaunch.dao, { nullable: false })
+  @JoinColumn({ name: 'projectLaunchId', referencedColumnName: 'id' })
   projectLaunch: ProjectLaunch;
 
   @ManyToMany(() => UserEntity, user => user.daos)
-  @JoinTable()
+  @JoinTable({
+    name: 'user_daos_dao',
+    joinColumn: { name: 'daoId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'userId', referencedColumnName: 'id' },
+  })
   members: User[];
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })

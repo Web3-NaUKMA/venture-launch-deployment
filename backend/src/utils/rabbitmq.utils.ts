@@ -37,6 +37,8 @@ export class RabbitMQ {
       RabbitMQExchangeNames.Direct,
     );
 
+    await this.channel.assertQueue('request_exchange');
+
     await this.channel.bindQueue('request_exchange', 'request_exchange', 'request_exchange');
     await this.channel.publish(
       process.env.RABBITMQ_EXCHANGE_NAME,

@@ -121,6 +121,5 @@ export class UserEntity implements User {
   seenMessages: Message[];
 
   @ManyToMany(() => DaoEntity, dao => dao.members, { cascade: true })
-  @JoinTable()
   daos: Dao[];
 }
