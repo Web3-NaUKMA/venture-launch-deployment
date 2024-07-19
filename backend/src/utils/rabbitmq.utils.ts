@@ -1,7 +1,13 @@
 import amqp, { Channel } from 'amqplib';
-import { RabbitMQException } from './exceptions/exceptions.utils';
+import { DatabaseException, RabbitMQException } from './exceptions/exceptions.utils';
 import { COMMAND_TYPE } from './command_type.enum';
+import AppDataSource from '../typeorm/index.typeorm';
+import { DaoEntity } from '../typeorm/entities/dao.entity';
+
 import * as dotenv from 'dotenv';
+import { User } from '../../../frontend/src/types/user.types';
+import { ProjectLaunchEntity } from '../typeorm/entities/project-launch.entity';
+import { programId } from '../../../frontend/src/utils/venture-launch.utils';
 export enum RabbitMQExchangeNames {
   Fanout = 'fanout',
   Direct = 'direct',
@@ -73,14 +79,23 @@ export class RabbitMQ {
 
     await this.channel.bindQueue(queue.queue, process.env.RABBITMQ_EXCHANGE_NAME, bindingKey);
 
-    this.channel.consume(queue.queue, message => {
+    this.channel.consume(queue.queue, async message => {
       if (message) {
         const data = JSON.parse(message.content.toString());
         this.channel.ack(message);
 
+        try{
         switch (data.command_type) {
           case COMMAND_TYPE.CREATE_DAO : {
             console.log(data.command_type);
+
+            const dao = await AppDataSource.getRepository(DaoEntity).findOneOrFail({
+              where: {
+                projectLaunch: {id: data.project_id}
+              }
+            });
+
+            
 
             break;
           }
@@ -125,6 +140,9 @@ export class RabbitMQ {
             break;
           }
         }
+      } catch (error: any) {
+        throw new DatabaseException('Internal server error', error);
+      }
         callback?.(data);
       } else {
         callback?.(null, 'The message is empty');
