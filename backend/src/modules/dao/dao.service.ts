@@ -11,7 +11,7 @@ import {
   BlockchainVoteDto,
   BlockchainChangeThresholdDto,
 } from '../../DTO/dao.dto';
-import { COMMAND_TYPE } from '../../utils/command_type.enum';
+import { CommandType } from '../../utils/dao.utils';
 import { rabbitMQ } from '../../utils/rabbitmq.utils';
 import { DaoEntity } from '../../typeorm/entities/dao.entity';
 import AppDataSource from '../../typeorm/index.typeorm';
@@ -58,11 +58,6 @@ export class DAOService {
   async create(data: CreateDaoDto): Promise<DaoEntity> {
     try {
       const dao = await AppDataSource.getRepository(DaoEntity).save(data);
-      rabbitMQ.publish(
-        'request_exchange',
-        { project_id: data.projectLaunch.id } as BlockchainCreateDaoDto,
-        COMMAND_TYPE.CREATE_DAO,
-      );
 
       return await AppDataSource.getRepository(DaoEntity).findOneOrFail({
         where: { id: dao.id },
@@ -133,15 +128,6 @@ export class DAOService {
         relations: { members: true, projectLaunch: { approver: true } },
       });
 
-      rabbitMQ.publish(
-        'request_exchange',
-        {
-          project_id: dao.projectLaunch.id,
-          pubkey: dao.projectLaunch.approver.id,
-        } as BlockchainAddMemberDto,
-        COMMAND_TYPE.ADD_MEMBER,
-      );
-
       const existingUsers = (
         (
           await Promise.allSettled(
@@ -155,6 +141,23 @@ export class DAOService {
       dao.members = existingUsers;
 
       await AppDataSource.getRepository(DaoEntity).save(dao);
+
+      existingUsers.forEach(member => {
+        rabbitMQ.publish(
+          'request_exchange',
+          {
+            multisig_pda: dao.multisigPda,
+            pubkey: member.walletId,
+            permissions: [],
+          } as BlockchainAddMemberDto,
+          CommandType.AddMember,
+        );
+      });
+
+      rabbitMQ.receive('response_exchange', 'response_exchange', (message, error) => {
+        if (message) console.log(message);
+        if (error) console.log(error);
+      });
 
       return await AppDataSource.getRepository(DaoEntity).findOneOrFail({
         relations: { projectLaunch: true, members: true },
@@ -178,15 +181,6 @@ export class DAOService {
         relations: { members: true, projectLaunch: { approver: true } },
       });
 
-      rabbitMQ.publish(
-        'request_exchange',
-        {
-          project_id: dao.projectLaunch.id,
-          pubkey: dao.projectLaunch.approver.id,
-        } as BlockchainRemoveMemberDto,
-        COMMAND_TYPE.REMOVE_MEMBER,
-      );
-
       const existingUsers = (
         (
           await Promise.allSettled(
@@ -200,7 +194,25 @@ export class DAOService {
       dao.members = dao.members.filter(
         member => !existingUsers.find(user => user.id === member.id),
       );
+
       await AppDataSource.getRepository(DaoEntity).save(dao);
+
+      existingUsers.forEach(member => {
+        rabbitMQ.publish(
+          'request_exchange',
+          {
+            multisig_pda: dao.multisigPda,
+            pubkey: member.walletId,
+            permissions: [],
+          } as BlockchainAddMemberDto,
+          CommandType.RemoveMember,
+        );
+      });
+
+      rabbitMQ.receive('response_exchange', 'response_exchange', (message, error) => {
+        if (message) console.log(message);
+        if (error) console.log(error);
+      });
 
       return await AppDataSource.getRepository(DaoEntity).findOneOrFail({
         relations: { projectLaunch: true, members: true },
@@ -217,38 +229,25 @@ export class DAOService {
     }
   }
 
-  // async addMember(memberDto: AddMemberDto) {
-  //   console.log('project ', memberDto.project_id);
-  //   console.log('adding ', memberDto.pubkey);
-  //   rabbitMQ.publish('request_exchange', memberDto, COMMAND_TYPE.ADD_MEMBER);
-  // }
-
-  // async removeMember(memberDto: RemoveMemberDto) {
-  //   console.log('project ', memberDto.project_id);
-  //   console.log('removing ', memberDto.pubkey);
-  //   rabbitMQ.publish('request_exchange', memberDto, COMMAND_TYPE.REMOVE_MEMBER);
-  // }
-
   async withdraw(withdrawDto: BlockchainWithdrawDto) {
-    console.log('project ', withdrawDto.project_id);
-    console.log('receiver ', withdrawDto.receiver);
-    rabbitMQ.publish('request_exchange', withdrawDto, COMMAND_TYPE.WITHDRAW);
+    console.log(withdrawDto);
+    rabbitMQ.publish('request_exchange', withdrawDto, CommandType.Withdraw);
   }
 
   async executeProposal(proposal: BlockchainExecuteProposalDto) {
-    console.log('project ', proposal.project_id);
-    rabbitMQ.publish('request_exchange', proposal, COMMAND_TYPE.PROPOSAL_EXECUTE);
+    console.log('project ', proposal.multisig_pda);
+    rabbitMQ.publish('request_exchange', proposal, CommandType.ProposalExecute);
   }
 
   async vote(vote: BlockchainVoteDto) {
-    console.log('project ', vote.project_id);
+    console.log('project ', vote.multisig_pda);
     console.log('voting ', vote.vote);
-    rabbitMQ.publish('request_exchange', vote, COMMAND_TYPE.VOTE);
+    rabbitMQ.publish('request_exchange', vote, CommandType.Vote);
   }
 
   async changeThreshold(threshold: BlockchainChangeThresholdDto) {
-    console.log('project ', threshold.project_id);
-    rabbitMQ.publish('request_exchange', threshold, COMMAND_TYPE.CHANGE_THRESHOLD);
+    console.log('project ', threshold.multisig_pda);
+    rabbitMQ.publish('request_exchange', threshold, CommandType.ChangeThreshold);
   }
 }
 

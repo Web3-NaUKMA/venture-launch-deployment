@@ -9,11 +9,9 @@ router.post('/daos', auth(), daoController.create);
 router.put('/daos/:id', auth(), daoController.update);
 router.delete('/daos/:id', auth(), daoController.remove);
 router.post('/daos', daoController.create);
-// router.post('/daos/:id/members', daoController.addMember);
-// router.delete('/daos/:id/members', daoController.removeMember);
-router.post('/dao/withdraw', daoController.withdraw);
-router.post('/dao/executeProposal', daoController.executeProposal);
-router.post('/dao/vote', daoController.vote);
-router.post('/dao/changeThreshold', daoController.changeThreshold);
+router.post('/daos/withdraw', daoController.withdraw);
+router.post('/daos/executeProposal', daoController.executeProposal);
+router.post('/daos/vote', daoController.vote);
+router.post('/daos/changeThreshold', daoController.changeThreshold);
 
 export default router;

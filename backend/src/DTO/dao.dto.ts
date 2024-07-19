@@ -21,34 +21,34 @@ export interface BlockchainCreateDaoDto {
 }
 
 export interface BlockchainAddMemberDto {
-  project_id: string;
+  multisig_pda: string;
   pubkey: string;
-  permissions: [string];
+  permissions: string[];
 }
 
 export interface BlockchainRemoveMemberDto {
-  project_id: string;
+  multisig_pda: string;
   pubkey: string;
 }
 
 export interface BlockchainWithdrawDto {
-  project_id: string;
+  multisig_pda: string;
   is_execute: boolean;
   receiver: string;
   amount: Number;
 }
 
 export interface BlockchainChangeThresholdDto {
-  project_id: string;
+  multisig_pda: string;
   new_threshold: Number;
 }
 
 export interface BlockchainExecuteProposalDto {
-  project_id: string;
+  multisig_pda: string;
 }
 
 export interface BlockchainVoteDto {
-  project_id: string;
+  multisig_pda: string;
   voter: string;
   vote: string; // approve cancel
 }

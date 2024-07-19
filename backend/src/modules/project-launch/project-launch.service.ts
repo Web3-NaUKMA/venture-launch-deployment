@@ -14,8 +14,8 @@ import {
 } from '../../utils/exceptions/exceptions.utils';
 import _ from 'lodash';
 import { rabbitMQ } from '../../utils/rabbitmq.utils';
-import { COMMAND_TYPE } from '../../utils/command_type.enum';
-import { DaoEntity } from '../../typeorm/entities/dao.entity';
+import { CommandType } from '../../utils/dao.utils';
+import daoService from '../dao/dao.service';
 
 export class ProjectLaunchService {
   async findMany(options?: FindManyOptions<ProjectLaunchEntity>): Promise<ProjectLaunchEntity[]> {
@@ -93,12 +93,17 @@ export class ProjectLaunchService {
       delete data.approverId;
 
       if (approverId) {
-        rabbitMQ.publish('request_exchange', { project_id: id }, COMMAND_TYPE.CREATE_DAO);
-        rabbitMQ.receive('response_exchange', 'response_exchange', (message: any, error: any) => {
-          console.log(message);
-          // const { multisigPda, vaultPda } = message;
-          // AppDataSource.getRepository(DaoEntity).save({ multisigPda, vaultPda });
-          console.log(error); 
+        rabbitMQ.publish('request_exchange', { project_id: id }, CommandType.CreateDao);
+        rabbitMQ.receive('response_exchange', 'response_exchange', (message, error) => {
+          const { multisig_pda, vault_pda } = message;
+
+          daoService.create({
+            projectLaunch: { id },
+            multisigPda: multisig_pda,
+            vaultPda: vault_pda,
+          });
+
+          if (error) console.log(error);
         });
       }
 

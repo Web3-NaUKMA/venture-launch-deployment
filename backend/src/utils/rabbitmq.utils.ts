@@ -9,7 +9,8 @@ export enum RabbitMQExchangeNames {
 }
 
 export class RabbitMQ {
-  private channel: Channel;
+  private requestChannel: Channel;
+  private responseChannel: Channel;
 
   constructor() {
     if (!process.env.RABBITMQ_URI) {
@@ -17,12 +18,16 @@ export class RabbitMQ {
     }
 
     amqp.connect(process.env.RABBITMQ_URI).then(async connection => {
-      this.channel = await connection.createChannel();
+      this.requestChannel = await connection.createChannel();
+    });
+
+    amqp.connect(process.env.RABBITMQ_URI).then(async connection => {
+      this.responseChannel = await connection.createChannel();
     });
   }
 
   public async publish(routingKey: string, message: unknown, commandType: string) {
-    if (!this.channel) {
+    if (!this.requestChannel) {
       throw new RabbitMQException('Cannot publish the message due to the channel is not connected');
     }
 
@@ -32,15 +37,15 @@ export class RabbitMQ {
       );
     }
 
-    await this.channel.assertExchange(
+    await this.requestChannel.assertExchange(
       process.env.RABBITMQ_EXCHANGE_NAME,
       RabbitMQExchangeNames.Direct,
     );
 
-    await this.channel.assertQueue('request_exchange');
+    await this.requestChannel.assertQueue('request_exchange', { durable: true });
+    await this.requestChannel.bindQueue('request_exchange', 'request_exchange', 'request_exchange');
 
-    await this.channel.bindQueue('request_exchange', 'request_exchange', 'request_exchange');
-    await this.channel.publish(
+    await this.requestChannel.publish(
       process.env.RABBITMQ_EXCHANGE_NAME,
       routingKey,
       Buffer.from(JSON.stringify(message)),
@@ -51,9 +56,9 @@ export class RabbitMQ {
   public async receive(
     queueName: string,
     bindingKey: string,
-    callback?: (message: unknown, error?: any) => any,
+    callback?: (message: any, error?: any) => any,
   ) {
-    if (!this.channel) {
+    if (!this.responseChannel) {
       throw new RabbitMQException('Cannot receive the message due to the channel is not connected');
     }
 
@@ -63,19 +68,23 @@ export class RabbitMQ {
       );
     }
 
-    await this.channel.assertExchange(
+    await this.responseChannel.assertExchange(
       process.env.RABBITMQ_EXCHANGE_NAME,
       RabbitMQExchangeNames.Direct,
     );
 
-    const queue = await this.channel.assertQueue(queueName);
+    const queue = await this.responseChannel.assertQueue(queueName, { durable: true });
 
-    await this.channel.bindQueue(queue.queue, process.env.RABBITMQ_EXCHANGE_NAME, bindingKey);
+    await this.responseChannel.bindQueue(
+      queue.queue,
+      process.env.RABBITMQ_EXCHANGE_NAME,
+      bindingKey,
+    );
 
-    this.channel.consume(queue.queue, message => {
+    this.responseChannel.consume(queue.queue, message => {
       if (message) {
         const data = JSON.parse(message.content.toString());
-        this.channel.ack(message);
+        this.responseChannel.ack(message);
         callback?.(data);
       } else {
         callback?.(null, 'The message is empty');
