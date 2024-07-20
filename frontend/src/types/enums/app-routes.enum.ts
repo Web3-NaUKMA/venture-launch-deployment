@@ -11,4 +11,5 @@ export enum AppRoutes {
   DetailsChat = '/chats/:id',
   About = '/about',
   Profile = '/profile',
+  Dashboard = '/dashboard',
 }
