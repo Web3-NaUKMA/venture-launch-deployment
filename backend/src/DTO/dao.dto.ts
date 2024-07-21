@@ -1,36 +1,54 @@
-export interface CreateDAODto{
-    project_id: string
+export interface DaoMemberDto {
+  id: string;
 }
 
-export interface AddMemberDto{
-    project_id: string,
-    pubkey: string,
-    permissions: [string]
+export interface CreateDaoDto {
+  multisigPda: string;
+  vaultPda: string;
+  projectLaunch: { id: string };
 }
 
-export interface RemoveMemberDto{
-    project_id: string,
-    pubkey: string
+export interface UpdateDaoDto {
+  membersToAdd?: DaoMemberDto[];
+  membersToRemove?: DaoMemberDto[];
+  threshold?: number;
+  updatedAt?: Date | null;
+  removedAt?: Date | null;
 }
 
-export interface WithdrawDto{
-    project_id: string,
-    is_execute: boolean,
-    receiver: string,
-    amount: Number
+export interface BlockchainCreateDaoDto {
+  project_id: string;
 }
 
-export interface ChangeThresholdDto{
-    project_id: string,
-    new_threshold: Number
+export interface BlockchainAddMemberDto {
+  multisig_pda: string;
+  pubkey: string;
+  permissions: string[];
 }
 
-export interface ExecuteProposalDto{
-    project_id: string,
+export interface BlockchainRemoveMemberDto {
+  multisig_pda: string;
+  pubkey: string;
 }
 
-export interface VoteDto{
-    project_id: string,
-    voter: string,
-    vote: string // approve cancel
+export interface BlockchainWithdrawDto {
+  multisig_pda: string;
+  is_execute: boolean;
+  receiver: string;
+  amount: Number;
+}
+
+export interface BlockchainChangeThresholdDto {
+  multisig_pda: string;
+  new_threshold: Number;
+}
+
+export interface BlockchainExecuteProposalDto {
+  multisig_pda: string;
+}
+
+export interface BlockchainVoteDto {
+  multisig_pda: string;
+  voter: string;
+  vote: string; // approve cancel
 }

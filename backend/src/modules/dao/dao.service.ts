@@ -1,14 +1,24 @@
+import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
 import {
-  AddMemberDto,
-  CreateDAODto,
-  ExecuteProposalDto,
-  RemoveMemberDto,
-  VoteDto,
-  WithdrawDto,
-  ChangeThresholdDto,
+  CreateDaoDto,
+  UpdateDaoDto,
+  DaoMemberDto,
+  BlockchainAddMemberDto,
+  BlockchainRemoveMemberDto,
+  BlockchainCreateDaoDto,
+  BlockchainWithdrawDto,
+  BlockchainExecuteProposalDto,
+  BlockchainVoteDto,
+  BlockchainChangeThresholdDto,
 } from '../../DTO/dao.dto';
-import { COMMAND_TYPE } from '../../utils/command_type.enum';
+import { CommandType } from '../../utils/dao.utils';
 import { rabbitMQ } from '../../utils/rabbitmq.utils';
+import { DaoEntity } from '../../typeorm/entities/dao.entity';
+import AppDataSource from '../../typeorm/index.typeorm';
+import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
+import _ from 'lodash';
+import { UserEntity } from '../../typeorm/entities/user.entity';
+import { COMMAND_TYPE } from '../../utils/command_type.enum';
 
 export class DAOService {
   async findOne() {
@@ -63,20 +73,20 @@ export class DAOService {
     rabbitMQ.publish('request_exchange', withdrawDto, COMMAND_TYPE.WITHDRAW);
   }
 
-  async executeProposal(proposal: ExecuteProposalDto) {
-    console.log('project ', proposal.project_id);
-    rabbitMQ.publish('request_exchange', proposal, COMMAND_TYPE.PROPOSAL_EXECUTE);
+  async executeProposal(proposal: BlockchainExecuteProposalDto) {
+    console.log('project ', proposal.multisig_pda);
+    rabbitMQ.publish('request_exchange', proposal, CommandType.ProposalExecute);
   }
 
-  async vote(vote: VoteDto) {
-    console.log('project ', vote.project_id);
+  async vote(vote: BlockchainVoteDto) {
+    console.log('project ', vote.multisig_pda);
     console.log('voting ', vote.vote);
-    rabbitMQ.publish('request_exchange', vote, COMMAND_TYPE.VOTE);
+    rabbitMQ.publish('request_exchange', vote, CommandType.Vote);
   }
 
-  async changeThreshold(threshold: ChangeThresholdDto) {
-    console.log('project ', threshold.project_id);
-    rabbitMQ.publish('request_exchange', threshold, COMMAND_TYPE.CHANGE_THRESHOLD);
+  async changeThreshold(threshold: BlockchainChangeThresholdDto) {
+    console.log('project ', threshold.multisig_pda);
+    rabbitMQ.publish('request_exchange', threshold, CommandType.ChangeThreshold);
   }
 }
 

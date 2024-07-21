@@ -2,23 +2,68 @@ import { Request, Response } from 'express';
 import { Controller } from '../../decorators/app.decorators';
 import { HttpStatusCode } from 'axios';
 import daoService from './dao.service';
+import { parseObjectStringValuesToPrimitives } from '../../utils/object.utils';
+import qs from 'qs';
+import _ from 'lodash';
 
 @Controller()
 export class DAOController {
+  async findMany(request: Request, response: Response) {
+    const query = request.query
+      ? parseObjectStringValuesToPrimitives(
+          qs.parse(request.query as Record<string, any>, { comma: true, allowDots: true }),
+        )
+      : undefined;
+
+    const daos = await daoService.findMany(query);
+
+    return response.status(HttpStatusCode.Ok).json(daos);
+  }
+
+  async findOne(request: Request, response: Response) {
+    const query = request.query
+      ? parseObjectStringValuesToPrimitives(
+          qs.parse(request.query as Record<string, any>, { comma: true, allowDots: true }),
+        )
+      : undefined;
+
+    const { id } = request.params as any;
+    const dao = await daoService.findOne(_.merge(query as any, { where: { id } }));
+
+    return response.status(HttpStatusCode.Ok).json(dao);
+  }
+
   async create(request: Request, response: Response) {
-    await daoService.create(request.body);
-    return response.status(HttpStatusCode.Ok).json('created');
+    const dao = await daoService.create(request.body);
+
+    return response.status(HttpStatusCode.Created).json(dao);
   }
 
-  async addMember(request: Request, response: Response) {
-    await daoService.addMember(request.body);
-    return response.status(HttpStatusCode.Ok).json('added');
+  async update(request: Request, response: Response) {
+    const { id } = request.params;
+    await daoService.findOne({ where: { id } });
+    const dao = await daoService.update(id, request.body);
+
+    return response.status(HttpStatusCode.Ok).json(dao);
   }
 
-  async removeMember(request: Request, response: Response) {
-    await daoService.removeMember(request.body);
-    return response.status(HttpStatusCode.Ok).json('removed');
+  async remove(request: Request, response: Response) {
+    const { id } = request.params;
+    await daoService.findOne({ where: { id } });
+    const dao = await daoService.remove(id);
+
+    return response.status(HttpStatusCode.Ok).json(dao);
   }
+
+  // async addMember(request: Request, response: Response) {
+  //   await daoService.addMember(request.body);
+  //   return response.status(HttpStatusCode.Ok).json('added');
+  // }
+
+  // async removeMember(request: Request, response: Response) {
+  //   await daoService.removeMember(request.body);
+  //   return response.status(HttpStatusCode.Ok).json('removed');
+  // }
 
   async withdraw(request: Request, response: Response) {
     await daoService.withdraw(request.body);
