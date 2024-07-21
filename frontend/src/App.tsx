@@ -20,7 +20,8 @@ import DetailsUserPage from './pages/DetailsUserPage/DetailsUserPage';
 import MessageCenterPage from './pages/MessageCenterPage/MessageCenterPage';
 import DetailsChatPage from './pages/DetailsChatPage/DetailsChatPage';
 
-axios.defaults.baseURL = `${import.meta.env.VITE_BACKEND_URI}/${import.meta.env.VITE_BACKEND_PREFIX || ''}`;
+// axios.defaults.baseURL = `${import.meta.env.VITE_BACKEND_URI}/${import.meta.env.VITE_BACKEND_PREFIX || ''}`;
+axios.defaults.baseURL = `http://localhost:8000`
 axios.defaults.withCredentials = true;
 
 const App = () => {

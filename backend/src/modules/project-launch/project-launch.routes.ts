@@ -64,7 +64,7 @@ router.put(
     { name: 'project-documents' },
     { name: 'project-logo', maxCount: 1 },
   ]),
-  auth(),
+  // auth(),
   projectLaunchController.update,
 );
 router.put(

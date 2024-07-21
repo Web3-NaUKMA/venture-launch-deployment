@@ -98,7 +98,7 @@ export class ProjectLaunchService {
           console.log(message);
           // const { multisigPda, vaultPda } = message;
           // AppDataSource.getRepository(DaoEntity).save({ multisigPda, vaultPda });
-          console.log(error); 
+          console.log(error);
         });
       }
 
@@ -109,6 +109,7 @@ export class ProjectLaunchService {
           ...(approverId ? { approver: { id: approverId } } : {}),
         },
       );
+
 
       return await AppDataSource.getRepository(ProjectLaunchEntity).findOneOrFail({
         relations: {

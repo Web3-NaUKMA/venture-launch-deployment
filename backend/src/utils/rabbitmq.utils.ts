@@ -8,6 +8,7 @@ import * as dotenv from 'dotenv';
 import { User } from '../../../frontend/src/types/user.types';
 import { ProjectLaunchEntity } from '../typeorm/entities/project-launch.entity';
 import { programId } from '../../../frontend/src/utils/venture-launch.utils';
+import { UserEntity } from '../typeorm/entities/user.entity';
 export enum RabbitMQExchangeNames {
   Fanout = 'fanout',
   Direct = 'direct',
@@ -95,12 +96,37 @@ export class RabbitMQ {
               }
             });
 
-            
+            console.log(dao.multisigPda);
 
+            await AppDataSource.getRepository(DaoEntity).update(
+              { projectLaunch: { id: data.project_id } },
+              {
+                multisigPda: data.multisig_pda,
+                vaultPda: data.vault_pda,
+                threshold: data.threshold
+              }
+            );
             break;
           }
           case COMMAND_TYPE.ADD_MEMBER : {
             console.log(data.command_type);
+
+            const dao = await AppDataSource.getRepository(DaoEntity).findOneOrFail({
+              where: {projectLaunch: { id: data.project_id }}
+            });
+
+            const new_member =  await AppDataSource.getRepository(UserEntity).findOneOrFail({
+              where: {walletId: data.member}
+            });
+
+            const members = dao.members.push(new_member);
+
+            // await AppDataSource.getRepository(DaoEntity).update(
+            //   { projectLaunch: { id: data.project_id } },
+            //   {
+            //     members: members
+            //   }
+            // );
 
             break;
           }
@@ -111,6 +137,13 @@ export class RabbitMQ {
           }
           case COMMAND_TYPE.CHANGE_THRESHOLD : {
             console.log(data.command_type);
+
+            await AppDataSource.getRepository(DaoEntity).update(
+              { projectLaunch: { id: data.project_id } },
+              {
+                threshold: data.threshold
+              }
+            );
 
             break;
           }
