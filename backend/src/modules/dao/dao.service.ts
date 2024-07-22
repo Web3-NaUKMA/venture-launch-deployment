@@ -18,59 +18,220 @@ import AppDataSource from '../../typeorm/index.typeorm';
 import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
 import _ from 'lodash';
 import { UserEntity } from '../../typeorm/entities/user.entity';
-import { COMMAND_TYPE } from '../../utils/command_type.enum';
 
 export class DAOService {
-  async findOne() {
-    rabbitMQ.publish('request_exchange', {project_id: "5"}, 'unknown');
-    // rabbitMQ.receive(
-    //   'request.rs',
-    //   'request_exchange',
-    //   (message: unknown, error: any) => {
-    //     console.log(message);
-    //     console.log(error);
-    //   },
-    // );
+  async findMany(options?: FindManyOptions<DaoEntity>): Promise<DaoEntity[]> {
+    try {
+      return await AppDataSource.getRepository(DaoEntity).find(
+        _.merge(options, {
+          relations: { projectLaunch: true, members: true },
+        }),
+      );
+    } catch (error: any) {
+      throw new DatabaseException('Internal server error', error);
+    }
   }
 
-  async create(dao: CreateDAODto){
-    rabbitMQ.publish('request_exchange', dao, COMMAND_TYPE.CREATE_DAO);
+  async findOne(options?: FindOneOptions<DaoEntity>): Promise<DaoEntity> {
+    try {
+      let removedAt = (options?.where as any)?.messages?.removedAt;
+      delete (options?.where as any)?.messages?.removedAt;
 
-    rabbitMQ.receive(
-      "response_exchange",
-      "response_exchange",
-      (message: unknown, error: any) => {
-            console.log(message);
-            console.log(error);
-          },
-    );
+      if (!removedAt) removedAt = null;
+
+      const dao = await AppDataSource.getRepository(DaoEntity).findOneOrFail(
+        _.merge(options, {
+          relations: { projectLaunch: true, members: true },
+        }),
+      );
+
+      return dao;
+    } catch (error: any) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException('The dao with provided params does not exist');
+      }
+
+      throw new DatabaseException('Internal server error', error);
+    }
   }
 
-  async addMember(memberDto: AddMemberDto) {
-    console.log('project ', memberDto.project_id);
-    console.log('adding ', memberDto.pubkey);
-    rabbitMQ.publish('request_exchange', memberDto, COMMAND_TYPE.ADD_MEMBER);
+  async create(data: CreateDaoDto): Promise<DaoEntity> {
+    try {
+      const dao = await AppDataSource.getRepository(DaoEntity).save(data);
 
-    rabbitMQ.receive(
-      "response_exchange",
-      "response_exchange",
-      (message: unknown, error: any) => {
-            console.log(message);
-            console.log(error);
-          },
-    );
+      return await AppDataSource.getRepository(DaoEntity).findOneOrFail({
+        where: { id: dao.id },
+        relations: { projectLaunch: true, members: true },
+      });
+    } catch (error: any) {
+      throw new DatabaseException('Internal server error', error);
+    }
   }
 
-  async removeMember(memberDto: RemoveMemberDto) {
-    console.log('project ', memberDto.project_id);
-    console.log('removing ', memberDto.pubkey);
-    rabbitMQ.publish('request_exchange', memberDto, COMMAND_TYPE.REMOVE_MEMBER);
+  async update(id: string, data: UpdateDaoDto): Promise<DaoEntity> {
+    try {
+      const { membersToAdd, membersToRemove, ...rest } = data;
+
+      await AppDataSource.getRepository(DaoEntity).update(
+        { id },
+        { updatedAt: new Date(), ...rest },
+      );
+
+      if (membersToAdd) {
+        await this.addMembersToDao(id, membersToAdd);
+      }
+
+      if (membersToRemove) {
+        await this.removeMembersFromDao(id, membersToRemove);
+      }
+
+      return await AppDataSource.getRepository(DaoEntity).findOneOrFail({
+        relations: { projectLaunch: true, members: true },
+        where: { id },
+      });
+    } catch (error: any) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException(
+          'Cannot update the dao. The dao with provided id does not exist',
+        );
+      }
+
+      throw new DatabaseException('Internal server error', error);
+    }
   }
 
-  async withdraw(withdrawDto: WithdrawDto) {
-    console.log('project ', withdrawDto.project_id);
-    console.log('receiver ', withdrawDto.receiver);
-    rabbitMQ.publish('request_exchange', withdrawDto, COMMAND_TYPE.WITHDRAW);
+  async remove(id: string): Promise<DaoEntity> {
+    try {
+      const dao = await AppDataSource.getRepository(DaoEntity).findOneOrFail({
+        relations: { projectLaunch: true, members: true },
+        where: { id },
+      });
+
+      await AppDataSource.getRepository(DaoEntity).remove(structuredClone(dao));
+
+      return dao;
+    } catch (error: any) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException(
+          'Cannot remove the dao. The dao with provided id does not exist',
+        );
+      }
+
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
+
+  private async addMembersToDao(id: string, members: DaoMemberDto[]): Promise<DaoEntity> {
+    try {
+      const dao = await AppDataSource.getRepository(DaoEntity).findOneOrFail({
+        where: { id },
+        relations: { members: true, projectLaunch: { approver: true } },
+      });
+
+      const existingUsers = (
+        (
+          await Promise.allSettled(
+            members.map(member =>
+              AppDataSource.getRepository(UserEntity).findOneOrFail({ where: { id: member.id } }),
+            ),
+          )
+        ).filter(result => result.status === 'fulfilled') as PromiseFulfilledResult<UserEntity>[]
+      ).map(result => result.value);
+
+      dao.members = existingUsers;
+
+      await AppDataSource.getRepository(DaoEntity).save(dao);
+
+      existingUsers.forEach(member => {
+        rabbitMQ.publish(
+          'request_exchange',
+          {
+            multisig_pda: dao.multisigPda,
+            pubkey: member.walletId,
+            permissions: [],
+          } as BlockchainAddMemberDto,
+          CommandType.AddMember,
+        );
+      });
+
+      rabbitMQ.receive('response_exchange', 'response_exchange', (message, error) => {
+        if (message) console.log(message);
+        if (error) console.log(error);
+      });
+
+      return await AppDataSource.getRepository(DaoEntity).findOneOrFail({
+        relations: { projectLaunch: true, members: true },
+        where: { id },
+      });
+    } catch (error: any) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException(
+          'Cannot add members to the dao. The dao or some of the members with provided id does not exist',
+        );
+      }
+
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
+
+  private async removeMembersFromDao(id: string, members: DaoMemberDto[]): Promise<DaoEntity> {
+    try {
+      const dao = await AppDataSource.getRepository(DaoEntity).findOneOrFail({
+        where: { id },
+        relations: { members: true, projectLaunch: { approver: true } },
+      });
+
+      const existingUsers = (
+        (
+          await Promise.allSettled(
+            members.map(member =>
+              AppDataSource.getRepository(UserEntity).findOneOrFail({ where: { id: member.id } }),
+            ),
+          )
+        ).filter(result => result.status === 'fulfilled') as PromiseFulfilledResult<UserEntity>[]
+      ).map(result => result.value);
+
+      dao.members = dao.members.filter(
+        member => !existingUsers.find(user => user.id === member.id),
+      );
+
+      await AppDataSource.getRepository(DaoEntity).save(dao);
+
+      existingUsers.forEach(member => {
+        rabbitMQ.publish(
+          'request_exchange',
+          {
+            multisig_pda: dao.multisigPda,
+            pubkey: member.walletId,
+            permissions: [],
+          } as BlockchainAddMemberDto,
+          CommandType.RemoveMember,
+        );
+      });
+
+      rabbitMQ.receive('response_exchange', 'response_exchange', (message, error) => {
+        if (message) console.log(message);
+        if (error) console.log(error);
+      });
+
+      return await AppDataSource.getRepository(DaoEntity).findOneOrFail({
+        relations: { projectLaunch: true, members: true },
+        where: { id },
+      });
+    } catch (error: any) {
+      if (error instanceof EntityNotFoundError) {
+        throw new NotFoundException(
+          'Cannot remove members from the dao. The dao with provided id does not exist',
+        );
+      }
+
+      throw new DatabaseException('Internal server error', error);
+    }
+  }
+
+  async withdraw(withdrawDto: BlockchainWithdrawDto) {
+    console.log(withdrawDto);
+    rabbitMQ.publish('request_exchange', withdrawDto, CommandType.Withdraw);
   }
 
   async executeProposal(proposal: BlockchainExecuteProposalDto) {
