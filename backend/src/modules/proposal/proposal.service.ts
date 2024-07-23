@@ -4,7 +4,6 @@ import AppDataSource from '../../typeorm/index.typeorm';
 import _ from 'lodash';
 import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
 import { CreateProposalDto, ProposalVoteDto, UpdateProposalDto } from '../../DTO/proposal.dto';
-import { UserEntity } from '../../typeorm/entities/user.entity';
 import { ProposalVoteEntity } from '../../typeorm/entities/proposal-vote.entity';
 import { User } from '../../types/user.interface';
 import { rabbitMQ } from '../../utils/rabbitmq.utils';
@@ -15,7 +14,7 @@ export class ProposalService {
     try {
       return await AppDataSource.getRepository(ProposalEntity).find(
         _.merge(options, {
-          relations: { project: true, author: true, votes: true },
+          relations: { milestone: true, author: true, votes: true },
         }),
       );
     } catch (error: any) {
@@ -27,7 +26,7 @@ export class ProposalService {
     try {
       const proposal = await AppDataSource.getRepository(ProposalEntity).findOneOrFail(
         _.merge(options, {
-          relations: { project: true, author: true, votes: true },
+          relations: { milestone: true, author: true, votes: true },
         }),
       );
 
@@ -47,7 +46,7 @@ export class ProposalService {
 
       return await AppDataSource.getRepository(ProposalEntity).findOneOrFail({
         where: { id: proposal.id },
-        relations: { project: true, author: true, votes: true },
+        relations: { milestone: true, author: true, votes: true },
       });
     } catch (error: any) {
       throw new DatabaseException('Internal server error', error);
@@ -68,7 +67,7 @@ export class ProposalService {
       }
 
       return await AppDataSource.getRepository(ProposalEntity).findOneOrFail({
-        relations: { project: true, author: true, votes: true },
+        relations: { milestone: true, author: true, votes: true },
         where: { id },
       });
     } catch (error: any) {
@@ -85,7 +84,7 @@ export class ProposalService {
   async remove(id: string): Promise<ProposalEntity> {
     try {
       const proposal = await AppDataSource.getRepository(ProposalEntity).findOneOrFail({
-        relations: { project: true, author: true, votes: true },
+        relations: { milestone: true, author: true, votes: true },
         where: { id },
       });
 
@@ -108,7 +107,7 @@ export class ProposalService {
       const proposal = await AppDataSource.getRepository(ProposalEntity).findOneOrFail({
         where: { id },
         relations: {
-          project: { projectLaunch: { dao: { members: true } } },
+          milestone: { project: { projectLaunch: { dao: { members: true } } } },
           author: true,
           votes: true,
         },
@@ -116,7 +115,7 @@ export class ProposalService {
 
       const votesToRegister = votes
         .filter(vote =>
-          proposal.project.projectLaunch.dao.members.find(
+          proposal.milestone.project.projectLaunch.dao.members.find(
             (member: User) => member.id === vote.memberId,
           ),
         )
@@ -129,8 +128,8 @@ export class ProposalService {
         }));
 
       votesToRegister.forEach(voteToRegister => {
-        const multisig_pda = proposal.project.projectLaunch.dao.multisigPda;
-        const member = proposal.project.projectLaunch.dao.members.find(
+        const multisig_pda = proposal.milestone.project.projectLaunch.dao.multisigPda;
+        const member = proposal.milestone.project.projectLaunch.dao.members.find(
           member => member.id === voteToRegister.memberId,
         );
         const vote = voteToRegister.decision;
@@ -144,7 +143,7 @@ export class ProposalService {
       await AppDataSource.getRepository(ProposalVoteEntity).save(votesToRegister);
 
       return await AppDataSource.getRepository(ProposalEntity).findOneOrFail({
-        relations: { project: true, author: true, votes: true },
+        relations: { milestone: true, author: true, votes: true },
         where: { id },
       });
     } catch (error: any) {

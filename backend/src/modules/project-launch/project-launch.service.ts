@@ -186,7 +186,7 @@ export class ProjectLaunchService {
         projectLaunchUpdateData,
       );
 
-      if (!projectLaunch.dao.members.find(member => member.id === data.investorId)) {
+      if (!projectLaunch.dao?.members.find(member => member.id === data.investorId)) {
         const investor = await userService.findOne({ where: { id: data.investorId } });
 
         rabbitMQ.publish(

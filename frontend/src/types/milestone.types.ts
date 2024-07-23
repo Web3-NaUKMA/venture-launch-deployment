@@ -1,3 +1,6 @@
+import { Project } from "./project.types";
+import { Proposal } from "./proposal.types";
+
 export interface Milestone {
   id: string;
   mergedPullRequestUrl: string;
@@ -7,6 +10,8 @@ export interface Milestone {
   transactionApprovalHash: string;
   createdAt: Date;
   projectId: string;
+  project: Project;
+  proposals: Proposal[];
 }
 
 export interface CreateMilestoneDto {

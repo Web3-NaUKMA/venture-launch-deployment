@@ -4,6 +4,7 @@ import { CommandType } from './dao.utils';
 import daoService from '../modules/dao/dao.service';
 import projectLaunchService from '../modules/project-launch/project-launch.service';
 import proposalService from '../modules/proposal/proposal.service';
+import { ProposalStatusEnum } from '../types/enums/proposal-status.enum';
 
 export enum RabbitMQExchangeNames {
   Fanout = 'fanout',
@@ -154,18 +155,11 @@ export class RabbitMQConsumer {
   }
 
   async executeWithdrawCommand(message: any) {
-    const { multisig_pda } = message;
-    const projectLaunch = await projectLaunchService.findOne({
-      where: { dao: { multisigPda: multisig_pda } },
-      relations: { project: true, approver: true },
-    });
+    const { proposal_id } = message;
 
-    if (projectLaunch.project && projectLaunch.approver) {
-      proposalService.create({
-        project: { id: projectLaunch.project.id },
-        description: 'Withdraw',
-        type: CommandType.Withdraw,
-        author: { id: projectLaunch.approver.id },
+    if (proposal_id) {
+      await proposalService.update(proposal_id, {
+        status: ProposalStatusEnum.Voting,
       });
     }
   }

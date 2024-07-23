@@ -1,7 +1,9 @@
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Milestone } from '../../types/milestone.interface';
 import { ProjectEntity } from './project.entity';
 import { Project } from '../../types/project.interface';
+import { ProposalEntity } from './proposal.entity';
+import { Proposal } from '../../types/proposal.interface';
 
 @Entity('milestone')
 export class MilestoneEntity implements Milestone {
@@ -31,4 +33,7 @@ export class MilestoneEntity implements Milestone {
     onUpdate: 'CASCADE',
   })
   project: Project;
+
+  @OneToMany(() => ProposalEntity, proposal => proposal.milestone)
+  proposals: Proposal[];
 }

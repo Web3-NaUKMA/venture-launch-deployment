@@ -1,3 +1,4 @@
+import { ProposalStatusEnum } from '../types/enums/proposal-status.enum';
 import { ProposalVote } from '../types/proposal-vote.interface';
 import { CommandType } from '../utils/dao.utils';
 
@@ -7,11 +8,12 @@ export interface CreateProposalDto {
   type: CommandType;
   description: string;
   proposalLink?: string | null;
-  project: { id: string };
+  milestone: { id: string };
   author: { id: string };
 }
 
 export interface UpdateProposalDto {
+  status?: ProposalStatusEnum;
   proposalLink?: string | null;
   executedAt?: string | null;
   updatedAt?: string | null;

@@ -16,8 +16,6 @@ import { ProjectLaunchEntity } from './project-launch.entity';
 import { DataAccount } from '../../types/data-account.interface';
 import { UserToProject } from '../../types/user-to-project.interface';
 import { Milestone } from '../../types/milestone.interface';
-import { ProposalEntity } from './proposal.entity';
-import { Proposal } from '../../types/proposal.interface';
 
 @Entity('project')
 @Index(['projectLaunchName', 'projectLaunch.id'], { unique: true })
@@ -58,7 +56,4 @@ export class ProjectEntity implements Project {
   @OneToOne(() => ProjectLaunchEntity, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn({ name: 'projectLaunchId', referencedColumnName: 'id' })
   projectLaunch: ProjectLaunch;
-
-  @OneToMany(() => ProposalEntity, proposal => proposal.project)
-  proposals: Proposal[];
 }

@@ -10,5 +10,4 @@ export interface Project {
   isFinal: boolean;
   createdAt: Date;
   projectLaunch: ProjectLaunch;
-  proposals: Proposal[];
 }
