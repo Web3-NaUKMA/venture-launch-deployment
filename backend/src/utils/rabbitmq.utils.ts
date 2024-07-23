@@ -1,5 +1,10 @@
 import amqp, { Channel } from 'amqplib';
 import { RabbitMQException } from './exceptions/exceptions.utils';
+import { CommandType } from './dao.utils';
+import daoService from '../modules/dao/dao.service';
+import projectLaunchService from '../modules/project-launch/project-launch.service';
+import proposalService from '../modules/proposal/proposal.service';
+import { ProposalStatusEnum } from '../types/enums/proposal-status.enum';
 
 export enum RabbitMQExchangeNames {
   Fanout = 'fanout',
@@ -9,20 +14,30 @@ export enum RabbitMQExchangeNames {
 }
 
 export class RabbitMQ {
-  private channel: Channel;
+  private requestChannel: Channel;
+  private responseChannel: Channel;
+  private ready: boolean = false;
 
-  constructor() {
+  constructor() {}
+
+  public async connect() {
+    if (this.isConnected()) return;
+
     if (!process.env.RABBITMQ_URI) {
       throw new RabbitMQException('Cannot connect to the RabbitMQ due to invalid RabbitMQ url');
     }
 
-    amqp.connect(process.env.RABBITMQ_URI).then(async connection => {
-      this.channel = await connection.createChannel();
-    });
+    const requestConnection = await amqp.connect(process.env.RABBITMQ_URI);
+    const responseConnection = await amqp.connect(process.env.RABBITMQ_URI);
+
+    this.requestChannel = await requestConnection.createChannel();
+    this.responseChannel = await responseConnection.createChannel();
+
+    this.ready = true;
   }
 
-  public async publish(routingKey: string, message: unknown) {
-    if (!this.channel) {
+  public async publish(routingKey: string, message: unknown, commandType: string) {
+    if (!this.requestChannel) {
       throw new RabbitMQException('Cannot publish the message due to the channel is not connected');
     }
 
@@ -32,24 +47,28 @@ export class RabbitMQ {
       );
     }
 
-    await this.channel.assertExchange(
+    await this.requestChannel.assertExchange(
       process.env.RABBITMQ_EXCHANGE_NAME,
       RabbitMQExchangeNames.Direct,
     );
 
-    await this.channel.publish(
+    await this.requestChannel.assertQueue('request_exchange', { durable: true });
+    await this.requestChannel.bindQueue('request_exchange', 'request_exchange', 'request_exchange');
+
+    await this.requestChannel.publish(
       process.env.RABBITMQ_EXCHANGE_NAME,
       routingKey,
-      Buffer.from(JSON.stringify({ type: routingKey, message, datetime: Date.now() })),
+      Buffer.from(JSON.stringify(message)),
+      { persistent: true, headers: { command: commandType } },
     );
   }
 
   public async receive(
     queueName: string,
     bindingKey: string,
-    callback?: (message: unknown, error?: any) => any,
+    callback?: (message: any, error?: any) => any,
   ) {
-    if (!this.channel) {
+    if (!this.responseChannel) {
       throw new RabbitMQException('Cannot receive the message due to the channel is not connected');
     }
 
@@ -59,25 +78,105 @@ export class RabbitMQ {
       );
     }
 
-    await this.channel.assertExchange(
+    await this.responseChannel.assertExchange(
       process.env.RABBITMQ_EXCHANGE_NAME,
       RabbitMQExchangeNames.Direct,
     );
 
-    const queue = await this.channel.assertQueue(queueName);
+    const queue = await this.responseChannel.assertQueue(queueName, { durable: true });
 
-    await this.channel.bindQueue(queue.queue, process.env.RABBITMQ_EXCHANGE_NAME, bindingKey);
+    await this.responseChannel.bindQueue(
+      queue.queue,
+      process.env.RABBITMQ_EXCHANGE_NAME,
+      bindingKey,
+    );
 
-    this.channel.consume(queue.queue, message => {
+    this.responseChannel.consume(queue.queue, message => {
       if (message) {
         const data = JSON.parse(message.content.toString());
-        this.channel.ack(message);
+        this.responseChannel.ack(message);
         callback?.(data);
       } else {
         callback?.(null, 'The message is empty');
       }
     });
   }
+
+  public isConnected() {
+    return this.ready;
+  }
+}
+
+export class RabbitMQConsumer {
+  constructor(private readonly rabbitMQInstance: RabbitMQ = new RabbitMQ()) {}
+
+  public async consume() {
+    await this.rabbitMQInstance.connect();
+
+    this.rabbitMQInstance.receive(
+      'response_exchange',
+      'response_exchange',
+      async (message, error) => {
+        if (message.command_type) {
+          switch (message.command_type) {
+            case CommandType.CreateDao:
+              this.executeCreateDaoCommand(message);
+              break;
+            case CommandType.Withdraw:
+              this.executeWithdrawCommand(message);
+            case CommandType.AddMember:
+            case CommandType.RemoveMember:
+            case CommandType.Vote:
+              if (message) console.log(message);
+              if (error) console.log(error);
+              break;
+          }
+        }
+      },
+    );
+  }
+
+  async executeCreateDaoCommand(message: any) {
+    const { project_id, multisig_pda, vault_pda } = message;
+    const projectLaunch = await projectLaunchService.findOne({
+      where: { id: project_id },
+      relations: { approver: true },
+    });
+
+    if (projectLaunch.approver.id) {
+      const dao = await daoService.create({
+        projectLaunch: { id: project_id },
+        multisigPda: multisig_pda,
+        vaultPda: vault_pda,
+      });
+
+      daoService.update(dao.id, { membersToAdd: [projectLaunch.approver] });
+    }
+  }
+
+  async executeWithdrawCommand(message: any) {
+    const { proposal_id, is_execute, error_msg } = message;
+
+    if (proposal_id) {
+      if (error_msg) {
+        await proposalService.update(proposal_id, {
+          status: ProposalStatusEnum.Failed,
+        });
+      } else {
+        if (is_execute === 'true') {
+          await proposalService.update(proposal_id, {
+            status: ProposalStatusEnum.Executed,
+            executedAt: new Date(),
+          });
+        } else {
+          await proposalService.update(proposal_id, {
+            status: ProposalStatusEnum.Voting,
+          });
+        }
+      }
+    }
+  }
 }
 
 export const rabbitMQ = new RabbitMQ();
+export const rabbitMQConsumer = new RabbitMQConsumer();

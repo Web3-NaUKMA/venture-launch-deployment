@@ -9,6 +9,7 @@ import fileRoutes from '../file/file.routes';
 import chatRoutes from '../chat/chat.routes';
 import messageRoutes from '../message/message.routes';
 import daoRoutes from '../dao/dao.routes';
+import proposalRoutes from '../proposal/proposal.routes';
 
 export default [
   authRoutes,
@@ -21,5 +22,6 @@ export default [
   fileRoutes,
   chatRoutes,
   messageRoutes,
-  daoRoutes
+  daoRoutes,
+  proposalRoutes,
 ];

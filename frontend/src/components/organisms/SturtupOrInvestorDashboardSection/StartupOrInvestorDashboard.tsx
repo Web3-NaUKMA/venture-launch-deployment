@@ -166,7 +166,7 @@ const StartupOrInvestorDashboard: FC<StartupOrInvestorDashboardProps> = ({ ...pr
       </div>
       <div className='flex flex-col'>
         <div className='flex flex-1 relative w-[calc(100%_+_1.5rem_+_15px)] -ms-3 min-h-[300px]'>
-          <div className='flex flex-col absolute overflow-y-scroll top-0 left-0 right-0 bottom-0 with-scrollbar px-3 pb-3'>
+          <div className='flex flex-col absolute overflow-y-scroll top-0 left-0 right-0 bottom-0 with-scrollbar px-3'>
             <div className='flex flex-col relative gap-4 flex-1'>
               {lockedProjectLaunches.map(projectLaunch => (
                 <DashboardUnlock

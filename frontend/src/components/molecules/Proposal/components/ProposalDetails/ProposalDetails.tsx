@@ -1,9 +1,9 @@
 import { FC, HTMLAttributes, useMemo, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { AppRoutes } from 'types/enums/app-routes.enum';
-import TransactionDetailsSection from './components/TransactionDetailsSection/TransactionDetailsSection';
+import ProposalDetailsSection from './components/ProposalDetailsSection/ProposalDetailsSection';
 
-export interface TransactionDetailsProps extends HTMLAttributes<HTMLDivElement> {
+export interface ProposalDetailsProps extends HTMLAttributes<HTMLDivElement> {
   isVisible: boolean;
   data: {
     description: string;
@@ -15,11 +15,12 @@ export interface TransactionDetailsProps extends HTMLAttributes<HTMLDivElement> 
     results: {
       confirmed: number;
       rejected: number;
+      threshold: number;
     };
   };
 }
 
-const TransactionDetails: FC<TransactionDetailsProps> = ({ isVisible, data, ...props }) => {
+const ProposalDetails: FC<ProposalDetailsProps> = ({ isVisible, children, data, ...props }) => {
   const datetimeFormatter = useMemo(
     () => new Intl.DateTimeFormat('en-US', { timeStyle: 'short', dateStyle: 'medium' }),
     [],
@@ -41,13 +42,13 @@ const TransactionDetails: FC<TransactionDetailsProps> = ({ isVisible, data, ...p
     >
       <div className='grid grid-cols-1 sm:grid-cols-2 px-3 pb-3 gap-3'>
         <hr className='sm:col-span-2' />
-        <TransactionDetailsSection
+        <ProposalDetailsSection
           title='Description'
           className='sm:col-span-2 bg-stone-100 p-3 rounded-xl'
         >
           <p className='text-stone-600'>{data.description}</p>
-        </TransactionDetailsSection>
-        <TransactionDetailsSection title='Author' className='bg-stone-100 p-3 rounded-xl'>
+        </ProposalDetailsSection>
+        <ProposalDetailsSection title='Author' className='bg-stone-100 p-3 rounded-xl'>
           <ul className='text-stone-600 flex flex-col gap-2'>
             <li className='flex justify-between'>
               <span className='text-sm'>Author</span>
@@ -66,7 +67,7 @@ const TransactionDetails: FC<TransactionDetailsProps> = ({ isVisible, data, ...p
               </span>
             </li>
             <li className='flex justify-between'>
-              <span className='text-sm'>Transaction link</span>
+              <span className='text-sm'>Proposal link</span>
               <a
                 className='font-semibold text-sm text-blue-500 cursor-pointer'
                 href={data.transactionLink}
@@ -84,8 +85,8 @@ const TransactionDetails: FC<TransactionDetailsProps> = ({ isVisible, data, ...p
               </Link>
             </li>
           </ul>
-        </TransactionDetailsSection>
-        <TransactionDetailsSection
+        </ProposalDetailsSection>
+        <ProposalDetailsSection
           title='Results'
           className='bg-stone-100 p-3 rounded-xl flex flex-col'
         >
@@ -100,15 +101,16 @@ const TransactionDetails: FC<TransactionDetailsProps> = ({ isVisible, data, ...p
             </div>
             <div className='flex flex-col flex-1 items-center justify-center bg-stone-50 rounded-xl gap-1'>
               <span className='font-bold text-3xl'>
-                {data.results.confirmed}/{data.results.confirmed + data.results.rejected}
+                {data.results.confirmed}/{data.results.threshold}
               </span>
               <span className='text-xs'>Threshold</span>
             </div>
           </div>
-        </TransactionDetailsSection>
+        </ProposalDetailsSection>
       </div>
+      <div className='flex flex-col'>{children}</div>
     </div>
   );
 };
 
-export default TransactionDetails;
+export default ProposalDetails;

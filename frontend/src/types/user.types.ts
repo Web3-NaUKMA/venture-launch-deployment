@@ -1,6 +1,8 @@
 import { UserRoleEnum } from './enums/user-role.enum';
 import { ProjectLaunchInvestment } from './project-launch-investment.types';
 import { ProjectLaunch } from './project-launch.types';
+import { ProposalVote } from './proposal-vote.types';
+import { Proposal } from './proposal.types';
 
 export interface User {
   id: string;
@@ -24,6 +26,8 @@ export interface User {
   projectLaunches: ProjectLaunch[];
   approvedProjectLaunches: ProjectLaunch[];
   projectLaunchInvestments?: ProjectLaunchInvestment[];
+  proposals: Proposal[];
+  proposalVotes: ProposalVote[];
 }
 
 export interface CreateUserDto {

@@ -1,8 +1,11 @@
 import { Chat } from './chat.interface';
+import { Dao } from './dao.interface';
 import { UserRoleEnum } from './enums/user-role.enum';
 import { Message } from './message.interface';
 import { ProjectLaunchInvestment } from './project-launch-investment.interface';
 import { ProjectLaunch } from './project-launch.interface';
+import { ProposalVote } from './proposal-vote.interface';
+import { Proposal } from './proposal.interface';
 import { UserToChat } from './user-to-chat.interface';
 
 export interface User {
@@ -33,4 +36,7 @@ export interface User {
   favouriteChats: Chat[];
   messages: Message[];
   seenMessages: Message[];
+  daos: Dao[];
+  proposals: Proposal[];
+  proposalVotes: ProposalVote[];
 }

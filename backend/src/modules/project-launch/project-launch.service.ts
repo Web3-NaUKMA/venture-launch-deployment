@@ -13,6 +13,11 @@ import {
   NotFoundException,
 } from '../../utils/exceptions/exceptions.utils';
 import _ from 'lodash';
+import { rabbitMQ } from '../../utils/rabbitmq.utils';
+import { CommandType } from '../../utils/dao.utils';
+import daoService from '../dao/dao.service';
+import userService from '../user/user.service';
+import { DaoEntity } from '../../typeorm/entities/dao.entity';
 
 export class ProjectLaunchService {
   async findMany(options?: FindManyOptions<ProjectLaunchEntity>): Promise<ProjectLaunchEntity[]> {
@@ -89,6 +94,10 @@ export class ProjectLaunchService {
       const { approverId } = data;
       delete data.approverId;
 
+      if (approverId) {
+        rabbitMQ.publish('request_exchange', { project_id: id }, CommandType.CreateDao);
+      }
+
       await AppDataSource.getRepository(ProjectLaunchEntity).update(
         { id },
         {
@@ -157,7 +166,7 @@ export class ProjectLaunchService {
 
       const projectLaunch = await AppDataSource.getRepository(ProjectLaunchEntity).findOneOrFail({
         where: { id },
-        relations: { projectLaunchInvestments: true },
+        relations: { projectLaunchInvestments: true, dao: { members: true } },
       });
 
       const fundraiseProgress = await AppDataSource.getRepository(
@@ -172,7 +181,27 @@ export class ProjectLaunchService {
         projectLaunchUpdateData = { ...projectLaunchUpdateData, isFundraised: true };
       }
 
-      await AppDataSource.getRepository(ProjectLaunchEntity).update({ id }, projectLaunchUpdateData);
+      await AppDataSource.getRepository(ProjectLaunchEntity).update(
+        { id },
+        projectLaunchUpdateData,
+      );
+
+      if (!projectLaunch.dao?.members.find(member => member.id === data.investorId)) {
+        const investor = await userService.findOne({ where: { id: data.investorId } });
+
+        rabbitMQ.publish(
+          'request_exchange',
+          {
+            multisig_pda: projectLaunch.dao.multisigPda,
+            pubkey: investor.walletId,
+            permissions: [],
+          },
+          CommandType.AddMember,
+        );
+
+        projectLaunch.dao.members.push(investor);
+        await AppDataSource.getRepository(DaoEntity).save(projectLaunch.dao);
+      }
 
       return await AppDataSource.getRepository(ProjectLaunchInvestmentEntity).findOneOrFail({
         where: { id: projectLaunchInvestment.id },

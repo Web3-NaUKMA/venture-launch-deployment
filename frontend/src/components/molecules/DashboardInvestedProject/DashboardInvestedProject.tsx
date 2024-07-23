@@ -1,6 +1,7 @@
 import Image from 'components/atoms/Image/Image';
 import { FC, HTMLAttributes } from 'react';
 import { ProjectLaunch } from 'types/project-launch.types';
+import { resolveImage } from 'utils/file.utils';
 
 export interface DashboardInvestedProjectProps extends HTMLAttributes<HTMLDivElement> {
   projectLaunch: ProjectLaunch;
@@ -19,10 +20,17 @@ const DashboardInvestedProject: FC<DashboardInvestedProjectProps> = ({
     >
       <div className='flex gap-3 items-center'>
         <Image
-          src={projectLaunch.logo || undefined}
+          src={resolveImage(projectLaunch.logo || '')}
           fallbackSrc='/logo.png'
+          emptySrcFallback={
+            <Image
+              src='logo.png'
+              alt='Empty image'
+              className='w-[32px] aspect-square object-cover'
+            />
+          }
           alt='Project logo'
-          className='w-[32px] aspect-square object-cover'
+          className='w-[32px] aspect-square object-cover rounded'
         />
         <h3 className='font-semibold text'>{projectLaunch.name}</h3>
       </div>

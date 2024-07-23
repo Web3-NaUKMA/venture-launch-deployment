@@ -5,6 +5,10 @@ import { Controller } from '../../decorators/app.decorators';
 import { parseObjectStringValuesToPrimitives } from '../../utils/object.utils';
 import qs from 'qs';
 import _ from 'lodash';
+import { CommandType } from '../../utils/dao.utils';
+import proposalService from '../proposal/proposal.service';
+import { rabbitMQ } from '../../utils/rabbitmq.utils';
+import authService from '../auth/auth.service';
 
 @Controller()
 export class MilestoneController {
@@ -44,7 +48,33 @@ export class MilestoneController {
 
   async update(request: Request, response: Response) {
     const { id } = request.params as any;
-    await milestoneService.findOne({ where: { id } });
+    const milestoneToFind = await milestoneService.findOne({
+      where: { id },
+      relations: {
+        project: { projectLaunch: { author: true, dao: true, projectLaunchInvestments: true } },
+      },
+    });
+
+    if (request.body.isFinal && request.session.user) {
+      const authenticatedUser = await authService.getAuthenticatedUser(request.session.user.id);
+      if (milestoneToFind.project.projectLaunch.projectLaunchInvestments) {
+        await milestoneService.handleProposal(id, {
+          commandType: CommandType.Withdraw,
+          authorId: authenticatedUser.id,
+          data: {
+            multisig_pda: milestoneToFind.project.projectLaunch.dao.multisigPda,
+            receiver: milestoneToFind.project.projectLaunch.author.walletId,
+            is_execute: false,
+            amount:
+              milestoneToFind.project.projectLaunch.projectLaunchInvestments.reduce(
+                (previousValue, currentValue) => previousValue + Number(currentValue.amount),
+                0,
+              ) / (milestoneToFind?.project?.milestoneNumber || 1),
+          },
+        });
+      }
+    }
+
     const milestone = await milestoneService.update(id, request.body);
 
     return response.status(HttpStatusCode.Ok).json(milestone);
@@ -56,6 +86,20 @@ export class MilestoneController {
     const milestone = await milestoneService.remove(id);
 
     return response.status(HttpStatusCode.Ok).json(milestone);
+  }
+
+  async handleProposal(request: Request, response: Response) {
+    const { id } = request.params;
+    const { commandType, createNew } = request.body;
+
+    if (Object.entries(CommandType).find(([_, value]) => value === commandType) && id) {
+      const proposal = await milestoneService.handleProposal(id, request.body, createNew);
+      return response.status(HttpStatusCode.Created).json(proposal);
+    }
+
+    return response
+      .status(HttpStatusCode.Conflict)
+      .json({ message: 'Invalid command type was provided', body: request.body });
   }
 }
 

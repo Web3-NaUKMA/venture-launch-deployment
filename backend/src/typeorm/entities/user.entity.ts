@@ -23,6 +23,12 @@ import { UserToChatEntity } from './user-to-chat.entity';
 import { UserToChat } from '../../types/user-to-chat.interface';
 import { MessageEntity } from './message.entity';
 import { Message } from '../../types/message.interface';
+import { Dao } from '../../types/dao.interface';
+import { DaoEntity } from './dao.entity';
+import { ProposalEntity } from './proposal.entity';
+import { Proposal } from '../../types/proposal.interface';
+import { ProposalVoteEntity } from './proposal-vote.entity';
+import { ProposalVote } from '../../types/proposal-vote.interface';
 
 @Entity('user')
 export class UserEntity implements User {
@@ -117,4 +123,13 @@ export class UserEntity implements User {
 
   @ManyToMany(() => MessageEntity, message => message.seenBy)
   seenMessages: Message[];
+
+  @ManyToMany(() => DaoEntity, dao => dao.members, { cascade: true })
+  daos: Dao[];
+
+  @OneToMany(() => ProposalEntity, proposal => proposal.author)
+  proposals: Proposal[];
+
+  @OneToMany(() => ProposalVoteEntity, proposalVote => proposalVote.member)
+  proposalVotes: ProposalVote[];
 }

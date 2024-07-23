@@ -21,6 +21,11 @@
   @apply bg-neutral-300 rounded-lg bg-clip-padding;
 }
 
+.without-scrollbar::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+
 ::-webkit-scrollbar-sm {
   width: 0;
 }

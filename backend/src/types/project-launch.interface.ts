@@ -1,3 +1,4 @@
+import { Dao } from './dao.interface';
 import { ProjectLaunchInvestment } from './project-launch-investment.interface';
 import { Project } from './project.interface';
 import { User } from './user.interface';
@@ -24,4 +25,5 @@ export interface ProjectLaunch {
   vaultTokenAccount: string;
   cryptoTrackerAccount: string;
   businessAnalystReview: string | null;
+  dao: Dao;
 }

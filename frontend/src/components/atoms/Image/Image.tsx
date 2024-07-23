@@ -20,7 +20,9 @@ const Image: FC<ImageProps> = ({
       src={src}
       alt={alt}
       {...props}
-      onError={event => (event.currentTarget.src = fallbackSrc)}
+      onError={event => {
+        event.currentTarget.src = fallbackSrc;
+      }}
     />
   );
 };

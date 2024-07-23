@@ -24,6 +24,10 @@ const links: NavbarLink[] = [
     name: 'Message Center',
     to: AppRoutes.MessageCenter,
   },
+  {
+    name: 'Dashboard',
+    to: AppRoutes.Dashboard,
+  },
 ];
 
 const PageWithNavigationTemplate = () => {

@@ -5,6 +5,9 @@ import { Controller } from '../../decorators/app.decorators';
 import { parseObjectStringValuesToPrimitives } from '../../utils/object.utils';
 import qs from 'qs';
 import _ from 'lodash';
+import { CommandType } from '../../utils/dao.utils';
+import { rabbitMQ } from '../../utils/rabbitmq.utils';
+import proposalService from '../proposal/proposal.service';
 
 @Controller()
 export class ProjectController {

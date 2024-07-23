@@ -1,3 +1,4 @@
+import { Dao } from './dao.types';
 import { ProjectLaunchInvestment } from './project-launch-investment.types';
 import { Project } from './project.types';
 import { User } from './user.types';
@@ -25,6 +26,7 @@ export interface ProjectLaunch {
   vaultTokenAccount: string;
   cryptoTrackerAccount: string;
   businessAnalystReview: string | null;
+  dao: Dao;
 }
 
 export interface CreateProjectLaunchDto {

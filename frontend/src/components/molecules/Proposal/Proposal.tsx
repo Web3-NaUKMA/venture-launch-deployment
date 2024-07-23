@@ -1,9 +1,10 @@
 import { FC, HTMLAttributes, ReactNode, useMemo, useState } from 'react';
-import TransactionSection from './components/TransactionSection/TransactionSection';
+import ProposalSection from './components/ProposalSection/ProposalSection';
 import AccordionButton from 'components/atoms/AccordionButton/AccordionButton';
-import TransactionDetails from './components/TransactionDetails/TransactionDetails';
+import ProposalDetails from './components/ProposalDetails/ProposalDetails';
+import { ProposalStatusEnum } from 'types/enums/proposal-status.enum';
 
-export interface TransactionProps extends HTMLAttributes<HTMLDivElement> {
+export interface ProposalProps extends HTMLAttributes<HTMLDivElement> {
   image: ReactNode;
   data: {
     type: string;
@@ -13,22 +14,24 @@ export interface TransactionProps extends HTMLAttributes<HTMLDivElement> {
     transactionLink: string;
     createdAt: Date;
     executedAt: Date | null;
+    status: ProposalStatusEnum;
     results: {
       confirmed: number;
       rejected: number;
+      threshold: number;
     };
   };
 }
 
-export interface TransactionState {
+export interface ProposalState {
   areDetailsVisible: boolean;
 }
 
-const initialState: TransactionState = {
+const initialState: ProposalState = {
   areDetailsVisible: false,
 };
 
-const Transaction: FC<TransactionProps> = ({ image, data, ...props }) => {
+const Proposal: FC<ProposalProps> = ({ image, data, children, ...props }) => {
   const [state, setState] = useState(initialState);
   const datetimeFormatter = useMemo(
     () => new Intl.DateTimeFormat('en-US', { timeStyle: 'short', dateStyle: 'medium' }),
@@ -39,10 +42,11 @@ const Transaction: FC<TransactionProps> = ({ image, data, ...props }) => {
     <div className='flex flex-col bg-white rounded-xl shadow-[0_0_15px_-7px_gray]' {...props}>
       <div className='flex p-3 gap-3 items-center w-full'>
         <div className='flex'>{image}</div>
-        <div className='grid grid-cols-3 text-sm w-full'>
-          <TransactionSection title='Type' value={data.type} />
-          <TransactionSection title='Wallet ID' value={data.walletId} />
-          <TransactionSection
+        <div className='grid grid-cols-4 text-sm w-full'>
+          <ProposalSection title='Type' value={data.type} />
+          <ProposalSection title='Wallet ID' value={data.walletId} />
+          <ProposalSection title='Status' value={data.status} />
+          <ProposalSection
             title='Datetime'
             value={datetimeFormatter.format(data.createdAt)}
             contentAlign='right'
@@ -55,7 +59,7 @@ const Transaction: FC<TransactionProps> = ({ image, data, ...props }) => {
           />
         </div>
       </div>
-      <TransactionDetails
+      <ProposalDetails
         isVisible={state.areDetailsVisible}
         data={{
           description: data.description,
@@ -66,9 +70,11 @@ const Transaction: FC<TransactionProps> = ({ image, data, ...props }) => {
           transactionLink: data.transactionLink,
           results: data.results,
         }}
-      />
+      >
+        {children}
+      </ProposalDetails>
     </div>
   );
 };
 
-export default Transaction;
+export default Proposal;
