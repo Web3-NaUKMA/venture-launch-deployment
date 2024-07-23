@@ -385,7 +385,13 @@ const Milestone: FC<MilestoneProps> = ({ milestone, projectLaunch }) => {
                                           multisig_pda: projectLaunch.dao.multisigPda,
                                           is_execute: true,
                                           receiver: projectLaunch.author.walletId,
-                                          amount: 100,
+                                          amount:
+                                            (projectLaunch?.projectLaunchInvestments?.reduce(
+                                              (previousValue, currentValue) =>
+                                                previousValue + Number(currentValue.amount),
+                                              0,
+                                            ) || 0) /
+                                            (projectLaunch?.project?.milestoneNumber || 1),
                                         },
                                       },
                                     );

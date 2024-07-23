@@ -50,21 +50,29 @@ export class MilestoneController {
     const { id } = request.params as any;
     const milestoneToFind = await milestoneService.findOne({
       where: { id },
-      relations: { project: { projectLaunch: { author: true, dao: true } } },
+      relations: {
+        project: { projectLaunch: { author: true, dao: true, projectLaunchInvestments: true } },
+      },
     });
 
     if (request.body.isFinal && request.session.user) {
       const authenticatedUser = await authService.getAuthenticatedUser(request.session.user.id);
-      await milestoneService.handleProposal(id, {
-        commandType: CommandType.Withdraw,
-        authorId: authenticatedUser.id,
-        data: {
-          multisig_pda: milestoneToFind.project.projectLaunch.dao.multisigPda,
-          receiver: milestoneToFind.project.projectLaunch.author.walletId,
-          is_execute: false,
-          amount: 100,
-        },
-      });
+      if (milestoneToFind.project.projectLaunch.projectLaunchInvestments) {
+        await milestoneService.handleProposal(id, {
+          commandType: CommandType.Withdraw,
+          authorId: authenticatedUser.id,
+          data: {
+            multisig_pda: milestoneToFind.project.projectLaunch.dao.multisigPda,
+            receiver: milestoneToFind.project.projectLaunch.author.walletId,
+            is_execute: false,
+            amount:
+              milestoneToFind.project.projectLaunch.projectLaunchInvestments.reduce(
+                (previousValue, currentValue) => previousValue + Number(currentValue.amount),
+                0,
+              ) / (milestoneToFind?.project?.milestoneNumber || 1),
+          },
+        });
+      }
     }
 
     const milestone = await milestoneService.update(id, request.body);

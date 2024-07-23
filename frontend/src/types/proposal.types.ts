@@ -1,8 +1,8 @@
 import { CommandType } from 'utils/dao.utils';
-import { Project } from './project.types';
 import { User } from './user.types';
 import { ProposalVote, ProposalVoteDto } from './proposal-vote.types';
 import { ProposalStatusEnum } from './enums/proposal-status.enum';
+import { Milestone } from './milestone.types';
 
 export interface Proposal {
   id: string;
@@ -13,7 +13,7 @@ export interface Proposal {
   createdAt: Date;
   executedAt: Date | null;
   updatedAt: Date | null;
-  project: Project;
+  milestone: Milestone;
   author: User;
   votes: ProposalVote[];
 }

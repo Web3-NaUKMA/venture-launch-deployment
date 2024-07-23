@@ -6,15 +6,25 @@ import { DatabaseException, NotFoundException } from '../../utils/exceptions/exc
 import { CreateProposalDto, ProposalVoteDto, UpdateProposalDto } from '../../DTO/proposal.dto';
 import { ProposalVoteEntity } from '../../typeorm/entities/proposal-vote.entity';
 import { User } from '../../types/user.interface';
-import { rabbitMQ } from '../../utils/rabbitmq.utils';
-import { CommandType } from '../../utils/dao.utils';
 
 export class ProposalService {
   async findMany(options?: FindManyOptions<ProposalEntity>): Promise<ProposalEntity[]> {
     try {
       return await AppDataSource.getRepository(ProposalEntity).find(
         _.merge(options, {
-          relations: { milestone: true, author: true, votes: true },
+          relations: {
+            milestone: {
+              project: {
+                projectLaunch: {
+                  author: true,
+                  dao: { members: true },
+                  projectLaunchInvestments: true,
+                },
+              },
+            },
+            author: true,
+            votes: true,
+          },
         }),
       );
     } catch (error: any) {
