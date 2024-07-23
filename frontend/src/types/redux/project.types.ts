@@ -10,6 +10,7 @@ export interface ProjectSliceStateErrors {
   createProject: string | null;
   updateProject: string | null;
   removeProject: string | null;
+  handleProposal: string | null;
 }
 
 export interface ProjectSliceState {

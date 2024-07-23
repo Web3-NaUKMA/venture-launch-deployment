@@ -206,7 +206,13 @@ const LaunchProjectModal: FC<LaunchProjectModalProps> = ({ title, onClose, child
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
-    if (formRef.current && isDataValid(state.data) && authenticatedUser) {
+    const dataIsValid = isDataValid(state.data);
+
+    if (!dataIsValid && formRef.current?.parentElement) {
+      formRef.current.parentElement.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    if (formRef.current && dataIsValid && authenticatedUser) {
       const formData = new FormData(formRef.current);
       formData.delete('project-documents');
 
@@ -336,7 +342,7 @@ const LaunchProjectModal: FC<LaunchProjectModalProps> = ({ title, onClose, child
               </label>
               <textarea
                 id='launch_project_description'
-                className='border border-stone-400 p-3 rounded-lg whitespace-pre-wrap text-stone-800 placeholder:text-stone-400 min-h-[170px] font-sans'
+                className='border border-stone-400 resize-none p-3 rounded-lg whitespace-pre-wrap text-stone-800 placeholder:text-stone-400 min-h-[170px] font-sans'
                 defaultValue={state.data.description}
                 placeholder='Project description'
                 onChange={event =>
@@ -536,7 +542,7 @@ const LaunchProjectModal: FC<LaunchProjectModalProps> = ({ title, onClose, child
                       </label>
                       <textarea
                         id={`launch_project_team_${index}_bio`}
-                        className='border border-stone-400 p-3 rounded-lg whitespace-pre-wrap text-stone-800 placeholder:text-stone-400 min-h-[100px] mb-4 font-sans'
+                        className='border border-stone-400 resize-none p-3 rounded-lg whitespace-pre-wrap text-stone-800 placeholder:text-stone-400 min-h-[100px] mb-4 font-sans'
                         defaultValue={member.bio}
                         placeholder='Web developer'
                         onChange={event =>
@@ -750,7 +756,7 @@ const LaunchProjectModal: FC<LaunchProjectModalProps> = ({ title, onClose, child
           </label>
           <textarea
             id='launch_project_tokenomics'
-            className='border border-stone-400 p-3 rounded-lg whitespace-pre-wrap text-stone-800 placeholder:text-stone-400 min-h-[150px] font-sans mb-5'
+            className='border border-stone-400 p-3 resize-none rounded-lg whitespace-pre-wrap text-stone-800 placeholder:text-stone-400 min-h-[150px] font-sans mb-5'
             defaultValue={state.data.tokenomics}
             placeholder='New project Tokenomics'
             onChange={event =>
@@ -769,7 +775,7 @@ const LaunchProjectModal: FC<LaunchProjectModalProps> = ({ title, onClose, child
           </label>
           <textarea
             id='launch_project_business_model'
-            className='border border-stone-400 p-3 rounded-lg whitespace-pre-wrap text-stone-800 placeholder:text-stone-400 min-h-[150px] font-sans'
+            className='border border-stone-400 p-3 resize-none rounded-lg whitespace-pre-wrap text-stone-800 placeholder:text-stone-400 min-h-[150px] font-sans'
             defaultValue={state.data.businessModel}
             placeholder='New project Business model'
             onChange={event =>

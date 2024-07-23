@@ -1,6 +1,7 @@
 import { DataAccount } from './data-account.types';
 import { Milestone } from './milestone.types';
 import { ProjectLaunch } from './project-launch.types';
+import { Proposal } from './proposal.types';
 
 export interface Project {
   id: string;
@@ -14,6 +15,7 @@ export interface Project {
   users: string[];
   milestones: Milestone[];
   dataAccount: DataAccount | null;
+  proposals: Proposal[];
 }
 
 export interface CreateProjectDto {

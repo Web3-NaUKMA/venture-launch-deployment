@@ -20,6 +20,7 @@ const initialState: ProjectSliceState = {
     createProject: null,
     updateProject: null,
     removeProject: null,
+    handleProposal: null,
   },
 };
 
