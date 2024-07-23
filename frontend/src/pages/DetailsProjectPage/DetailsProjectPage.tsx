@@ -22,7 +22,6 @@ import { createNftTransaction, getIPFSUrlForProject } from '../../utils/nft.util
 import * as web3 from '@solana/web3.js';
 import ProjectLaunchInfoModal from '../../components/organisms/ProjectLaunchInfoModal/ProjectLaunchInfoModal';
 import useWeb3Auth from '../../hooks/web3auth.hooks';
-import Proposal from 'components/molecules/Proposal/Proposal';
 
 const DetailsProjectPage: FC = () => {
   const { id } = useParams();
