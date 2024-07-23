@@ -1,5 +1,8 @@
 import amqp, { Channel } from 'amqplib';
 import { RabbitMQException } from './exceptions/exceptions.utils';
+import { CommandType } from './dao.utils';
+import daoService from '../modules/dao/dao.service';
+import projectLaunchService from '../modules/project-launch/project-launch.service';
 
 export enum RabbitMQExchangeNames {
   Fanout = 'fanout',
@@ -11,19 +14,24 @@ export enum RabbitMQExchangeNames {
 export class RabbitMQ {
   private requestChannel: Channel;
   private responseChannel: Channel;
+  private ready: boolean = false;
 
-  constructor() {
+  constructor() {}
+
+  public async connect() {
+    if (this.isConnected()) return;
+
     if (!process.env.RABBITMQ_URI) {
       throw new RabbitMQException('Cannot connect to the RabbitMQ due to invalid RabbitMQ url');
     }
 
-    amqp.connect(process.env.RABBITMQ_URI).then(async connection => {
-      this.requestChannel = await connection.createChannel();
-    });
+    const requestConnection = await amqp.connect(process.env.RABBITMQ_URI);
+    const responseConnection = await amqp.connect(process.env.RABBITMQ_URI);
 
-    amqp.connect(process.env.RABBITMQ_URI).then(async connection => {
-      this.responseChannel = await connection.createChannel();
-    });
+    this.requestChannel = await requestConnection.createChannel();
+    this.responseChannel = await responseConnection.createChannel();
+
+    this.ready = true;
   }
 
   public async publish(routingKey: string, message: unknown, commandType: string) {
@@ -91,6 +99,53 @@ export class RabbitMQ {
       }
     });
   }
+
+  public isConnected() {
+    return this.ready;
+  }
+}
+
+export class RabbitMQConsumer {
+  constructor(private readonly rabbitMQInstance: RabbitMQ = new RabbitMQ()) {}
+
+  public async consume() {
+    await this.rabbitMQInstance.connect();
+
+    this.rabbitMQInstance.receive(
+      'response_exchange',
+      'response_exchange',
+      async (message, error) => {
+        if (message.command_type) {
+          switch (message.command_type) {
+            case CommandType.CreateDao:
+              const { project_id, multisig_pda, vault_pda } = message;
+              const projectLaunch = await projectLaunchService.findOne({
+                where: { id: project_id },
+                relations: { approver: true },
+              });
+
+              if (projectLaunch.approver.id) {
+                const dao = await daoService.create({
+                  projectLaunch: { id: project_id },
+                  multisigPda: multisig_pda,
+                  vaultPda: vault_pda,
+                });
+
+                daoService.update(dao.id, { membersToAdd: [projectLaunch.approver] });
+              }
+
+              break;
+            case CommandType.AddMember:
+            case CommandType.RemoveMember:
+              if (message) console.log(message);
+              if (error) console.log(error);
+              break;
+          }
+        }
+      },
+    );
+  }
 }
 
 export const rabbitMQ = new RabbitMQ();
+export const rabbitMQConsumer = new RabbitMQConsumer();

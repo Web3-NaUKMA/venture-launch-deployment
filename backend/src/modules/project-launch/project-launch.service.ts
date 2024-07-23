@@ -16,6 +16,8 @@ import _ from 'lodash';
 import { rabbitMQ } from '../../utils/rabbitmq.utils';
 import { CommandType } from '../../utils/dao.utils';
 import daoService from '../dao/dao.service';
+import userService from '../user/user.service';
+import { DaoEntity } from '../../typeorm/entities/dao.entity';
 
 export class ProjectLaunchService {
   async findMany(options?: FindManyOptions<ProjectLaunchEntity>): Promise<ProjectLaunchEntity[]> {
@@ -94,17 +96,6 @@ export class ProjectLaunchService {
 
       if (approverId) {
         rabbitMQ.publish('request_exchange', { project_id: id }, CommandType.CreateDao);
-        rabbitMQ.receive('response_exchange', 'response_exchange', (message, error) => {
-          const { multisig_pda, vault_pda } = message;
-
-          daoService.create({
-            projectLaunch: { id },
-            multisigPda: multisig_pda,
-            vaultPda: vault_pda,
-          });
-
-          if (error) console.log(error);
-        });
       }
 
       await AppDataSource.getRepository(ProjectLaunchEntity).update(
@@ -175,7 +166,7 @@ export class ProjectLaunchService {
 
       const projectLaunch = await AppDataSource.getRepository(ProjectLaunchEntity).findOneOrFail({
         where: { id },
-        relations: { projectLaunchInvestments: true },
+        relations: { projectLaunchInvestments: true, dao: { members: true } },
       });
 
       const fundraiseProgress = await AppDataSource.getRepository(
@@ -194,6 +185,23 @@ export class ProjectLaunchService {
         { id },
         projectLaunchUpdateData,
       );
+
+      if (!projectLaunch.dao.members.find(member => member.id === data.investorId)) {
+        const investor = await userService.findOne({ where: { id: data.investorId } });
+
+        rabbitMQ.publish(
+          'request_exchange',
+          {
+            multisig_pda: projectLaunch.dao.multisigPda,
+            pubkey: investor.walletId,
+            permissions: [],
+          },
+          CommandType.AddMember,
+        );
+
+        projectLaunch.dao.members.push(investor);
+        await AppDataSource.getRepository(DaoEntity).save(projectLaunch.dao);
+      }
 
       return await AppDataSource.getRepository(ProjectLaunchInvestmentEntity).findOneOrFail({
         where: { id: projectLaunchInvestment.id },

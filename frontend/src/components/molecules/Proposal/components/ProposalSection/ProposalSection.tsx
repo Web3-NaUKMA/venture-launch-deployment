@@ -1,12 +1,12 @@
 import { FC, HTMLAttributes } from 'react';
 
-export interface TransactionSectionProps extends HTMLAttributes<HTMLDivElement> {
+export interface ProposalSectionProps extends HTMLAttributes<HTMLDivElement> {
   title: string;
   value: string;
   contentAlign?: 'left' | 'right';
 }
 
-const TransactionSection: FC<TransactionSectionProps> = ({
+const ProposalSection: FC<ProposalSectionProps> = ({
   title,
   value,
   contentAlign = 'left',
@@ -23,4 +23,4 @@ const TransactionSection: FC<TransactionSectionProps> = ({
   );
 };
 
-export default TransactionSection;
+export default ProposalSection;

@@ -21,7 +21,12 @@ export class ProjectService {
       return await AppDataSource.getRepository(ProjectEntity).find(
         _.merge(options, {
           relations: {
-            projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
+            projectLaunch: {
+              author: true,
+              projectLaunchInvestments: true,
+              approver: true,
+              dao: true,
+            },
             dataAccount: true,
             milestones: true,
             userToProjects: { project: true },
@@ -38,7 +43,12 @@ export class ProjectService {
       return await AppDataSource.getRepository(ProjectEntity).findOneOrFail(
         _.merge(options, {
           relations: {
-            projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
+            projectLaunch: {
+              author: true,
+              projectLaunchInvestments: true,
+              approver: true,
+              dao: true,
+            },
             dataAccount: true,
             milestones: true,
             userToProjects: { project: true },
@@ -91,7 +101,12 @@ export class ProjectService {
       return await AppDataSource.getRepository(ProjectEntity).findOneOrFail({
         where: { id: project.id },
         relations: {
-          projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
+          projectLaunch: {
+            author: true,
+            projectLaunchInvestments: true,
+            approver: true,
+            dao: true,
+          },
         },
       });
     } catch (error: any) {
@@ -132,7 +147,12 @@ export class ProjectService {
 
       return await AppDataSource.getRepository(ProjectEntity).findOneOrFail({
         relations: {
-          projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
+          projectLaunch: {
+            author: true,
+            projectLaunchInvestments: true,
+            approver: true,
+            dao: true,
+          },
           dataAccount: true,
           milestones: true,
           userToProjects: { project: true },
@@ -155,7 +175,12 @@ export class ProjectService {
     try {
       const project = await AppDataSource.getRepository(ProjectEntity).findOneOrFail({
         relations: {
-          projectLaunch: { author: true, projectLaunchInvestments: true, approver: true },
+          projectLaunch: {
+            author: true,
+            projectLaunchInvestments: true,
+            approver: true,
+            dao: true,
+          },
           dataAccount: true,
           milestones: true,
           userToProjects: { project: true },

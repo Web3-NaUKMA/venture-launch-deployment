@@ -1,9 +1,9 @@
 import { FC, HTMLAttributes, ReactNode, useMemo, useState } from 'react';
-import TransactionSection from './components/TransactionSection/TransactionSection';
+import ProposalSection from './components/ProposalSection/ProposalSection';
 import AccordionButton from 'components/atoms/AccordionButton/AccordionButton';
-import TransactionDetails from './components/TransactionDetails/TransactionDetails';
+import ProposalDetails from './components/ProposalDetails/ProposalDetails';
 
-export interface TransactionProps extends HTMLAttributes<HTMLDivElement> {
+export interface ProposalProps extends HTMLAttributes<HTMLDivElement> {
   image: ReactNode;
   data: {
     type: string;
@@ -20,15 +20,15 @@ export interface TransactionProps extends HTMLAttributes<HTMLDivElement> {
   };
 }
 
-export interface TransactionState {
+export interface ProposalState {
   areDetailsVisible: boolean;
 }
 
-const initialState: TransactionState = {
+const initialState: ProposalState = {
   areDetailsVisible: false,
 };
 
-const Transaction: FC<TransactionProps> = ({ image, data, ...props }) => {
+const Proposal: FC<ProposalProps> = ({ image, data, ...props }) => {
   const [state, setState] = useState(initialState);
   const datetimeFormatter = useMemo(
     () => new Intl.DateTimeFormat('en-US', { timeStyle: 'short', dateStyle: 'medium' }),
@@ -40,9 +40,9 @@ const Transaction: FC<TransactionProps> = ({ image, data, ...props }) => {
       <div className='flex p-3 gap-3 items-center w-full'>
         <div className='flex'>{image}</div>
         <div className='grid grid-cols-3 text-sm w-full'>
-          <TransactionSection title='Type' value={data.type} />
-          <TransactionSection title='Wallet ID' value={data.walletId} />
-          <TransactionSection
+          <ProposalSection title='Type' value={data.type} />
+          <ProposalSection title='Wallet ID' value={data.walletId} />
+          <ProposalSection
             title='Datetime'
             value={datetimeFormatter.format(data.createdAt)}
             contentAlign='right'
@@ -55,7 +55,7 @@ const Transaction: FC<TransactionProps> = ({ image, data, ...props }) => {
           />
         </div>
       </div>
-      <TransactionDetails
+      <ProposalDetails
         isVisible={state.areDetailsVisible}
         data={{
           description: data.description,
@@ -71,4 +71,4 @@ const Transaction: FC<TransactionProps> = ({ image, data, ...props }) => {
   );
 };
 
-export default Transaction;
+export default Proposal;

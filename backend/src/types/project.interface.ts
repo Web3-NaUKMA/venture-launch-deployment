@@ -1,4 +1,5 @@
 import { ProjectLaunch } from './project-launch.interface';
+import { Proposal } from './proposal.interface';
 
 export interface Project {
   id: string;
@@ -9,4 +10,5 @@ export interface Project {
   isFinal: boolean;
   createdAt: Date;
   projectLaunch: ProjectLaunch;
+  proposals: Proposal[];
 }

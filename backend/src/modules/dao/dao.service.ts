@@ -154,11 +154,6 @@ export class DAOService {
         );
       });
 
-      rabbitMQ.receive('response_exchange', 'response_exchange', (message, error) => {
-        if (message) console.log(message);
-        if (error) console.log(error);
-      });
-
       return await AppDataSource.getRepository(DaoEntity).findOneOrFail({
         relations: { projectLaunch: true, members: true },
         where: { id },

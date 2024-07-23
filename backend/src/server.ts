@@ -13,6 +13,7 @@ import { applicationLogger } from './middleware/logging.middleware';
 import { exceptionsFilter } from './middleware/exceptions.middleware';
 
 import Socket from './socket';
+import { rabbitMQ, rabbitMQConsumer } from './utils/rabbitmq.utils';
 
 dotenv.config();
 
@@ -53,3 +54,6 @@ const server = app.listen(port, () => {
 
 const socket = new Socket(server);
 socket.configure();
+
+rabbitMQ.connect();
+rabbitMQConsumer.consume();

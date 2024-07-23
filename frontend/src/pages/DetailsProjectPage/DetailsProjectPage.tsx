@@ -22,6 +22,7 @@ import { createNftTransaction, getIPFSUrlForProject } from '../../utils/nft.util
 import * as web3 from '@solana/web3.js';
 import ProjectLaunchInfoModal from '../../components/organisms/ProjectLaunchInfoModal/ProjectLaunchInfoModal';
 import useWeb3Auth from '../../hooks/web3auth.hooks';
+import Proposal from 'components/molecules/Proposal/Proposal';
 
 const DetailsProjectPage: FC = () => {
   const { id } = useParams();
@@ -202,6 +203,21 @@ const DetailsProjectPage: FC = () => {
               <span className='font-mono'>{project.milestoneNumber}</span>
             </div>
             <hr />
+            {project.projectLaunch?.dao && (
+              <>
+                <div className='px-10 py-5'>
+                  <h3 className='font-sans font-semibold text-xl mb-1.5'>
+                    Link to the DAO in Solana Explorer
+                  </h3>
+                  <a
+                    href={`https://explorer.solana.com/address/${project.projectLaunch.dao.multisigPda}/anchor-account?cluster=devnet`}
+                    className='font-mono text-blue-500 hover:underline transition-all duration-300'
+                    target='_blank'
+                  >{`https://explorer.solana.com/address/${project.projectLaunch.dao.multisigPda}/anchor-account?cluster=devnet`}</a>
+                </div>
+                <hr />
+              </>
+            )}
             <div className='px-10 py-5'>
               <h3 className='font-sans font-semibold text-xl mb-1.5'>Status</h3>
               <span className='font-sans inline-flex'>
@@ -231,6 +247,23 @@ const DetailsProjectPage: FC = () => {
               <span className='font-mono'>{new Date(project.createdAt).toLocaleString()}</span>
             </div>
           </div>
+          <Proposal
+            className='w-full bg-white rounded-xl my-2'
+            image={undefined}
+            data={{
+              type: '',
+              walletId: '',
+              description: '',
+              projectId: '',
+              transactionLink: '',
+              createdAt: new Date(),
+              executedAt: null,
+              results: {
+                confirmed: 0,
+                rejected: 0,
+              },
+            }}
+          />
           <MilestonesGrid
             milestones={project.milestones}
             setIsCreateMilestoneModalVisible={setIsCreateMilestoneModalVisible}
