@@ -18,7 +18,7 @@ export class RabbitMQ {
   private responseChannel: Channel;
   private ready: boolean = false;
 
-  constructor() {}
+  constructor() { }
 
   public async connect() {
     if (this.isConnected()) return;
@@ -108,7 +108,7 @@ export class RabbitMQ {
 }
 
 export class RabbitMQConsumer {
-  constructor(private readonly rabbitMQInstance: RabbitMQ = new RabbitMQ()) {}
+  constructor(private readonly rabbitMQInstance: RabbitMQ = new RabbitMQ()) { }
 
   public async consume() {
     await this.rabbitMQInstance.connect();
@@ -151,6 +151,8 @@ export class RabbitMQConsumer {
       });
 
       daoService.update(dao.id, { membersToAdd: [projectLaunch.approver] });
+      projectLaunchService.update(projectLaunch.id, { vaultTokenAccount: vault_pda });
+
     }
   }
 
