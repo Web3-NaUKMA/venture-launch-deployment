@@ -167,10 +167,12 @@ const CreateInvestmentModal: FC<CreateInvestmentModalProps> = ({
       // );
 
       tx = await signTransaction(tx);
-      // const signature = await connection.sendRawTransaction(tx.serialize());
-      // console.log(signature);
+
       const signature = await sendTransaction(tx, connection);
       console.log(signature)
+      setTimeout(() => { }
+
+        , 10000);
 
       dispatch(
         createProjectLaunchInvestment(
