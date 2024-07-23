@@ -4,13 +4,17 @@ import { MilestoneEntity } from '../../typeorm/entities/milestone.entity';
 import { EntityNotFoundError, FindManyOptions, FindOneOptions } from 'typeorm';
 import { DatabaseException, NotFoundException } from '../../utils/exceptions/exceptions.utils';
 import _ from 'lodash';
+import { CommandType } from '../../utils/dao.utils';
+import { ProposalEntity } from '../../typeorm/entities/proposal.entity';
+import proposalService from '../proposal/proposal.service';
+import { rabbitMQ } from '../../utils/rabbitmq.utils';
 
 export class MilestoneService {
   async findMany(options?: FindManyOptions<MilestoneEntity>): Promise<MilestoneEntity[]> {
     try {
       return await AppDataSource.getRepository(MilestoneEntity).find(
         _.merge(options, {
-          relations: { project: true },
+          relations: { project: true, proposals: true },
         }),
       );
     } catch (error: any) {
@@ -22,7 +26,7 @@ export class MilestoneService {
     try {
       return await AppDataSource.getRepository(MilestoneEntity).findOneOrFail(
         _.merge(options, {
-          relations: { project: true },
+          relations: { proposals: true },
         }),
       );
     } catch (error: any) {
@@ -50,7 +54,7 @@ export class MilestoneService {
       await AppDataSource.getRepository(MilestoneEntity).update({ id }, data);
 
       return await AppDataSource.getRepository(MilestoneEntity).findOneOrFail({
-        relations: { project: true },
+        relations: { project: true, proposals: true },
         where: { id },
       });
     } catch (error: any) {
@@ -67,7 +71,7 @@ export class MilestoneService {
   async remove(id: string): Promise<MilestoneEntity> {
     try {
       const milestone = await AppDataSource.getRepository(MilestoneEntity).findOneOrFail({
-        relations: { project: true },
+        relations: { project: true, proposals: true },
         where: { id },
       });
 
@@ -83,6 +87,37 @@ export class MilestoneService {
 
       throw new DatabaseException('Internal server error', error);
     }
+  }
+
+  async handleProposal(
+    milestoneId: string,
+    dto: { commandType: CommandType; authorId: string; data: any },
+    createNew: boolean = true,
+  ): Promise<ProposalEntity> {
+    const milestone = await this.findOne({ where: { id: milestoneId } });
+
+    const proposal = createNew
+      ? await proposalService.create({
+          milestone: { id: milestoneId },
+          description: milestone.description,
+          type: dto.commandType,
+          author: { id: dto.authorId },
+        })
+      : (
+          await proposalService.findMany({
+            where: { milestone: { id: milestoneId } },
+            order: { createdAt: 'DESC' },
+          })
+        ).find(proposal => proposal)!;
+
+    
+    rabbitMQ.publish(
+      'request_exchange',
+      { ...dto.data, proposal_id: proposal.id },
+      dto.commandType,
+    );
+
+    return proposal;
   }
 }
 

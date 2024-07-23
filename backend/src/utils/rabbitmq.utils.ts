@@ -155,12 +155,25 @@ export class RabbitMQConsumer {
   }
 
   async executeWithdrawCommand(message: any) {
-    const { proposal_id } = message;
+    const { proposal_id, is_execute, error_msg } = message;
 
     if (proposal_id) {
-      await proposalService.update(proposal_id, {
-        status: ProposalStatusEnum.Voting,
-      });
+      if (error_msg) {
+        await proposalService.update(proposal_id, {
+          status: ProposalStatusEnum.Failed,
+        });
+      } else {
+        if (is_execute === 'true') {
+          await proposalService.update(proposal_id, {
+            status: ProposalStatusEnum.Executed,
+            executedAt: new Date(),
+          });
+        } else {
+          await proposalService.update(proposal_id, {
+            status: ProposalStatusEnum.Voting,
+          });
+        }
+      }
     }
   }
 }

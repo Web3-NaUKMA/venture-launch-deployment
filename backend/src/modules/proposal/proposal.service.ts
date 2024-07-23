@@ -127,18 +127,18 @@ export class ProposalService {
           proposalId: id,
         }));
 
-      votesToRegister.forEach(voteToRegister => {
-        const multisig_pda = proposal.milestone.project.projectLaunch.dao.multisigPda;
-        const member = proposal.milestone.project.projectLaunch.dao.members.find(
-          member => member.id === voteToRegister.memberId,
-        );
-        const vote = voteToRegister.decision;
+      // votesToRegister.forEach(voteToRegister => {
+      //   const multisig_pda = proposal.milestone.project.projectLaunch.dao.multisigPda;
+      //   const member = proposal.milestone.project.projectLaunch.dao.members.find(
+      //     member => member.id === voteToRegister.memberId,
+      //   );
+      //   const vote = voteToRegister.decision;
 
-        if (member) {
-          const voter = member.walletId;
-          rabbitMQ.publish('request_exchange', { multisig_pda, voter, vote }, CommandType.Vote);
-        }
-      });
+      //   if (member) {
+      //     const voter = member.walletId;
+      //     rabbitMQ.publish('request_exchange', { multisig_pda, voter, vote }, CommandType.Vote);
+      //   }
+      // });
 
       await AppDataSource.getRepository(ProposalVoteEntity).save(votesToRegister);
 

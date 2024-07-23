@@ -15,11 +15,12 @@ export interface ProposalDetailsProps extends HTMLAttributes<HTMLDivElement> {
     results: {
       confirmed: number;
       rejected: number;
+      threshold: number;
     };
   };
 }
 
-const ProposalDetails: FC<ProposalDetailsProps> = ({ isVisible, data, ...props }) => {
+const ProposalDetails: FC<ProposalDetailsProps> = ({ isVisible, children, data, ...props }) => {
   const datetimeFormatter = useMemo(
     () => new Intl.DateTimeFormat('en-US', { timeStyle: 'short', dateStyle: 'medium' }),
     [],
@@ -100,13 +101,14 @@ const ProposalDetails: FC<ProposalDetailsProps> = ({ isVisible, data, ...props }
             </div>
             <div className='flex flex-col flex-1 items-center justify-center bg-stone-50 rounded-xl gap-1'>
               <span className='font-bold text-3xl'>
-                {data.results.confirmed}/{data.results.confirmed + data.results.rejected}
+                {data.results.confirmed}/{data.results.threshold}
               </span>
               <span className='text-xs'>Threshold</span>
             </div>
           </div>
         </ProposalDetailsSection>
       </div>
+      <div className='flex flex-col'>{children}</div>
     </div>
   );
 };

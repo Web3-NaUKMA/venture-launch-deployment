@@ -2,6 +2,7 @@ import { FC, HTMLAttributes, ReactNode, useMemo, useState } from 'react';
 import ProposalSection from './components/ProposalSection/ProposalSection';
 import AccordionButton from 'components/atoms/AccordionButton/AccordionButton';
 import ProposalDetails from './components/ProposalDetails/ProposalDetails';
+import { ProposalStatusEnum } from 'types/enums/proposal-status.enum';
 
 export interface ProposalProps extends HTMLAttributes<HTMLDivElement> {
   image: ReactNode;
@@ -13,9 +14,11 @@ export interface ProposalProps extends HTMLAttributes<HTMLDivElement> {
     transactionLink: string;
     createdAt: Date;
     executedAt: Date | null;
+    status: ProposalStatusEnum;
     results: {
       confirmed: number;
       rejected: number;
+      threshold: number;
     };
   };
 }
@@ -28,7 +31,7 @@ const initialState: ProposalState = {
   areDetailsVisible: false,
 };
 
-const Proposal: FC<ProposalProps> = ({ image, data, ...props }) => {
+const Proposal: FC<ProposalProps> = ({ image, data, children, ...props }) => {
   const [state, setState] = useState(initialState);
   const datetimeFormatter = useMemo(
     () => new Intl.DateTimeFormat('en-US', { timeStyle: 'short', dateStyle: 'medium' }),
@@ -39,9 +42,10 @@ const Proposal: FC<ProposalProps> = ({ image, data, ...props }) => {
     <div className='flex flex-col bg-white rounded-xl shadow-[0_0_15px_-7px_gray]' {...props}>
       <div className='flex p-3 gap-3 items-center w-full'>
         <div className='flex'>{image}</div>
-        <div className='grid grid-cols-3 text-sm w-full'>
+        <div className='grid grid-cols-4 text-sm w-full'>
           <ProposalSection title='Type' value={data.type} />
           <ProposalSection title='Wallet ID' value={data.walletId} />
+          <ProposalSection title='Status' value={data.status} />
           <ProposalSection
             title='Datetime'
             value={datetimeFormatter.format(data.createdAt)}
@@ -66,7 +70,9 @@ const Proposal: FC<ProposalProps> = ({ image, data, ...props }) => {
           transactionLink: data.transactionLink,
           results: data.results,
         }}
-      />
+      >
+        {children}
+      </ProposalDetails>
     </div>
   );
 };

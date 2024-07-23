@@ -8,6 +8,7 @@ import _ from 'lodash';
 import { CommandType } from '../../utils/dao.utils';
 import proposalService from '../proposal/proposal.service';
 import { rabbitMQ } from '../../utils/rabbitmq.utils';
+import authService from '../auth/auth.service';
 
 @Controller()
 export class MilestoneController {
@@ -47,7 +48,25 @@ export class MilestoneController {
 
   async update(request: Request, response: Response) {
     const { id } = request.params as any;
-    await milestoneService.findOne({ where: { id } });
+    const milestoneToFind = await milestoneService.findOne({
+      where: { id },
+      relations: { project: { projectLaunch: { author: true, dao: true } } },
+    });
+
+    if (request.body.isFinal && request.session.user) {
+      const authenticatedUser = await authService.getAuthenticatedUser(request.session.user.id);
+      await milestoneService.handleProposal(id, {
+        commandType: CommandType.Withdraw,
+        authorId: authenticatedUser.id,
+        data: {
+          multisig_pda: milestoneToFind.project.projectLaunch.dao.multisigPda,
+          receiver: milestoneToFind.project.projectLaunch.author.walletId,
+          is_execute: false,
+          amount: 100,
+        },
+      });
+    }
+
     const milestone = await milestoneService.update(id, request.body);
 
     return response.status(HttpStatusCode.Ok).json(milestone);
@@ -63,20 +82,10 @@ export class MilestoneController {
 
   async handleProposal(request: Request, response: Response) {
     const { id } = request.params;
-    const { commandType, authorId, data } = request.body;
+    const { commandType, createNew } = request.body;
 
     if (Object.entries(CommandType).find(([_, value]) => value === commandType) && id) {
-      const milestone = await milestoneService.findOne({ where: { id } });
-
-      const proposal = await proposalService.create({
-        milestone: { id },
-        description: milestone.description,
-        type: CommandType.Withdraw,
-        author: { id: authorId },
-      });
-
-      rabbitMQ.publish('request_exchange', { ...data, proposal_id: proposal.id }, commandType);
-
+      const proposal = await milestoneService.handleProposal(id, request.body, createNew);
       return response.status(HttpStatusCode.Created).json(proposal);
     }
 

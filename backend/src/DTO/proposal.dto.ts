@@ -15,7 +15,7 @@ export interface CreateProposalDto {
 export interface UpdateProposalDto {
   status?: ProposalStatusEnum;
   proposalLink?: string | null;
-  executedAt?: string | null;
-  updatedAt?: string | null;
+  executedAt?: Date | null;
+  updatedAt?: Date | null;
   votesToAdd?: ProposalVoteDto[];
 }

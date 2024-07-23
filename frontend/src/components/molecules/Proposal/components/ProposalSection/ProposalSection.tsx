@@ -14,10 +14,10 @@ const ProposalSection: FC<ProposalSectionProps> = ({
 }) => {
   return (
     <div
-      className={`flex flex-col ${contentAlign === 'left' ? '' : 'items-end'} overflow-hidden`}
+      className={`flex flex-col ${contentAlign === 'left' ? '' : 'items-end'} overflow-hidden px-5`}
       {...props}
     >
-      <span className='font-mono font-semibold'>{value}</span>
+      <span className='font-mono font-semibold overflow-x-auto without-scrollbar'>{value}</span>
       <h6 className='font-sans'>{title}</h6>
     </div>
   );

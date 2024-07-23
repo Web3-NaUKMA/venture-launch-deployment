@@ -18,6 +18,11 @@ import { useAuth } from '../../../hooks/auth.hooks';
 import { UserRoleEnum } from '../../../types/enums/user-role.enum';
 import useWeb3Auth from '../../../hooks/web3auth.hooks';
 import ApproveMilestoneModal from 'components/organisms/ApproveMilestoneModal/ApproveMilestoneModal';
+import Proposal from '../Proposal/Proposal';
+import { ProposalVoteEnum } from 'types/enums/proposal-vote.enum';
+import { ProposalStatusEnum } from 'types/enums/proposal-status.enum';
+import axios, { HttpStatusCode } from 'axios';
+import { CommandType } from 'utils/dao.utils';
 
 export interface MilestoneProps {
   milestone: MilestoneType;
@@ -173,92 +178,243 @@ const Milestone: FC<MilestoneProps> = ({ milestone, projectLaunch }) => {
           />,
           document.getElementById('root')!,
         )}
-      <div className='flex p-4 border rounded-md items-start justify-between'>
-        <div className='flex w-full flex-col gap-y-1'>
-          <div className='flex gap-1'>
-            <span className='font-sans font-semibold'>Milestone ID:</span>
-            <span className='font-mono'>{milestone.id}</span>
-          </div>
-          <div className='flex gap-1'>
-            <span className='font-sans font-semibold whitespace-nowrap'>
-              Merged pull request URL:
-            </span>
-            <span className='font-mono'>
-              <a
-                href={milestone.mergedPullRequestUrl}
-                target='_blank'
-                className='text-blue-600 border-b border-blue-600 hover:border-none transition-[0.3s_ease]'
-              >
-                {milestone.mergedPullRequestUrl}
-              </a>
-            </span>
-          </div>
-          <div className='flex gap-1'>
-            <span className='font-sans font-semibold whitespace-nowrap'>
-              Aproval transaction hash:
-            </span>
-            <span className='font-mono overflow-x-auto with-scrollbar-sm'>
-              {milestone.transactionApprovalHash ? milestone.transactionApprovalHash : '—'}
-            </span>
-          </div>
-          <div className='flex gap-1'>
-            <span className='font-sans font-semibold'>Status:</span>
-            {!milestone.isFinal ? (
-              <span className='font-medium text-white rounded-xl bg-yellow-500 px-3'>
-                Under review
+      <div className='flex flex-col border rounded-md'>
+        <div className='flex p-4 items-start justify-between'>
+          <div className='flex w-full flex-col gap-y-1'>
+            <div className='flex gap-1'>
+              <span className='font-sans font-semibold'>Milestone ID:</span>
+              <span className='font-mono'>{milestone.id}</span>
+            </div>
+            <div className='flex gap-1'>
+              <span className='font-sans font-semibold whitespace-nowrap'>
+                Merged pull request URL:
               </span>
-            ) : milestone.isFinal && !milestone.isWithdrawn ? (
-              <span className='font-medium text-white rounded-xl bg-blue-500 px-3'>Approved</span>
-            ) : (
-              <span className='font-medium text-white rounded-xl bg-emerald-500 px-3'>
-                Withdrawn
+              <span className='font-mono'>
+                <a
+                  href={milestone.mergedPullRequestUrl}
+                  target='_blank'
+                  className='text-blue-600 border-b border-blue-600 hover:border-none transition-[0.3s_ease]'
+                >
+                  {milestone.mergedPullRequestUrl}
+                </a>
               </span>
-            )}
+            </div>
+            <div className='flex gap-1'>
+              <span className='font-sans font-semibold whitespace-nowrap'>
+                Aproval transaction hash:
+              </span>
+              <span className='font-mono overflow-x-auto with-scrollbar-sm'>
+                {milestone.transactionApprovalHash ? milestone.transactionApprovalHash : '—'}
+              </span>
+            </div>
+            <div className='flex gap-1'>
+              <span className='font-sans font-semibold'>Status:</span>
+              {!milestone.isFinal ? (
+                <span className='font-medium text-white rounded-xl bg-yellow-500 px-3'>
+                  Under review
+                </span>
+              ) : milestone.isFinal && !milestone.isWithdrawn ? (
+                <span className='font-medium text-white rounded-xl bg-blue-500 px-3'>Approved</span>
+              ) : (
+                <span className='font-medium text-white rounded-xl bg-emerald-500 px-3'>
+                  Withdrawn
+                </span>
+              )}
+            </div>
+            <div className='flex gap-1'>
+              <span className='font-sans font-semibold'>Created at:</span>
+              <span className='font-mono'>{new Date(milestone.createdAt).toLocaleString()}</span>
+            </div>
           </div>
-          <div className='flex gap-1'>
-            <span className='font-sans font-semibold'>Created at:</span>
-            <span className='font-mono'>{new Date(milestone.createdAt).toLocaleString()}</span>
+          <div className='flex gap-2'>
+            {/* {authenticatedUser?.role.includes(UserRoleEnum.Startup) &&
+              authenticatedUser.id === projectLaunch?.author.id &&
+              milestone.isFinal &&
+              !milestone.isWithdrawn && (
+                <Button
+                  className='inline-flex border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
+                  onClick={() => setIsWithdrawMilestoneModalVisible(true)}
+                >
+                  Withdraw
+                </Button>
+              )} */}
+            {authenticatedUser?.role.includes(UserRoleEnum.BusinessAnalyst) &&
+              !milestone.isFinal && (
+                <Button
+                  className='inline-flex border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
+                  onClick={() => setIsApproveMilestoneModalVisible(true)}
+                >
+                  Approve
+                </Button>
+              )}
+            {authenticatedUser?.role.includes(UserRoleEnum.Startup) &&
+              authenticatedUser.id === projectLaunch?.author.id &&
+              !milestone.isFinal && (
+                <>
+                  <Button
+                    className='inline-flex p-1.5 border rounded-lg hover:bg-neutral-100 transition-[0.3s_ease] text-yellow-600'
+                    onClick={() => setIsEditMilestoneModalVisible(true)}
+                  >
+                    <EditIcon className='size-4' />
+                  </Button>
+                  <Button
+                    className='inline-flex p-1.5 border rounded-lg hover:bg-neutral-100 transition-[0.3s_ease] text-red-600'
+                    onClick={() => setIsRemoveMilestoneModalVisible(true)}
+                  >
+                    <RemoveIcon className='size-4' />
+                  </Button>
+                </>
+              )}
           </div>
         </div>
-        <div className='flex gap-2'>
-          {authenticatedUser?.role.includes(UserRoleEnum.Startup) &&
-            authenticatedUser.id === projectLaunch?.author.id &&
-            milestone.isFinal &&
-            !milestone.isWithdrawn && (
-              <Button
-                className='inline-flex border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
-                onClick={() => setIsWithdrawMilestoneModalVisible(true)}
-              >
-                Withdraw
-              </Button>
-            )}
-          {authenticatedUser?.role.includes(UserRoleEnum.BusinessAnalyst) && !milestone.isFinal && (
-            <Button
-              className='inline-flex border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
-              onClick={() => setIsApproveMilestoneModalVisible(true)}
-            >
-              Approve
-            </Button>
-          )}
-          {authenticatedUser?.role.includes(UserRoleEnum.Startup) &&
-            authenticatedUser.id === projectLaunch?.author.id &&
-            !milestone.isFinal && (
-              <>
-                <Button
-                  className='inline-flex p-1.5 border rounded-lg hover:bg-neutral-100 transition-[0.3s_ease] text-yellow-600'
-                  onClick={() => setIsEditMilestoneModalVisible(true)}
+        {milestone.proposals?.length > 0 && (
+          <div className='flex flex-col gap-3 p-5'>
+            {structuredClone(milestone.proposals)
+              .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+              .map(proposal => (
+                <Proposal
+                  key={proposal.id}
+                  image={undefined}
+                  className='border rounded-xl'
+                  data={{
+                    type: proposal.type,
+                    status: proposal.status,
+                    walletId: projectLaunch?.author.walletId || '',
+                    description: proposal.description,
+                    projectId: projectLaunch?.project?.id || '',
+                    transactionLink: '',
+                    createdAt: new Date(proposal.createdAt),
+                    executedAt: proposal.executedAt ? new Date(proposal.executedAt) : null,
+                    results: {
+                      confirmed: proposal.votes.filter(
+                        vote => vote.decision === ProposalVoteEnum.Approve,
+                      ).length,
+                      rejected: proposal.votes.filter(
+                        vote => vote.decision === ProposalVoteEnum.Cancel,
+                      ).length,
+                      threshold: Math.round(
+                        (projectLaunch?.dao?.members?.filter(
+                          member =>
+                            !member.role.find(role => role === UserRoleEnum.BusinessAnalyst),
+                        ).length || 0) / 2,
+                      ),
+                    },
+                  }}
                 >
-                  <EditIcon className='size-4' />
-                </Button>
-                <Button
-                  className='inline-flex p-1.5 border rounded-lg hover:bg-neutral-100 transition-[0.3s_ease] text-red-600'
-                  onClick={() => setIsRemoveMilestoneModalVisible(true)}
-                >
-                  <RemoveIcon className='size-4' />
-                </Button>
-              </>
-            )}
-        </div>
+                  <div className='flex gap-3 px-5 pt-2 pb-5'>
+                    {projectLaunch?.dao.members?.find(
+                      member => member.id === authenticatedUser?.id,
+                    ) &&
+                      proposal.status === ProposalStatusEnum.Voting && (
+                        <>
+                          {!authenticatedUser?.role?.find(
+                            role => role === UserRoleEnum.BusinessAnalyst,
+                          ) &&
+                          !proposal.votes.find(vote => vote.memberId === authenticatedUser?.id) ? (
+                            <>
+                              <button
+                                type='button'
+                                className='inline-flex border-transparent bg-emerald-500 hover:bg-transparent border-2 hover:border-emerald-500 hover:text-emerald-500 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
+                                onClick={async () => {
+                                  if (authenticatedUser) {
+                                    const response = await axios.put(`/proposals/${proposal.id}`, {
+                                      votesToAdd: [
+                                        {
+                                          memberId: authenticatedUser.id,
+                                          decision: ProposalVoteEnum.Approve,
+                                        },
+                                      ],
+                                    });
+
+                                    if (response.status === HttpStatusCode.Ok && id) {
+                                      dispatch(fetchProject(id));
+                                    }
+                                  }
+                                }}
+                              >
+                                Vote for
+                              </button>
+                              <button
+                                type='button'
+                                className='inline-flex border-transparent bg-red-500 hover:bg-transparent border-2 hover:border-red-500 hover:text-red-500 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
+                                onClick={async () => {
+                                  if (authenticatedUser) {
+                                    const response = await axios.put(`/proposals/${proposal.id}`, {
+                                      votesToAdd: [
+                                        {
+                                          memberId: authenticatedUser.id,
+                                          decision: ProposalVoteEnum.Cancel,
+                                        },
+                                      ],
+                                    });
+
+                                    if (response.status === HttpStatusCode.Ok && id) {
+                                      dispatch(fetchProject(id));
+                                    }
+                                  }
+                                }}
+                              >
+                                Vote against
+                              </button>
+                            </>
+                          ) : (
+                            authenticatedUser?.role?.find(
+                              role => role === UserRoleEnum.BusinessAnalyst,
+                            ) &&
+                            (proposal.votes.filter(
+                              vote => vote.decision === ProposalVoteEnum.Approve,
+                            ).length >=
+                            Math.round(
+                              (projectLaunch?.dao?.members?.filter(
+                                member =>
+                                  !member.role.find(role => role === UserRoleEnum.BusinessAnalyst),
+                              ).length || 0) / 2,
+                            ) ? (
+                              <button
+                                type='button'
+                                className='inline-flex border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
+                                onClick={async () => {
+                                  if (authenticatedUser) {
+                                    const response = await axios.post(
+                                      `milestones/${milestone.id}/proposals`,
+                                      {
+                                        createNew: false,
+                                        commandType: CommandType.Withdraw,
+                                        authorId: authenticatedUser.id,
+                                        data: {
+                                          multisig_pda: projectLaunch.dao.multisigPda,
+                                          is_execute: true,
+                                          receiver: projectLaunch.author.walletId,
+                                          amount: 100,
+                                        },
+                                      },
+                                    );
+
+                                    if (response.status === HttpStatusCode.Created && id) {
+                                      dispatch(fetchProject(id));
+                                    }
+                                  }
+                                }}
+                              >
+                                Execute
+                              </button>
+                            ) : (
+                              <button
+                                type='button'
+                                disabled
+                                className='inline-flex border-transparent bg-zinc-900 enabled:hover:bg-transparent border-2 enabled:hover:border-zinc-900 enabled:hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium disabled:opacity-40'
+                              >
+                                Execute
+                              </button>
+                            ))
+                          )}
+                        </>
+                      )}
+                  </div>
+                </Proposal>
+              ))}
+          </div>
+        )}
       </div>
     </>
   );
