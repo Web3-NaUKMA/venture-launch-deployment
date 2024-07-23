@@ -6,6 +6,7 @@ import { User } from '../../types/user.interface';
 import { CommandType } from '../../utils/dao.utils';
 import { ProjectEntity } from './project.entity';
 import { UserEntity } from './user.entity';
+import { ProposalVoteEntity } from './proposal-vote.entity';
 
 @Entity('proposal')
 export class ProposalEntity implements Proposal {
@@ -39,6 +40,6 @@ export class ProposalEntity implements Proposal {
   @ManyToOne(() => UserEntity, user => user.proposals, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   author: User;
 
-  // @OneToMany(() => )
+  @OneToMany(() => ProposalVoteEntity, proposalVote => proposalVote.proposal)
   votes: ProposalVote[];
 }

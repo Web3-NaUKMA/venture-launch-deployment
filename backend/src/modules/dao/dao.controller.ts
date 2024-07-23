@@ -55,16 +55,6 @@ export class DAOController {
     return response.status(HttpStatusCode.Ok).json(dao);
   }
 
-  // async addMember(request: Request, response: Response) {
-  //   await daoService.addMember(request.body);
-  //   return response.status(HttpStatusCode.Ok).json('added');
-  // }
-
-  // async removeMember(request: Request, response: Response) {
-  //   await daoService.removeMember(request.body);
-  //   return response.status(HttpStatusCode.Ok).json('removed');
-  // }
-
   async withdraw(request: Request, response: Response) {
     await daoService.withdraw(request.body);
     return response.status(HttpStatusCode.Ok).json('received');

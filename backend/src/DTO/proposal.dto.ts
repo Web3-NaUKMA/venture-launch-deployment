@@ -1,6 +1,8 @@
 import { ProposalVote } from '../types/proposal-vote.interface';
 import { CommandType } from '../utils/dao.utils';
 
+export type ProposalVoteDto = Omit<ProposalVote, 'datetime' | 'member' | 'proposal' | 'proposalId'>;
+
 export interface CreateProposalDto {
   type: CommandType;
   description: string;
@@ -13,5 +15,5 @@ export interface UpdateProposalDto {
   proposalLink?: string | null;
   executedAt?: string | null;
   updatedAt?: string | null;
-  votesToAdd?: Omit<ProposalVote, 'datetime' | 'member' | 'proposal'>[];
+  votesToAdd?: ProposalVoteDto[];
 }

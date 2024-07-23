@@ -3,6 +3,7 @@ import { RabbitMQException } from './exceptions/exceptions.utils';
 import { CommandType } from './dao.utils';
 import daoService from '../modules/dao/dao.service';
 import projectLaunchService from '../modules/project-launch/project-launch.service';
+import proposalService from '../modules/proposal/proposal.service';
 
 export enum RabbitMQExchangeNames {
   Fanout = 'fanout',
@@ -118,25 +119,13 @@ export class RabbitMQConsumer {
         if (message.command_type) {
           switch (message.command_type) {
             case CommandType.CreateDao:
-              const { project_id, multisig_pda, vault_pda } = message;
-              const projectLaunch = await projectLaunchService.findOne({
-                where: { id: project_id },
-                relations: { approver: true },
-              });
-
-              if (projectLaunch.approver.id) {
-                const dao = await daoService.create({
-                  projectLaunch: { id: project_id },
-                  multisigPda: multisig_pda,
-                  vaultPda: vault_pda,
-                });
-
-                daoService.update(dao.id, { membersToAdd: [projectLaunch.approver] });
-              }
-
+              this.executeCreateDaoCommand(message);
               break;
+            case CommandType.Withdraw:
+              this.executeWithdrawCommand(message);
             case CommandType.AddMember:
             case CommandType.RemoveMember:
+            case CommandType.Vote:
               if (message) console.log(message);
               if (error) console.log(error);
               break;
@@ -144,6 +133,41 @@ export class RabbitMQConsumer {
         }
       },
     );
+  }
+
+  async executeCreateDaoCommand(message: any) {
+    const { project_id, multisig_pda, vault_pda } = message;
+    const projectLaunch = await projectLaunchService.findOne({
+      where: { id: project_id },
+      relations: { approver: true },
+    });
+
+    if (projectLaunch.approver.id) {
+      const dao = await daoService.create({
+        projectLaunch: { id: project_id },
+        multisigPda: multisig_pda,
+        vaultPda: vault_pda,
+      });
+
+      daoService.update(dao.id, { membersToAdd: [projectLaunch.approver] });
+    }
+  }
+
+  async executeWithdrawCommand(message: any) {
+    const { multisig_pda } = message;
+    const projectLaunch = await projectLaunchService.findOne({
+      where: { dao: { multisigPda: multisig_pda } },
+      relations: { project: true, approver: true },
+    });
+
+    if (projectLaunch.project && projectLaunch.approver) {
+      proposalService.create({
+        project: { id: projectLaunch.project.id },
+        description: 'Withdraw',
+        type: CommandType.Withdraw,
+        author: { id: projectLaunch.approver.id },
+      });
+    }
   }
 }
 

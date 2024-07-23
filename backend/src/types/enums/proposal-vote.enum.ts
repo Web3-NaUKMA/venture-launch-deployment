@@ -1,5 +1,5 @@
 export enum ProposalVoteEnum {
-  For = 'for',
-  Against = 'against',
-  Abstained = 'abstained',
+  Approve = 'Approve',
+  Cancel = 'Cancel',
+  Abstained = 'Abstain',
 }

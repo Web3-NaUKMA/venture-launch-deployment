@@ -4,8 +4,6 @@ import {
   UpdateDaoDto,
   DaoMemberDto,
   BlockchainAddMemberDto,
-  BlockchainRemoveMemberDto,
-  BlockchainCreateDaoDto,
   BlockchainWithdrawDto,
   BlockchainExecuteProposalDto,
   BlockchainVoteDto,
@@ -34,11 +32,6 @@ export class DAOService {
 
   async findOne(options?: FindOneOptions<DaoEntity>): Promise<DaoEntity> {
     try {
-      let removedAt = (options?.where as any)?.messages?.removedAt;
-      delete (options?.where as any)?.messages?.removedAt;
-
-      if (!removedAt) removedAt = null;
-
       const dao = await AppDataSource.getRepository(DaoEntity).findOneOrFail(
         _.merge(options, {
           relations: { projectLaunch: true, members: true },

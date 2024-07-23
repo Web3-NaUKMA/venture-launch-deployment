@@ -5,6 +5,8 @@ import { Controller } from '../../decorators/app.decorators';
 import { parseObjectStringValuesToPrimitives } from '../../utils/object.utils';
 import qs from 'qs';
 import _ from 'lodash';
+import { CommandType } from '../../utils/dao.utils';
+import { rabbitMQ } from '../../utils/rabbitmq.utils';
 
 @Controller()
 export class ProjectController {
@@ -74,6 +76,22 @@ export class ProjectController {
     const ipfsURL = await projectService.prepareNftMetadata(request.body);
 
     return response.status(HttpStatusCode.Created).json({ ipfsURL });
+  }
+
+  async handleProposal(request: Request, response: Response) {
+    const { commandType, data } = request.body;
+
+    if (Object.entries(CommandType).find(([_, value]) => value === commandType)) {
+      rabbitMQ.publish('request_exchange', data, commandType);
+
+      return response
+        .status(HttpStatusCode.Created)
+        .json({ message: 'The proposal was successfully handled', body: request.body });
+    }
+
+    return response
+      .status(HttpStatusCode.Conflict)
+      .json({ message: 'Invalid command type was provided', body: request.body });
   }
 }
 
