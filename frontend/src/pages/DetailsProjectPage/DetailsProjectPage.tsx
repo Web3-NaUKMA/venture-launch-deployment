@@ -247,23 +247,6 @@ const DetailsProjectPage: FC = () => {
               <span className='font-mono'>{new Date(project.createdAt).toLocaleString()}</span>
             </div>
           </div>
-          <Proposal
-            className='w-full bg-white rounded-xl my-2'
-            image={undefined}
-            data={{
-              type: '',
-              walletId: '',
-              description: '',
-              projectId: '',
-              transactionLink: '',
-              createdAt: new Date(),
-              executedAt: null,
-              results: {
-                confirmed: 0,
-                rejected: 0,
-              },
-            }}
-          />
           <MilestonesGrid
             milestones={project.milestones}
             setIsCreateMilestoneModalVisible={setIsCreateMilestoneModalVisible}
