@@ -1,65 +1,7 @@
 import { FC } from 'react';
-import { Marked } from '@ts-stack/markdown'
 
 
 const AboutPage: FC = () => {
-
-  const content = `
-  # Venture Launch
-
-  ## Overview
-  
-  In the ever-evolving landscape of startups, raising capital during the crucial pre-seed and seed stages can be a daunting challenge. Similarly, retail investors often struggle to find accessible opportunities to participate in these high-potential, early-stage investments. Enter Venture Launch, a  platform designed to bridge this gap, empowering both startups and investors. By democratizing access to early-stage investments and pioneering liquid pre-markets, Venture Launch is set to transform the startup ecosystem.
-  
-  ## Key Features
-  
-  ### Accessible Investment Opportunities
-  
-  VentureLaunch is committed to democratizing access to early-stage investments. Retail investors can easily participate in pre-seed and seed rounds through an intuitive user interface and streamlined onboarding process. This simplicity allows investors to explore and engage with startup opportunities effortlessly, leveling the playing field for those traditionally excluded from early-stage investments.
-  
-  
-  ### Liquid Pre-Markets
-  
-  One of VentureLaunch's most innovative features is the concept of liquid pre-markets. This allows startups to offer early liquidity options for investors, providing flexibility and exit strategies through cutting-edge financial instruments and market mechanisms. By enhancing liquidity for early-stage investments, VentureLaunch offers a unique value proposition for both startups and investors.
-  
-  ### Comprehensive Due Diligence
-  
-  To ensure transparency and mitigate risks, VentureLaunch conducts thorough due diligence on participating startups. This includes comprehensive data analytics and expert evaluations, enabling investors to make informed decisions. The platform's rigorous approach to due diligence fosters trust and confidence in the investment process.
-  
-  ### Community Engagement
-  
-  VentureLaunch is more than just a platform; it's a community. By fostering a vibrant network of entrepreneurs, investors, and industry experts, VentureLaunch facilitates collaboration and knowledge-sharing. Networking events, forums, and discussion boards encourage meaningful interactions and partnerships, enriching the overall experience for all participants.
-  
-  
-  ##  Technology Stack
-  
-  Below is an overview of the technologies used:
-  
-  ### Node.js
-  Our backend is powered by Node.js, providing a fast and efficient runtime environment for building scalable network applications.
-  
-  ### PostgreSQL
-  We use PostgreSQL as our relational database system, ensuring reliable and efficient data storage and retrieval.
-  
-  ### Docker
-  
-  Docker is utilized for containerization, allowing us to package our application and its dependencies into a container, ensuring consistency across multiple environments.
-  
-  ### Nginx
-  Nginx serves as our web server and reverse proxy, providing load balancing, security, and high performance.
-  
-  ### React.js
-  Our frontend is built with React.js, creating a dynamic and responsive user interface for our users.
-  
-  ### RabbitMQ
-  RabbitMQ is employed for message brokering, enabling efficient communication between different parts of our system.
-  
-  ### Squads
-  We use Squads for building and interacting with Decentralized Autonomous Organisations.
-  
-  ### Phantom Wallet
-  Phantom Wallet is integrated for secure and efficient handling of cryptocurrency transactions, ensuring the reliability and robustness of our platform's financial operations.
-  `
 
 
   return (
