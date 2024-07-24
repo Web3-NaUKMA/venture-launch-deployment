@@ -1,7 +1,6 @@
 import {
   ACCOUNT_SIZE,
   createInitializeAccountInstruction,
-  getAssociatedTokenAddress as getAssocTokenAddress,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
 import * as web3 from '@solana/web3.js';
@@ -232,5 +231,3 @@ export async function createVaultTx(
   tx.partialSign(cryptoTrackerAccount);
   return [tx, vaultTokenAccount.publicKey, cryptoTrackerAccount.publicKey] as const;
 }
-
-export const getAssociatedTokenAddress = getAssocTokenAddress;
