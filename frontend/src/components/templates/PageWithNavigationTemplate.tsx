@@ -16,10 +16,7 @@ const links: NavbarLink[] = [
     name: 'Portfolio',
     to: AppRoutes.Portfolio,
   },
-  {
-    name: 'About',
-    to: AppRoutes.About,
-  },
+
   {
     name: 'Message Center',
     to: AppRoutes.MessageCenter,
@@ -27,6 +24,10 @@ const links: NavbarLink[] = [
   {
     name: 'Dashboard',
     to: AppRoutes.Dashboard,
+  },
+  {
+    name: 'About',
+    to: AppRoutes.About,
   },
 ];
 
