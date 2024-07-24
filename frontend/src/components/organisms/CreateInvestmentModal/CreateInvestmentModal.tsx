@@ -10,15 +10,23 @@ import {
 import { CreateProjectLaunchInvestmentDto } from '../../../types/project-launch-investment.types';
 import { useAuth } from '../../../hooks/auth.hooks';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
-import {
-  USDC_MINT,
-  createDepositTx,
-  getAssociatedTokenAddress,
-  programId,
-} from '../../../utils/venture-launch.utils';
-import { Commitment, ConfirmOptions, Connection, LAMPORTS_PER_SOL, PublicKey, Transaction } from '@solana/web3.js';
+import { USDC_MINT } from '../../../utils/venture-launch.utils';
+import { Commitment, ConfirmOptions, Connection, PublicKey, Transaction } from '@solana/web3.js';
 import useWeb3Auth from '../../../hooks/web3auth.hooks';
-import { Account, ASSOCIATED_TOKEN_PROGRAM_ID, createAssociatedTokenAccountInstruction, createTransferInstruction, getAccount, getAssociatedTokenAddressSync, TOKEN_PROGRAM_ID, TokenAccountNotFoundError, TokenInvalidAccountOwnerError, TokenInvalidMintError, TokenInvalidOwnerError } from '@solana/spl-token';
+import {
+  Account,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  createAssociatedTokenAccountInstruction,
+  createTransferInstruction,
+  getAccount,
+  getAssociatedTokenAddress,
+  getAssociatedTokenAddressSync,
+  TOKEN_PROGRAM_ID,
+  TokenAccountNotFoundError,
+  TokenInvalidAccountOwnerError,
+  TokenInvalidMintError,
+  TokenInvalidOwnerError,
+} from '@solana/spl-token';
 
 async function getOrCreateAssociatedTokenAccount(
   publicKey: PublicKey,
@@ -29,14 +37,14 @@ async function getOrCreateAssociatedTokenAccount(
   commitment?: Commitment,
   confirmOptions?: ConfirmOptions,
   programId = TOKEN_PROGRAM_ID,
-  associatedTokenProgramId = ASSOCIATED_TOKEN_PROGRAM_ID
+  associatedTokenProgramId = ASSOCIATED_TOKEN_PROGRAM_ID,
 ): Promise<Transaction | Account> {
   const associatedToken = getAssociatedTokenAddressSync(
     mint,
     owner,
     allowOwnerOffCurve,
     programId,
-    associatedTokenProgramId
+    associatedTokenProgramId,
   );
 
   // This is the optimal logic, considering TX fee, client-side computation, RPC roundtrips and guaranteed idempotent.
@@ -48,7 +56,10 @@ async function getOrCreateAssociatedTokenAccount(
     // TokenAccountNotFoundError can be possible if the associated address has already received some lamports,
     // becoming a system account. Assuming program derived addressing is safe, this is the only case for the
     // TokenInvalidAccountOwnerError in this code path.
-    if (error instanceof TokenAccountNotFoundError || error instanceof TokenInvalidAccountOwnerError) {
+    if (
+      error instanceof TokenAccountNotFoundError ||
+      error instanceof TokenInvalidAccountOwnerError
+    ) {
       // As this isn't atomic, it's possible others can create associated accounts meanwhile.
       try {
         const transaction = new Transaction().add(
@@ -58,11 +69,10 @@ async function getOrCreateAssociatedTokenAccount(
             owner,
             mint,
             programId,
-            associatedTokenProgramId
-          )
+            associatedTokenProgramId,
+          ),
         );
         return transaction;
-
       } catch (error: unknown) {
         // Ignore all errors; for now there is no API-compatible way to selectively ignore the expected
         // instruction error if the associated account exists already.
@@ -79,7 +89,6 @@ async function getOrCreateAssociatedTokenAccount(
 
   return account;
 }
-
 
 export interface CreateInvestmentModalProps extends ModalProps {
   projectLaunch: ProjectLaunch;
@@ -135,12 +144,21 @@ const CreateInvestmentModal: FC<CreateInvestmentModalProps> = ({
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
-    if (isDataValid(state.data) && authenticatedUser && publicKey && signTransaction) {
+    if (isDataValid(state.data) && authenticatedUser && publicKey && sendTransaction) {
+      console.log(projectLaunch.dao.vaultPda);
+      const associatedTokenAccount = await getAssociatedTokenAddress(
+        USDC_MINT,
+        new PublicKey(projectLaunch.dao.vaultPda),
+        true,
+      );
+      const associatedTokenAccountFrom = await getAssociatedTokenAddress(
+        USDC_MINT,
+        publicKey,
+        true,
+      );
 
-      const associatedTokenAccount = await getAssociatedTokenAddress(USDC_MINT, new PublicKey(projectLaunch.vaultTokenAccount), true);
-      const associatedTokenAccountFrom = await getAssociatedTokenAddress(USDC_MINT, publicKey, true);
-
-      console.log(associatedTokenAccountFrom)
+      console.log(associatedTokenAccount.toBase58());
+      console.log(associatedTokenAccountFrom.toBase58());
       let blockhash = (await connection.getLatestBlockhash('finalized')).blockhash;
 
       const programId = new PublicKey('B1Lmegd5rBAAZ4nBRN9ePeMcThLdEQ5ec3yfDZZJxnBY');
@@ -149,12 +167,11 @@ const CreateInvestmentModal: FC<CreateInvestmentModalProps> = ({
           associatedTokenAccountFrom,
           associatedTokenAccount,
           publicKey,
-          state.data.amount! * 1000000,
-          // programId: programId
+          state.data.amount! * 1_000_000,
         ),
       );
-      tx.recentBlockhash = blockhash;
       tx.feePayer = publicKey;
+      tx.recentBlockhash = blockhash;
 
       // let tx = await createDepositTx(
       //   connection,
@@ -166,13 +183,13 @@ const CreateInvestmentModal: FC<CreateInvestmentModalProps> = ({
       //   state.data.amount!,
       // );
 
-      tx = await signTransaction(tx);
+      // tx = await signTransaction(tx);
 
       const signature = await sendTransaction(tx, connection);
-      console.log(signature)
-      setTimeout(() => { }
+      console.log(signature);
+      // setTimeout(() => { }
 
-        , 10000);
+      //   , 10000);
 
       dispatch(
         createProjectLaunchInvestment(
