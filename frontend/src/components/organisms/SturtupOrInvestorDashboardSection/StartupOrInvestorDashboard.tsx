@@ -12,7 +12,7 @@ import {
   selectInvestedProjectLaunches,
   selectLockedProjectLaunches,
 } from 'redux/slices/dashboard.slice';
-import { ChartStatisticsPeriod } from 'utils/app.utils';
+import { ChartStatisticsPeriod, shortenNumber } from 'utils/app.utils';
 
 export interface StartupOrInvestorDashboardProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -122,7 +122,16 @@ const StartupOrInvestorDashboard: FC<StartupOrInvestorDashboardProps> = ({ ...pr
                   key={projectLaunch.id}
                   className='flex bg-white rounded-xl shadow-[0_0_15px_-7px_grey] p-3 justify-between items-center'
                   projectLaunch={projectLaunch}
-                  allocation={250}
+                  allocation={
+                    projectLaunch?.projectLaunchInvestments?.reduce(
+                      (previousValue, currentValue) =>
+                        previousValue +
+                        (currentValue.investor?.id === authenticatedUser?.id
+                          ? Number(currentValue.amount)
+                          : 0),
+                      0,
+                    ) || 0
+                  }
                 />
               ))}
               {!investedProjectLaunches?.length && (
@@ -142,7 +151,21 @@ const StartupOrInvestorDashboard: FC<StartupOrInvestorDashboardProps> = ({ ...pr
             <h3 className='font-semibold text-sm'>My own funds invested</h3>
             <InformationCircleIcon className='size-4 text-stone-500 mt-2' />
             <div className='flex mt-2 justify-between items-end'>
-              <h3 className='text-2xl font-serif'>$2.5k</h3>
+              <h3 className='text-2xl font-serif'>$
+                {shortenNumber(
+                  investedProjectLaunches.reduce(
+                    (previousValue, currentValue) =>
+                      previousValue +
+                      Number(
+                        currentValue?.projectLaunchInvestments?.reduce(
+                          (p, c) =>
+                            p + (c.investor?.id === authenticatedUser?.id ? Number(c.amount) : 0),
+                          0,
+                        ) || 0,
+                      ),
+                    0,
+                  ),
+                )}</h3>
               <ChartBarIcon className='size-4 fill-stone-300 text-stone-300 m-1' />
             </div>
           </div>

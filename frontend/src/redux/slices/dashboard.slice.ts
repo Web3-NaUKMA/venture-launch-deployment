@@ -94,6 +94,9 @@ export const fetchLockedProjectLaunches =
             },
           },
         },
+        relations: {
+          projectLaunchInvestments: true,
+        },
       },
       {
         arrayFormat: 'comma',
@@ -122,8 +125,20 @@ export const fetchInvestedProjectLaunches =
   (options?: ActionCreatorOptions) => async (dispatch: AppDispatch) => {
     dispatch(dashboardSlice.actions.setError({ fetchInvestedProjectLaunches: null }));
 
+    const query = qs.stringify(
+      {
+        relations: {
+          projectLaunchInvestments: true,
+        },
+      },
+      {
+        arrayFormat: 'comma',
+        allowDots: true,
+        commaRoundTrip: true,
+      } as any,
+    );
     try {
-      const response = await axios.get(`project-launches/`);
+      const response = await axios.get(`project-launches/${query ? `?${query}` : ``}`);
 
       if (response.status === HttpStatusCode.Ok) {
         options?.onSuccess?.(response.data);

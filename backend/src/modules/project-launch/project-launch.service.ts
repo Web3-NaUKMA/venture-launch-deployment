@@ -27,7 +27,7 @@ export class ProjectLaunchService {
           relations: {
             author: true,
             project: true,
-            projectLaunchInvestments: true,
+            projectLaunchInvestments: { investor: true },
             approver: true,
             dao: { members: true }
           },

@@ -194,7 +194,7 @@ const DetailsProjectPage: FC = () => {
             <hr />
             <div className='px-10 py-5'>
               <h3 className='font-sans font-semibold text-xl mb-1.5'>Description</h3>
-              <span className='font-mono'>{project.projectLaunchDescription}</span>
+              <span className='font-mono whitespace-pre-wrap'>{project.projectLaunchDescription}</span>
             </div>
             <hr />
             <div className='px-10 py-5'>

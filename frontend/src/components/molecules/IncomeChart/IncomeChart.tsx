@@ -34,7 +34,7 @@ const IncomeChart: FC<ChartProps> = ({
       </div>
       <div className='flex mb-1'>
         <h3 className='text-2xl font-serif'>
-          {`${
+          {/* {`${
             (data?.datasets?.[0]?.reduce(
               (previousValue: any, currentValue: any) => previousValue + Number(currentValue),
               0,
@@ -57,7 +57,8 @@ const IncomeChart: FC<ChartProps> = ({
                   0,
                 ) || 0),
             ),
-          )}`}
+          )}`} */}
+          3X
         </h3>
       </div>
       <div className='flex mb-3'>

@@ -204,7 +204,18 @@ const Milestone: FC<MilestoneProps> = ({ milestone, projectLaunch }) => {
                 Aproval transaction hash:
               </span>
               <span className='font-mono overflow-x-auto with-scrollbar-sm'>
-                {milestone.transactionApprovalHash ? milestone.transactionApprovalHash : '—'}
+                {milestone.transactionApprovalHash ? (
+                  <a
+                    href={`https://explorer.solana.com/tx/${milestone.transactionApprovalHash}?cluster=devnet`}
+                    className='font-mono text-blue-500 hover:underline transition-all duration-300'
+                    target='_blank'
+                  >
+                    {`https://explorer.solana.com/tx/${milestone.transactionApprovalHash}?cluster=devnet`}
+                  </a>
+                )
+                  : 
+                  '—'
+                }
               </span>
             </div>
             <div className='flex gap-1'>
