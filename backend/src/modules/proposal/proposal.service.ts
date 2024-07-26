@@ -6,6 +6,8 @@ import { DatabaseException, NotFoundException } from '../../utils/exceptions/exc
 import { CreateProposalDto, ProposalVoteDto, UpdateProposalDto } from '../../DTO/proposal.dto';
 import { ProposalVoteEntity } from '../../typeorm/entities/proposal-vote.entity';
 import { User } from '../../types/user.interface';
+import { ProposalVoteEnum } from '../../types/enums/proposal-vote.enum';
+import { ProposalStatusEnum } from '../../types/enums/proposal-status.enum';
 
 export class ProposalService {
   async findMany(options?: FindManyOptions<ProposalEntity>): Promise<ProposalEntity[]> {
@@ -152,10 +154,21 @@ export class ProposalService {
 
       await AppDataSource.getRepository(ProposalVoteEntity).save(votesToRegister);
 
-      return await AppDataSource.getRepository(ProposalEntity).findOneOrFail({
-        relations: { milestone: true, author: true, votes: true },
-        where: { id },
-      });
+      if (
+        proposal.votes.filter(vote => vote.decision === ProposalVoteEnum.Approve).length +
+          votesToRegister.filter(vote => vote.decision === ProposalVoteEnum.Approve).length >=
+        Math.round(proposal.milestone.project.projectLaunch.dao.members.length / 2)
+      ) {
+        if (proposal.status !== ProposalStatusEnum.PendingExecution) {
+          this.update(proposal.id, { status: ProposalStatusEnum.PendingExecution });
+        }
+      } else {
+        if (proposal.status !== ProposalStatusEnum.Voting) {
+          this.update(proposal.id, { status: ProposalStatusEnum.Voting });
+        }
+      }
+
+      return proposal;
     } catch (error: any) {
       if (error instanceof EntityNotFoundError) {
         throw new NotFoundException(

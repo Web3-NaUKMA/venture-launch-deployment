@@ -8,6 +8,7 @@ import { CommandType } from '../../utils/dao.utils';
 import { ProposalEntity } from '../../typeorm/entities/proposal.entity';
 import proposalService from '../proposal/proposal.service';
 import { rabbitMQ } from '../../utils/rabbitmq.utils';
+import { ProposalStatusEnum } from '../../types/enums/proposal-status.enum';
 
 export class MilestoneService {
   async findMany(options?: FindManyOptions<MilestoneEntity>): Promise<MilestoneEntity[]> {
@@ -110,7 +111,10 @@ export class MilestoneService {
           })
         ).find(proposal => proposal)!;
 
-    
+    if (!createNew) {
+      await proposalService.update(proposal.id, { status: ProposalStatusEnum.Executing });
+    }
+
     rabbitMQ.publish(
       'request_exchange',
       { ...dto.data, proposal_id: proposal.id },

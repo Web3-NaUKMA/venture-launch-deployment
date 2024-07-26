@@ -6,8 +6,6 @@ import { parseObjectStringValuesToPrimitives } from '../../utils/object.utils';
 import qs from 'qs';
 import _ from 'lodash';
 import { CommandType } from '../../utils/dao.utils';
-import proposalService from '../proposal/proposal.service';
-import { rabbitMQ } from '../../utils/rabbitmq.utils';
 import authService from '../auth/auth.service';
 
 @Controller()

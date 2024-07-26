@@ -10,7 +10,6 @@ import {
 } from '../../redux/slices/project-launch.slice';
 import { UserIcon } from '../../components/atoms/Icons/Icons';
 import { AppRoutes } from '../../types/enums/app-routes.enum';
-import { useNavigate } from 'react-router';
 import { Project } from '../../components/molecules/Project/Project';
 import { resolveImage } from '../../utils/file.utils';
 import { Proposal as ProposalType } from 'types/proposal.types';
@@ -29,7 +28,6 @@ const ProfilePage: FC = () => {
   const [proposals, setProposals] = useState<ProposalType[]>([]);
   const projects = useAppSelector(selectProjectLaunches);
   const dispatch = useAppDispatch();
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (authenticatedUser) {
@@ -43,6 +41,7 @@ const ProfilePage: FC = () => {
                 project: {
                   projectLaunch: {
                     dao: true,
+                    project: true,
                   },
                 },
               },
@@ -118,9 +117,9 @@ const ProfilePage: FC = () => {
                 </Button>
                 <Button
                   className='inline-flex text-lg font-sans font-medium border-transparent bg-neutral-400 hover:bg-transparent border-2 hover:border-neutral-400 hover:text-neutral-400 text-white px-10 py-1 transition-[0.3s_ease] rounded-full'
-                  onClick={() => {
-                    signOut();
-                    navigate(AppRoutes.SignIn, { state: { walletDisconnect: true } });
+                  onClick={async () => {
+                    await signOut();
+                    location.replace(AppRoutes.SignIn);
                   }}
                 >
                   Sign Out
@@ -188,14 +187,15 @@ const ProfilePage: FC = () => {
                     image={
                       <Image
                         src={resolveImage(proposal?.milestone?.project?.projectLaunch?.logo || '')}
-                        alt='Project logo'
-                        className='w-[48px] rounded object-cover aspect-square'
+                        fallbackSrc='/logo.png'
+                        className='w-[48px] aspect-square rounded object-cover'
                       />
                     }
+                    className='border rounded-xl bg-white shadow-[0_0_15px_-7px_grey]'
                     data={{
                       type: proposal.type,
                       status: proposal.status,
-                      walletId: proposal?.milestone?.project?.projectLaunch?.author?.walletId || '',
+                      walletId: proposal?.milestone?.project?.projectLaunch?.author.walletId || '',
                       description: proposal.description,
                       projectId: proposal?.milestone?.project?.projectLaunch?.project?.id || '',
                       transactionLink: '',
@@ -217,22 +217,21 @@ const ProfilePage: FC = () => {
                       },
                     }}
                   >
-                    <div className='flex gap-3 px-5 pt-2 pb-5'>
+                    <div className='flex gap-3 px-5 pt-2'>
                       {proposal?.milestone?.project?.projectLaunch?.dao.members?.find(
                         member => member.id === authenticatedUser?.id,
-                      ) &&
-                        proposal.status === ProposalStatusEnum.Voting && (
-                          <>
-                            {!authenticatedUser?.role?.find(
-                              role => role === UserRoleEnum.BusinessAnalyst,
-                            ) &&
+                      ) && proposal.status === ProposalStatusEnum.Voting ? (
+                        <>
+                          {!authenticatedUser?.role?.find(
+                            role => role === UserRoleEnum.BusinessAnalyst,
+                          ) &&
                             !proposal.votes.find(
                               vote => vote.memberId === authenticatedUser?.id,
-                            ) ? (
+                            ) && (
                               <>
                                 <button
                                   type='button'
-                                  className='inline-flex border-transparent bg-emerald-500 hover:bg-transparent border-2 hover:border-emerald-500 hover:text-emerald-500 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
+                                  className='inline-flex border-transparent bg-emerald-500 hover:bg-transparent border-2 hover:border-emerald-500 hover:text-emerald-500 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium mb-5'
                                   onClick={async () => {
                                     if (authenticatedUser) {
                                       const response = await axios.put(
@@ -257,7 +256,7 @@ const ProfilePage: FC = () => {
                                 </button>
                                 <button
                                   type='button'
-                                  className='inline-flex border-transparent bg-red-500 hover:bg-transparent border-2 hover:border-red-500 hover:text-red-500 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
+                                  className='inline-flex border-transparent bg-red-500 hover:bg-transparent border-2 hover:border-red-500 hover:text-red-500 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium mb-5'
                                   onClick={async () => {
                                     if (authenticatedUser) {
                                       const response = await axios.put(
@@ -281,71 +280,71 @@ const ProfilePage: FC = () => {
                                   Vote against
                                 </button>
                               </>
-                            ) : (
-                              authenticatedUser?.role?.find(
-                                role => role === UserRoleEnum.BusinessAnalyst,
-                              ) &&
-                              (proposal.votes.filter(
-                                vote => vote.decision === ProposalVoteEnum.Approve,
-                              ).length >=
-                              Math.round(
-                                (proposal?.milestone?.project?.projectLaunch?.dao?.members?.filter(
-                                  member =>
-                                    !member.role.find(
-                                      role => role === UserRoleEnum.BusinessAnalyst,
-                                    ),
-                                ).length || 0) / 2,
-                              ) ? (
-                                <button
-                                  type='button'
-                                  className='inline-flex border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium'
-                                  onClick={async () => {
-                                    if (authenticatedUser) {
-                                      const response = await axios.post(
-                                        `milestones/${proposal?.milestone.id}/proposals`,
-                                        {
-                                          createNew: false,
-                                          commandType: CommandType.Withdraw,
-                                          authorId: authenticatedUser.id,
-                                          data: {
-                                            multisig_pda:
-                                              proposal?.milestone?.project?.projectLaunch?.dao
-                                                ?.multisigPda,
-                                            is_execute: true,
-                                            receiver:
-                                              proposal?.milestone?.project?.projectLaunch?.author
-                                                ?.walletId,
-                                            amount:
-                                              (proposal?.milestone?.project?.projectLaunch?.projectLaunchInvestments?.reduce(
-                                                (previousValue, currentValue) =>
-                                                  previousValue + Number(currentValue.amount),
-                                                0,
-                                              ) || 0) /
-                                              (proposal?.milestone?.project?.milestoneNumber || 1),
-                                          },
-                                        },
-                                      );
-
-                                      if (response.status === HttpStatusCode.Created) {
-                                        fetchLatestAuthInfo();
-                                      }
-                                    }
-                                  }}
-                                >
-                                  Execute
-                                </button>
-                              ) : (
-                                <button
-                                  type='button'
-                                  disabled
-                                  className='inline-flex border-transparent bg-zinc-900 enabled:hover:bg-transparent border-2 enabled:hover:border-zinc-900 enabled:hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium disabled:opacity-40'
-                                >
-                                  Execute
-                                </button>
-                              ))
                             )}
-                          </>
-                        )}
+                        </>
+                      ) : (
+                        proposal.status === ProposalStatusEnum.PendingExecution &&
+                        authenticatedUser?.role?.find(
+                          role => role === UserRoleEnum.BusinessAnalyst,
+                        ) &&
+                        (proposal.votes.filter(vote => vote.decision === ProposalVoteEnum.Approve)
+                          .length >=
+                        Math.round(
+                          (proposal?.milestone?.project?.projectLaunch?.dao?.members?.filter(
+                            member =>
+                              !member.role.find(role => role === UserRoleEnum.BusinessAnalyst),
+                          ).length || 0) / 2,
+                        ) ? (
+                          <button
+                            type='button'
+                            className='inline-flex border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium mb-5'
+                            onClick={async () => {
+                              if (
+                                authenticatedUser &&
+                                proposal?.milestone?.project?.projectLaunch
+                              ) {
+                                const response = await axios.post(
+                                  `milestones/${proposal.milestone.id}/proposals`,
+                                  {
+                                    createNew: false,
+                                    commandType: CommandType.Withdraw,
+                                    authorId: authenticatedUser.id,
+                                    data: {
+                                      multisig_pda:
+                                        proposal.milestone.project.projectLaunch.dao.multisigPda,
+                                      is_execute: true,
+                                      receiver:
+                                        proposal.milestone.project.projectLaunch.author.walletId,
+                                      amount:
+                                        (proposal.milestone.project.projectLaunch.projectLaunchInvestments?.reduce(
+                                          (previousValue, currentValue) =>
+                                            previousValue + Number(currentValue.amount),
+                                          0,
+                                        ) || 0) /
+                                        (proposal.milestone.project.projectLaunch.project
+                                          ?.milestoneNumber || 1),
+                                    },
+                                  },
+                                );
+
+                                if (response.status === HttpStatusCode.Created) {
+                                  fetchLatestAuthInfo();
+                                }
+                              }
+                            }}
+                          >
+                            Execute
+                          </button>
+                        ) : (
+                          <button
+                            type='button'
+                            disabled
+                            className='inline-flex border-transparent bg-zinc-900 enabled:hover:bg-transparent border-2 enabled:hover:border-zinc-900 enabled:hover:text-zinc-900 text-white px-10 py-1.5 transition-all duration-300 rounded-full font-sans font-medium disabled:opacity-40 mb-5'
+                          >
+                            Execute
+                          </button>
+                        ))
+                      )}
                     </div>
                   </Proposal>
                 ))}
