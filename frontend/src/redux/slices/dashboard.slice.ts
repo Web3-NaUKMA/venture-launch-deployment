@@ -95,7 +95,9 @@ export const fetchLockedProjectLaunches =
           },
         },
         relations: {
-          projectLaunchInvestments: true,
+          projectLaunchInvestments: {
+            investor: true,
+          },
         },
       },
       {
@@ -128,7 +130,9 @@ export const fetchInvestedProjectLaunches =
     const query = qs.stringify(
       {
         relations: {
-          projectLaunchInvestments: true,
+          projectLaunchInvestments: {
+            investor: true,
+          },
         },
       },
       {

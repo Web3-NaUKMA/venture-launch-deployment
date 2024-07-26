@@ -2,7 +2,14 @@ import { FC, HTMLAttributes, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppRoutes } from '../../../types/enums/app-routes.enum';
 import Button from '../../atoms/Button/Button';
-import { DotsIcon, EmptyLogoIcon, RemoveIcon, ShareIcon, StarIcon } from '../../atoms/Icons/Icons';
+import {
+  DotsIcon,
+  EmptyLogoIcon,
+  LockIcon,
+  RemoveIcon,
+  ShareIcon,
+  StarIcon,
+} from '../../atoms/Icons/Icons';
 import { useOutsideClick } from '../../../hooks/dom.hooks';
 import Modal from '../Modal/Modal';
 import { useAppDispatch } from '../../../hooks/redux.hooks';
@@ -241,9 +248,20 @@ export const Project: FC<ProjectProps> = ({
                       ) &&
                         projectLaunch.approver !== null && (
                           <Button
-                            className={`inline-flex text-center justify-center items-center font-medium font-sans hover:border-transparent hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 hover:text-white transition-all duration-300 rounded-full ${variant === 'tiny' ? 'text-sm px-4 py-0.5' : 'text-lg px-10 py-1'}`}
+                            disabled={!projectLaunch.dao}
+                            className={`inline-flex text-center justify-center items-center font-medium font-sans enabled:hover:border-transparent enabled:hover:bg-zinc-900 bg-transparent border-2 border-zinc-900 text-zinc-900 disabled:border-zinc-400 disabled:text-zinc-400 enabled:hover:text-white transition-all duration-300 rounded-full gap-2 disabled:bg-opacity-30 disabled:cursor-pointer relative group/invest-button ${variant === 'tiny' ? 'text-sm px-4 py-0.5' : 'text-lg px-10 py-1'}`}
                             onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}
                           >
+                            {!projectLaunch.dao && (
+                              <>
+                                <LockIcon className='size-4 stroke-2' />
+                                <div className='group-hover/invest-button:flex hidden absolute w-[125%] z-50 bg-white rounded-xl text-zinc-600 text-xs bottom-full mb-3 shadow-[0_0_15px_-7px_grey] p-2 before:content-[""] before:flex before:w-[16px] before:aspect-square before:bg-white before:shadow-[0_0_30px_-15px_grey] before:absolute before:rotate-45 before:top-full before:-translate-y-[80%] before:-z-50 before:left-1/2 before:-translate-x-1/2'>
+                                  The investment opportunity is temporarily unavailable due to the
+                                  creation of a DAO for this project on Solana Blockchain. Please
+                                  try again later
+                                </div>
+                              </>
+                            )}
                             Invest now
                           </Button>
                         )}
@@ -381,9 +399,20 @@ export const Project: FC<ProjectProps> = ({
                 ) &&
                   projectLaunch.approver !== null && (
                     <Button
-                      className='inline-flex text-center justify-center items-center font-medium font-sans text-lg border-transparent bg-zinc-900 hover:bg-transparent border-2 hover:border-zinc-900 hover:text-zinc-900 text-white px-10 py-1 transition-all duration-300 rounded-full'
+                      disabled={!projectLaunch.dao}
+                      className='inline-flex text-center justify-center gap-2 items-center font-medium font-sans text-lg border-transparent bg-zinc-900 enabled:hover:bg-transparent border-2 enabled:hover:border-zinc-900 enabled:hover:text-zinc-900 text-white px-10 py-1 transition-all duration-300 rounded-full disabled:bg-opacity-30 disabled:cursor-pointer relative group/invest-button'
                       onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}
                     >
+                      {!projectLaunch.dao && (
+                        <>
+                          <LockIcon className='size-4 stroke-2' />
+                          <div className='group-hover/invest-button:flex hidden absolute w-[125%] z-50 bg-white rounded-xl text-zinc-600 text-xs bottom-full mb-3 shadow-[0_0_15px_-7px_grey] p-2 before:content-[""] before:flex before:w-[16px] before:aspect-square before:bg-white before:shadow-[0_0_30px_-15px_grey] before:absolute before:rotate-45 before:top-full before:-translate-y-[80%] before:-z-50 before:left-1/2 before:-translate-x-1/2'>
+                            The investment opportunity is temporarily unavailable due to the
+                            creation of a DAO for this project on Solana Blockchain. Please try
+                            again later
+                          </div>
+                        </>
+                      )}
                       Invest now
                     </Button>
                   )}

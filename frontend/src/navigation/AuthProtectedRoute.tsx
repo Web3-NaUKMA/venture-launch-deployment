@@ -1,5 +1,5 @@
 import { FC, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router';
+import { Outlet, useLocation } from 'react-router';
 import { useAuth } from '../hooks/auth.hooks';
 import { AppRoutes } from '../types/enums/app-routes.enum';
 import { UserRoleEnum } from '../types/enums/user-role.enum';
@@ -12,22 +12,22 @@ const AuthProtectedRoute: FC<AuthProtectedRouteProps> = ({
   roles = Object.values(UserRoleEnum),
 }) => {
   const { fetchLatestAuthInfo, signOut } = useAuth();
-  const navigate = useNavigate();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     fetchLatestAuthInfo({
-      onSuccess: user => {
+      onSuccess: async user => {
         if (!user || !roles?.find(role => user.role.includes(role))) {
-          signOut();
-          navigate(AppRoutes.SignIn);
+          await signOut();
+          location.replace(AppRoutes.SignIn);
         }
       },
-      onError: () => {
-        signOut();
-        navigate(AppRoutes.SignIn);
+      onError: async () => {
+        await signOut();
+        location.replace(AppRoutes.SignIn);
       },
     });
-  }, []);
+  }, [pathname]);
 
   return <Outlet />;
 };

@@ -117,12 +117,10 @@ const StartupOrInvestorDashboard: FC<StartupOrInvestorDashboardProps> = ({ ...pr
         <div className='flex flex-1 relative min-h-[500px] w-[calc(100%_+_1.5rem_+_15px)] -ms-3'>
           <div className='flex flex-col absolute overflow-y-scroll top-0 left-0 right-0 bottom-0 with-scrollbar px-3 pb-3 flex-1'>
             <div className='flex flex-col relative gap-4 flex-1'>
-              {investedProjectLaunches.map(projectLaunch => (
-                <DashboardInvestedProject
-                  key={projectLaunch.id}
-                  className='flex bg-white rounded-xl shadow-[0_0_15px_-7px_grey] p-3 justify-between items-center'
-                  projectLaunch={projectLaunch}
-                  allocation={
+              {investedProjectLaunches
+                .map(projectLaunch => ({
+                  ...projectLaunch,
+                  allocation:
                     projectLaunch?.projectLaunchInvestments?.reduce(
                       (previousValue, currentValue) =>
                         previousValue +
@@ -130,10 +128,17 @@ const StartupOrInvestorDashboard: FC<StartupOrInvestorDashboardProps> = ({ ...pr
                           ? Number(currentValue.amount)
                           : 0),
                       0,
-                    ) || 0
-                  }
-                />
-              ))}
+                    ) || 0,
+                }))
+                .filter(projectLaunch => projectLaunch.allocation > 0)
+                .map(projectLaunch => (
+                  <DashboardInvestedProject
+                    key={projectLaunch.id}
+                    className='flex bg-white rounded-xl shadow-[0_0_15px_-7px_grey] p-3 justify-between items-center'
+                    projectLaunch={projectLaunch}
+                    allocation={projectLaunch.allocation}
+                  />
+                ))}
               {!investedProjectLaunches?.length && (
                 <div className='flex flex-1 border-2 border-stone-300 border-dashed rounded-xl items-center justify-center'>
                   <span className='text-center p-5 text-sm font-medium font-mono text-stone-400'>
@@ -151,7 +156,8 @@ const StartupOrInvestorDashboard: FC<StartupOrInvestorDashboardProps> = ({ ...pr
             <h3 className='font-semibold text-sm'>My own funds invested</h3>
             <InformationCircleIcon className='size-4 text-stone-500 mt-2' />
             <div className='flex mt-2 justify-between items-end'>
-              <h3 className='text-2xl font-serif'>$
+              <h3 className='text-2xl font-serif'>
+                $
                 {shortenNumber(
                   investedProjectLaunches.reduce(
                     (previousValue, currentValue) =>
@@ -165,7 +171,8 @@ const StartupOrInvestorDashboard: FC<StartupOrInvestorDashboardProps> = ({ ...pr
                       ),
                     0,
                   ),
-                )}</h3>
+                )}
+              </h3>
               <ChartBarIcon className='size-4 fill-stone-300 text-stone-300 m-1' />
             </div>
           </div>
@@ -176,7 +183,22 @@ const StartupOrInvestorDashboard: FC<StartupOrInvestorDashboardProps> = ({ ...pr
               <ArrowDropDown className='size-4 text-stone-600 mt-0.5' />
             </div>
             <div className='flex mt-2 justify-between items-end'>
-              <h3 className='text-2xl font-serif'>$1.2m</h3>
+              <h3 className='text-2xl font-serif'>
+                $
+                {shortenNumber(
+                  investedProjectLaunches.reduce(
+                    (previousValue, currentValue) =>
+                      previousValue +
+                      Number(
+                        currentValue?.projectLaunchInvestments?.reduce(
+                          (p, c) => p + Number(c.amount),
+                          0,
+                        ) || 0,
+                      ),
+                    0,
+                  ),
+                )}
+              </h3>
               <ChartBarIcon className='size-4 fill-stone-300 text-stone-300 m-1' />
             </div>
           </div>

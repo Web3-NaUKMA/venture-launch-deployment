@@ -17,6 +17,8 @@ export interface SignInFormState {
     password: string;
   };
   error?: string;
+  isLoaded: boolean;
+  isLoggedIn: boolean;
 }
 
 const initialState: SignInFormState = {
@@ -24,6 +26,8 @@ const initialState: SignInFormState = {
     email: '',
     password: '',
   },
+  isLoaded: false,
+  isLoggedIn: false,
 };
 
 const SignInPage: FC = () => {
@@ -73,6 +77,12 @@ const SignInPage: FC = () => {
   };
 
   useEffect(() => {
+    if (!state.isLoaded) {
+      setState({ ...state, isLoaded: true });
+    }
+  }, [state.isLoaded]);
+
+  useEffect(() => {
     if (cookies.get('auth.token')) {
       jose
         .jwtVerify(
@@ -100,30 +110,39 @@ const SignInPage: FC = () => {
   }, []);
 
   useEffect(() => {
-    if (wallet.publicKey && location.state?.walletDisconnect) {
-      wallet.publicKey = null;
-      wallet.disconnect();
-      location.state.walletDisconnect = false;
-      return;
-    }
+    if (state.isLoaded) {
+      if (wallet.publicKey && location.state?.walletDisconnect) {
+        wallet.publicKey = null;
+        wallet.disconnect();
+        sessionStorage.removeItem('wallet');
+        location.state.walletDisconnect = false;
+        return;
+      }
 
-    if (wallet.publicKey && wallet.signMessage) {
-      signIn(
-        SignInMethod.Wallet,
-        { wallet },
-        {
-          onSuccess: () => {
-            navigate(AppRoutes.Home);
-            sessionStorage.setItem('wallet', wallet.publicKey!.toString());
+      if (wallet.publicKey && wallet.signMessage && !state.isLoggedIn) {
+        setState({ ...state, isLoggedIn: true });
+        signIn(
+          SignInMethod.Wallet,
+          { wallet },
+          {
+            onSuccess: () => {
+              navigate(AppRoutes.Home);
+              sessionStorage.setItem('wallet', wallet.publicKey!.toString());
+              setState({ ...state, isLoggedIn: false });
+            },
+            onError: () => {
+              setState({
+                ...state,
+                error: 'The user with such Wallet ID does not exist!',
+                isLoggedIn: false,
+              });
+              wallet.disconnect();
+            },
           },
-          onError: () => {
-            setState({ ...state, error: 'The user with such Wallet ID does not exist!' });
-            wallet.disconnect();
-          },
-        },
-      );
+        );
+      }
     }
-  }, [wallet.publicKey]);
+  }, [wallet.publicKey, wallet.signMessage, state.isLoaded, state.isLoggedIn]);
 
   return (
     <div className='flex flex-col min-h-screen'>

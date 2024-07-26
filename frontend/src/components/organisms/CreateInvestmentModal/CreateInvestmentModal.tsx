@@ -13,11 +13,7 @@ import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { USDC_MINT } from '../../../utils/venture-launch.utils';
 import { PublicKey, Transaction } from '@solana/web3.js';
 import useWeb3Auth from '../../../hooks/web3auth.hooks';
-import {
-  createTransferInstruction,
-  getAssociatedTokenAddress,
-} from '@solana/spl-token';
-
+import { createTransferInstruction, getAssociatedTokenAddress } from '@solana/spl-token';
 
 export interface CreateInvestmentModalProps extends ModalProps {
   projectLaunch: ProjectLaunch;
@@ -27,6 +23,7 @@ interface CreateInvestmentModalState {
   data: {
     amount?: number;
   };
+  doesUserAgree: boolean;
   error: string | null;
 }
 
@@ -34,6 +31,7 @@ const initialState: CreateInvestmentModalState = {
   data: {
     amount: undefined,
   },
+  doesUserAgree: false,
   error: null,
 };
 
@@ -73,8 +71,13 @@ const CreateInvestmentModal: FC<CreateInvestmentModalProps> = ({
   const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
-    if (isDataValid(state.data) && authenticatedUser && publicKey && sendTransaction) {
-      console.log(projectLaunch.dao.vaultPda);
+    if (
+      isDataValid(state.data) &&
+      authenticatedUser &&
+      publicKey &&
+      sendTransaction &&
+      projectLaunch.dao
+    ) {
       const associatedTokenAccount = await getAssociatedTokenAddress(
         USDC_MINT,
         new PublicKey(projectLaunch.dao.vaultPda),
@@ -86,11 +89,8 @@ const CreateInvestmentModal: FC<CreateInvestmentModalProps> = ({
         true,
       );
 
-      console.log(associatedTokenAccount.toBase58());
-      console.log(associatedTokenAccountFrom.toBase58());
       let blockhash = (await connection.getLatestBlockhash('finalized')).blockhash;
 
-      // const programId = new PublicKey('B1Lmegd5rBAAZ4nBRN9ePeMcThLdEQ5ec3yfDZZJxnBY');
       let tx = new Transaction().add(
         createTransferInstruction(
           associatedTokenAccountFrom,
@@ -102,23 +102,7 @@ const CreateInvestmentModal: FC<CreateInvestmentModalProps> = ({
       tx.feePayer = publicKey;
       tx.recentBlockhash = blockhash;
 
-      // let tx = await createDepositTx(
-      //   connection,
-      //   programId,
-      //   publicKey,
-      //   associatedTokenAccount,
-      //   new PublicKey(projectLaunch.vaultTokenAccount),
-      //   new PublicKey(projectLaunch.cryptoTrackerAccount),
-      //   state.data.amount!,
-      // );
-
-      // tx = await signTransaction(tx);
-
-      const signature = await sendTransaction(tx, connection);
-      console.log(signature);
-      // setTimeout(() => { }
-
-      //   , 10000);
+      await sendTransaction(tx, connection);
 
       dispatch(
         createProjectLaunchInvestment(
@@ -138,40 +122,61 @@ const CreateInvestmentModal: FC<CreateInvestmentModalProps> = ({
   };
 
   return (
-    <Modal title={title} onClose={onClose} className='max-w-[492px]'>
+    <Modal title={title} onClose={onClose} className='max-w-xl'>
       <form ref={formRef} className='flex flex-col py-8 px-10 w-full' onSubmit={onSubmit}>
         {state.error && (
           <span className='bg-rose-100 border border-rose-200 p-2 rounded-md mb-8 font-mono text-sm'>
             {state.error}
           </span>
         )}
-        <input
-          type='number'
-          id='create_project_launch_investment_amount'
-          className='border border-stone-400 p-3 rounded-lg text-stone-800 text-center placeholder:text-stone-400 placeholder:text-center font-mono'
-          placeholder='Amount'
-          defaultValue={state.data.amount}
-          onChange={event =>
-            setState({
-              ...state,
-              data: {
-                ...state.data,
-                amount: event.target.value ? Number(event.target.value) : undefined,
-              },
-              error: null,
-            })
-          }
-        />
+        <div className='flex flex-col'>
+          <input
+            type='number'
+            id='create_project_launch_investment_amount'
+            className='border border-stone-400 p-3 rounded-lg text-stone-800 text-center placeholder:text-stone-400 placeholder:text-center font-mono'
+            placeholder='Amount'
+            min={0.01}
+            step={0.01}
+            defaultValue={state.data.amount}
+            onChange={event =>
+              setState({
+                ...state,
+                data: {
+                  ...state.data,
+                  amount: event.target.value ? Number(event.target.value) : undefined,
+                },
+                error: null,
+              })
+            }
+          />
+        </div>
+        <div className='flex flex-col mt-5'>
+          <div className='flex gap-2 items-baseline'>
+            <input
+              type='checkbox'
+              id='approve_milestone_checkbox'
+              className='!ring-0'
+              defaultChecked={state.doesUserAgree}
+              onChange={event => setState({ ...state, doesUserAgree: event.target.checked })}
+            />
+            <label htmlFor='approve_milestone_checkbox' className='cursor-pointer'>
+              I have read all the information provided in the form and agree to the proposed terms
+              and conditions
+            </label>
+          </div>
+        </div>
         <div className='flex flex-col mt-8 gap-4'>
           <button
             type='submit'
-            className='inline-flex text-center justify-center items-center bg-zinc-900 text-white font-mono rounded-full py-2.5 text-lg w-full hover:bg-zinc-700 transition-all duration-300'
+            disabled
+            className='inline-flex text-center justify-center items-center bg-zinc-900 text-white font-mono rounded-full py-2.5 text-lg w-full enabled:hover:bg-zinc-700 transition-all duration-300 disabled:opacity-30'
           >
             SAFT/SAFE
           </button>
           <button
             type='submit'
-            className='inline-flex text-center justify-center items-center bg-zinc-900 text-white font-mono rounded-full py-2.5 text-lg w-full hover:bg-zinc-700 transition-all duration-300'
+            disabled={!state.doesUserAgree}
+            className='inline-flex text-center justify-center items-center bg-zinc-900 text-white font-mono rounded-full py-2.5 text-lg w-full enabled:hover:bg-zinc-700 transition-all duration-300 disabled:opacity-30'
           >
             INVEST
           </button>

@@ -8,6 +8,7 @@ import {
   FileIcon,
   ImageIcon,
   LinkedInIcon,
+  LockIcon,
   PlanetIcon,
   ShareIcon,
   StarIcon,
@@ -114,9 +115,20 @@ const ProjectLaunchInfoModal: FC<ProjectLaunchInfoModalProps> = ({
                   </div>
                   {projectLaunch.approver && !projectLaunch.isFundraised && (
                     <Button
-                      className='inline-flex text-center font-medium justify-center mt-4 border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-2 transition-all duration-300 rounded-full max-w-[260px] text-lg'
+                      disabled={!projectLaunch.dao}
+                      className='inline-flex text-center items-center gap-2 font-medium justify-center mt-4 border-transparent bg-zinc-900 enabled:hover:bg-transparent border-2 enabled:hover:border-zinc-900 enabled:hover:text-zinc-900 text-white px-5 py-2 transition-all duration-300 rounded-full max-w-[260px] text-lg group/invest-button disabled:bg-opacity-30 relative disabled:cursor-pointer'
                       onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}
                     >
+                      {!projectLaunch.dao && (
+                        <>
+                          <LockIcon className='size-5 stroke-2' />
+                          <div className='group-hover/invest-button:flex hidden absolute w-[125%] z-50 bg-white rounded-xl text-zinc-600 text-xs bottom-full mb-3 shadow-[0_0_15px_-7px_grey] p-2 before:content-[""] before:flex before:w-[16px] before:aspect-square before:bg-white before:shadow-[0_0_30px_-15px_grey] before:absolute before:rotate-45 before:top-full before:-translate-y-[80%] before:-z-50 before:left-1/2 before:-translate-x-1/2'>
+                            The investment opportunity is temporarily unavailable due to the
+                            creation of a DAO for this project on Solana Blockchain. Please try
+                            again later
+                          </div>
+                        </>
+                      )}
                       Invest Now
                     </Button>
                   )}
@@ -451,9 +463,20 @@ const ProjectLaunchInfoModal: FC<ProjectLaunchInfoModalProps> = ({
                 <>
                   {projectLaunch.approver && !projectLaunch.isFundraised && (
                     <Button
-                      className='inline-flex text-center font-medium justify-center border-transparent bg-black hover:bg-transparent border-2 hover:border-black hover:text-black text-white px-5 py-1.5 transition-all duration-300 rounded-full text-lg'
+                      disabled={!projectLaunch.dao}
+                      className='inline-flex items-center gap-2 text-center font-medium justify-center border-transparent bg-zinc-900 enabled:hover:bg-transparent border-2 enabled:hover:border-zinc-900 enabled:hover:text-zinc-900 text-white px-5 py-1.5 transition-all duration-300 rounded-full text-lg relative disabled:bg-opacity-30 group/invest-button disabled:cursor-pointer'
                       onClick={() => setIsCreateProjectLaunchInvestmentModalVisible(true)}
                     >
+                      {!projectLaunch.dao && (
+                        <>
+                          <LockIcon className='size-4 stroke-2' />
+                          <div className='group-hover/invest-button:flex hidden absolute w-[125%] z-50 bg-white rounded-xl text-zinc-600 text-xs bottom-full mb-3 shadow-[0_0_15px_-7px_grey] p-2 before:content-[""] before:flex before:w-[16px] before:aspect-square before:bg-white before:shadow-[0_0_30px_-15px_grey] before:absolute before:rotate-45 before:top-full before:-translate-y-[80%] before:-z-50 before:left-1/2 before:-translate-x-1/2'>
+                            The investment opportunity is temporarily unavailable due to the
+                            creation of a DAO for this project on Solana Blockchain. Please try
+                            again later
+                          </div>
+                        </>
+                      )}
                       Invest Now
                     </Button>
                   )}

@@ -4,9 +4,9 @@
   @apply !inline-flex hover:!border-transparent w-full text-center items-center justify-center hover:!bg-zinc-900 !bg-transparent !border-2 !border-zinc-900 !text-zinc-900 hover:!text-white !px-10 !py-3 !h-auto !leading-normal !transition-all !duration-300 !rounded-full !font-medium;
 }
 
-.wallet-adapter-button.wallet-adapter-button-trigger .wallet-adapter-button-start-icon {
+/* .wallet-adapter-button.wallet-adapter-button-trigger .wallet-adapter-button-start-icon {
   display: none;
-}
+} */
 
 ::-webkit-scrollbar {
   width: 0;

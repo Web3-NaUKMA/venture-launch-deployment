@@ -27,9 +27,8 @@ export class ProjectLaunchService {
           relations: {
             author: true,
             project: true,
-            projectLaunchInvestments: { investor: true },
             approver: true,
-            dao: { members: true }
+            dao: { members: true },
           },
         }),
       );
@@ -45,9 +44,8 @@ export class ProjectLaunchService {
           relations: {
             author: true,
             project: true,
-            projectLaunchInvestments: true,
             approver: true,
-            dao: { members: true }
+            dao: { members: true },
           },
         }),
       );
@@ -66,7 +64,7 @@ export class ProjectLaunchService {
         where: {
           name: data.name,
           author: { id: data.authorId },
-          dao: { members: true }
+          dao: { members: true },
         },
       });
 
@@ -114,7 +112,7 @@ export class ProjectLaunchService {
           author: true,
           project: true,
           approver: true,
-          dao: { members: true }
+          dao: { members: true },
         },
         where: { id },
       });
@@ -137,7 +135,7 @@ export class ProjectLaunchService {
           author: true,
           project: true,
           approver: true,
-          dao: { members: true }
+          dao: { members: true },
         },
         where: { id },
       });

@@ -53,9 +53,9 @@ const Content: FC = () => {
             <Route path={AppRoutes.MessageCenter} Component={MessageCenterPage}>
               <Route path={AppRoutes.DetailsChat} Component={DetailsChatPage} />
             </Route>
+            <Route path={AppRoutes.Root} element={<Navigate to={AppRoutes.Home} />} />
+            <Route path={AppRoutes.About} Component={AboutPage} />
           </Route>
-          <Route path={AppRoutes.Root} element={<Navigate to={AppRoutes.Home} />} />
-          <Route path={AppRoutes.About} Component={AboutPage} />
         </Route>
         <Route path={AppRoutes.Any} Component={NotFoundPage} />
       </Routes>
