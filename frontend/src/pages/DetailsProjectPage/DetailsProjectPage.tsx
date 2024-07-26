@@ -22,6 +22,7 @@ import { createNftTransaction, getIPFSUrlForProject } from '../../utils/nft.util
 import * as web3 from '@solana/web3.js';
 import ProjectLaunchInfoModal from '../../components/organisms/ProjectLaunchInfoModal/ProjectLaunchInfoModal';
 import useWeb3Auth from '../../hooks/web3auth.hooks';
+import Spinner from 'components/atoms/Spinner/Spinner';
 
 const DetailsProjectPage: FC = () => {
   const { id } = useParams();
@@ -31,6 +32,8 @@ const DetailsProjectPage: FC = () => {
   const [isSubmitProjectModalVisible, setIsSubmitProjectModalVisible] = useState(false);
   const [isShowProjectLaunchInfoModalVisible, setIsShowProjectLaunchInfoModalVisible] =
     useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [wasProjectSubmitted, setWasProjectSubmitted] = useState(false);
   const [isCreateMilestoneModalVisible, setIsCreateMilestoneModalVisible] = useState(false);
   const { authenticatedUser } = useAuth();
   const wallet = useWallet();
@@ -38,7 +41,17 @@ const DetailsProjectPage: FC = () => {
   const { connectWallet } = useWeb3Auth();
 
   useEffect(() => {
-    if (id) dispatch(fetchProject(id, { onError: () => setNotFound(true) }));
+    if (id) {
+      dispatch(
+        fetchProject(id, {
+          onError: () => {
+            setNotFound(true);
+            setIsLoaded(true);
+          },
+          onSuccess: () => setIsLoaded(true),
+        }),
+      );
+    }
 
     return () => {
       dispatch(setProject(null));
@@ -46,6 +59,8 @@ const DetailsProjectPage: FC = () => {
   }, [id]);
 
   const submitProject = async () => {
+    setWasProjectSubmitted(true);
+
     if (project && wallet.publicKey && wallet.signTransaction) {
       const metadataUrl = await getIPFSUrlForProject(project);
       const nftTransaction = await createNftTransaction(
@@ -64,20 +79,25 @@ const DetailsProjectPage: FC = () => {
           { isFinal: true, dataAccountHash },
           {
             onSuccess: () => {
+              setWasProjectSubmitted(false);
               setIsSubmitProjectModalVisible(false);
               if (id) dispatch(fetchProject(id));
+            },
+            onError: () => {
+              setWasProjectSubmitted(false);
             },
           },
         ),
       );
     } else if (!wallet.publicKey || !wallet.signTransaction) {
+      setWasProjectSubmitted(false);
       connectWallet();
     }
   };
 
   return notFound ? (
     <NotFoundPage />
-  ) : (
+  ) : isLoaded ? (
     project && (
       <>
         {isSubmitProjectModalVisible &&
@@ -87,28 +107,38 @@ const DetailsProjectPage: FC = () => {
               onClose={() => setIsSubmitProjectModalVisible(false)}
               className='max-w-[596px]'
             >
-              <div className='px-10 py-8 flex flex-col'>
-                <p className='font-mono'>
-                  Are you sure you want to submit this submit? You will not be able to cancel this
-                  operation.
-                </p>
-                <div className='mt-8 flex gap-4'>
-                  <button
-                    type='button'
-                    className='inline-flex text-center justify-center items-center border-2 bg-emerald-500 hover:bg-emerald-600 border-transparent text-white rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
-                    onClick={() => submitProject()}
-                  >
-                    Submit
-                  </button>
-                  <button
-                    type='button'
-                    className='inline-flex text-center justify-center items-center text-zinc-700 border-2 border-zinc-900 hover:text-zinc-900 hover:bg-slate-100 rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
-                    onClick={() => setIsSubmitProjectModalVisible(false)}
-                  >
-                    Cancel
-                  </button>
+              {!wasProjectSubmitted ? (
+                <div className='px-10 py-8 flex flex-col'>
+                  <p className='font-mono'>
+                    Are you sure you want to submit this submit? You will not be able to cancel this
+                    operation.
+                  </p>
+                  <div className='mt-8 flex gap-4'>
+                    <button
+                      type='button'
+                      className='inline-flex text-center justify-center items-center border-2 bg-emerald-500 hover:bg-emerald-600 border-transparent text-white rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                      onClick={() => submitProject()}
+                    >
+                      Submit
+                    </button>
+                    <button
+                      type='button'
+                      className='inline-flex text-center justify-center items-center text-zinc-700 border-2 border-zinc-900 hover:text-zinc-900 hover:bg-slate-100 rounded-full transition-all duration-300 py-2 px-10 font-sans font-medium text-lg'
+                      onClick={() => setIsSubmitProjectModalVisible(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <div className='px-10 py-8 flex flex-col items-center justify-center min-h-[250px] gap-5'>
+                  <Spinner className='size-12 text-gray-200 animate-spin fill-zinc-900' />
+                  <p className='text-center font-mono'>
+                    We are proceeding your project submission. Please, complete all required steps
+                    and wait for some time
+                  </p>
+                </div>
+              )}
             </Modal>,
             document.getElementById('root')!,
           )}
@@ -194,7 +224,9 @@ const DetailsProjectPage: FC = () => {
             <hr />
             <div className='px-10 py-5'>
               <h3 className='font-sans font-semibold text-xl mb-1.5'>Description</h3>
-              <span className='font-mono whitespace-pre-wrap'>{project.projectLaunchDescription}</span>
+              <span className='font-mono whitespace-pre-wrap'>
+                {project.projectLaunchDescription}
+              </span>
             </div>
             <hr />
             <div className='px-10 py-5'>
@@ -258,6 +290,11 @@ const DetailsProjectPage: FC = () => {
         </div>
       </>
     )
+  ) : (
+    <div className='max-w-[1440px] flex flex-col items-center justify-center flex-1 gap-5 w-full'>
+      <Spinner className='size-12 text-gray-200 animate-spin fill-zinc-900' />
+      <p className='text-center font-mono'>Loading the project details page for you</p>
+    </div>
   );
 };
 

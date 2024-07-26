@@ -147,7 +147,6 @@ export async function createVaultTx(
 
   // Create token account that will be transfered to program
   let vaultTokenAccount = web3.Keypair.generate();
-  console.log(`vaultTokenAccount address: ${vaultTokenAccount.publicKey.toBase58()}`);
   tx.add(
     // create account
     web3.SystemProgram.createAccount({
@@ -163,7 +162,6 @@ export async function createVaultTx(
 
   // Create data account (to store state) that will be transfered to program
   let cryptoTrackerAccount = web3.Keypair.generate();
-  console.log(`cryptoTrackerAccount address: ${cryptoTrackerAccount.publicKey.toBase58()}`);
   tx.add(
     // create account
     web3.SystemProgram.createAccount({

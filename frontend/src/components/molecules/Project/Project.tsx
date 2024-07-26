@@ -134,16 +134,18 @@ export const Project: FC<ProjectProps> = ({
       >
         <div className='flex flex-col w-full flex-1'>
           <div className='flex justify-between items-start pb-5'>
-            <div className='flex items-center w-full'>
+            <div className='flex w-full'>
               <img
                 src={resolveImage(projectLaunch.logo || '')}
                 onError={({ currentTarget }) => {
                   currentTarget.onerror = null;
                   currentTarget.src = '/logo.png';
                 }}
-                className={`${variant === 'tiny' ? 'w-[3em]' : 'w-[6em]'} aspect-square rounded-xl object-cover`}
+                className={`${variant === 'tiny' ? 'w-[3.7em]' : 'w-[6em]'} aspect-square rounded-xl object-cover border`}
               />
-              <div className={`flex flex-col w-full ${variant === 'tiny' ? 'ms-3' : 'ms-5'}`}>
+              <div
+                className={`flex self-center flex-col w-full ${variant === 'tiny' ? 'ms-3' : 'ms-5'}`}
+              >
                 <h4 className={`font-semibold ${variant === 'tiny' ? 'text-lg' : 'text-2xl'}`}>
                   {projectLaunch.name}
                 </h4>
@@ -213,7 +215,7 @@ export const Project: FC<ProjectProps> = ({
                 )}
               </div>
               {variant !== 'extended' && (
-                <div className='grid auto-cols-max gap-2'>
+                <div className='grid auto-cols-max gap-2 items-start'>
                   {projectLaunch.isFundraised &&
                     projectLaunch.approver !== null &&
                     projectLaunch.project && (

@@ -1,4 +1,5 @@
 import axios, { HttpStatusCode } from 'axios';
+import Spinner from 'components/atoms/Spinner/Spinner';
 import AverageRevenuePerUserChart, {
   AverageRevenuePerUserChartData,
 } from 'components/molecules/AverageRevenuePerUserChart/AverageRevenuePerUserChart';
@@ -24,6 +25,14 @@ export enum BusinessAnalystDashboardStatisticsPeriod {
 
 const BusinessAnalystDashboard: FC<BusinessAnalystDashboardProps> = ({ ...props }) => {
   const [filteredProjectLaunches, setFilteredProjectLaunches] = useState<ProjectLaunch[]>([]);
+  const [loadingState, setLoadingState] = useState({
+    isLoaded: false,
+    isTotalUsersChartDataLoaded: false,
+    isTotalInvestmentsChartDataLoaded: false,
+    isAverageRevenuePerUserChartDataLoaded: false,
+    isGeneralChartDataLoaded: false,
+    isProjectLaunchesDataLoaded: false,
+  });
   const [totalUsersChartData, setTotalUsersChartData] = useState<TotalUsersChartData>({
     period: ChartStatisticsPeriod.LastYear,
     labels: [],
@@ -55,7 +64,20 @@ const BusinessAnalystDashboard: FC<BusinessAnalystDashboardProps> = ({ ...props 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(fetchAllProjectLaunches({}, { onSuccess: data => setFilteredProjectLaunches(data) }));
+    dispatch(
+      fetchAllProjectLaunches(
+        {},
+        {
+          onSuccess: data => {
+            setFilteredProjectLaunches(data);
+            setLoadingState({ ...loadingState, isProjectLaunchesDataLoaded: true });
+          },
+          onError: () => {
+            setLoadingState({ ...loadingState, isProjectLaunchesDataLoaded: true });
+          },
+        },
+      ),
+    );
   }, []);
 
   useEffect(() => {
@@ -78,6 +100,35 @@ const BusinessAnalystDashboard: FC<BusinessAnalystDashboardProps> = ({ ...props 
       averageRevenuePerUserChartData.period || ChartStatisticsPeriod.LastYear,
     );
   }, []);
+
+  useEffect(() => {
+    setLoadingState(prevState => ({ ...prevState, isGeneralChartDataLoaded: true }));
+  }, [generalChartData.datasets]);
+
+  useEffect(() => {
+    setLoadingState(prevState => ({ ...prevState, isAverageRevenuePerUserChartDataLoaded: true }));
+  }, [averageRevenuePerUserChartData.datasets]);
+
+  useEffect(() => {
+    setLoadingState(prevState => ({ ...prevState, isTotalInvestmentsChartDataLoaded: true }));
+  }, [totalInvestmentsChartData.datasets]);
+
+  useEffect(() => {
+    setLoadingState(prevState => ({ ...prevState, isTotalUsersChartDataLoaded: true }));
+  }, [totalUsersChartData.datasets]);
+
+  useEffect(() => {
+    if (
+      loadingState.isTotalInvestmentsChartDataLoaded &&
+      loadingState.isGeneralChartDataLoaded &&
+      loadingState.isProjectLaunchesDataLoaded &&
+      loadingState.isTotalUsersChartDataLoaded &&
+      loadingState.isAverageRevenuePerUserChartDataLoaded &&
+      !loadingState.isLoaded
+    ) {
+      setLoadingState({ ...loadingState, isLoaded: true });
+    }
+  }, [loadingState]);
 
   const updateTotalUsersChart = async (period: ChartStatisticsPeriod) => {
     const response: any = await axios.get(`/users`);
@@ -447,8 +498,8 @@ const BusinessAnalystDashboard: FC<BusinessAnalystDashboardProps> = ({ ...props 
     await updateAverageRevenuePerUserChart(period as ChartStatisticsPeriod);
   };
 
-  return (
-    <div className='grid min-[1440px]:grid-cols-[1fr_2.5fr] gap-10 flex-1' {...props}>
+  return loadingState.isLoaded ? (
+    <div className='grid min-[1440px]:grid-cols-[1fr_2.5fr] gap-10 flex-1 min-h-[80vh]' {...props}>
       <div className='flex flex-col flex-1 gap-4'>
         <div className='flex'>
           <input
@@ -501,6 +552,11 @@ const BusinessAnalystDashboard: FC<BusinessAnalystDashboardProps> = ({ ...props 
           />
         </div>
       </div>
+    </div>
+  ) : (
+    <div className='max-w-[1440px] flex flex-col items-center justify-center flex-1 gap-5 w-full'>
+      <Spinner className='size-12 text-gray-200 animate-spin fill-zinc-900' />
+      <p className='text-center font-mono'>Loading the dashboard for you</p>
     </div>
   );
 };

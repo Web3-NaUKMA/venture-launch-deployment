@@ -1,5 +1,6 @@
 import axios, { HttpStatusCode } from 'axios';
 import { ArrowDropDown, ChartBarIcon, InformationCircleIcon } from 'components/atoms/Icons/Icons';
+import Spinner from 'components/atoms/Spinner/Spinner';
 import DashboardInvestedProject from 'components/molecules/DashboardInvestedProject/DashboardInvestedProject';
 import DashboardUnlock from 'components/molecules/DashboardUnlock/DashboardUnlock';
 import IncomeChart, { IncomeChartData } from 'components/molecules/IncomeChart/IncomeChart';
@@ -27,13 +28,32 @@ const StartupOrInvestorDashboard: FC<StartupOrInvestorDashboardProps> = ({ ...pr
     datasets: [],
     growthPercentages: [0, 0],
   });
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [areLockedProjectLaunchesLoaded, setAreLockedProjectLaunchesLoaded] = useState(false);
+  const [areInvestedProjectLaunchesLoaded, setAreInvestedProjectLaunchesLoaded] = useState(false);
 
   useEffect(() => {
     if (authenticatedUser) {
-      dispatch(fetchLockedProjectLaunches());
-      dispatch(fetchInvestedProjectLaunches());
+      dispatch(
+        fetchLockedProjectLaunches({
+          onSuccess: () => setAreLockedProjectLaunchesLoaded(true),
+          onError: () => setAreLockedProjectLaunchesLoaded(true),
+        }),
+      );
+      dispatch(
+        fetchInvestedProjectLaunches({
+          onSuccess: () => setAreInvestedProjectLaunchesLoaded(true),
+          onError: () => setAreInvestedProjectLaunchesLoaded(true),
+        }),
+      );
     }
   }, [authenticatedUser]);
+
+  useEffect(() => {
+    if (areLockedProjectLaunchesLoaded && areInvestedProjectLaunchesLoaded) {
+      setIsLoaded(true);
+    }
+  }, [areLockedProjectLaunchesLoaded, areInvestedProjectLaunchesLoaded]);
 
   useEffect(() => {
     updateIncomeChart(incomeChartData.period || ChartStatisticsPeriod.LastYear);
@@ -100,18 +120,40 @@ const StartupOrInvestorDashboard: FC<StartupOrInvestorDashboardProps> = ({ ...pr
         }
         break;
     }
+
+    if (areLockedProjectLaunchesLoaded && areInvestedProjectLaunchesLoaded) {
+      setIsLoaded(true);
+    }
   };
 
   const handleIncomeChartStatisticsPeriodChanged = async (period: string) => {
+    setIsLoaded(false);
     await updateIncomeChart(period as ChartStatisticsPeriod);
   };
 
-  return (
+  return isLoaded ? (
     <div className='grid min-[1440px]:grid-cols-[1fr_1.66fr_1.2fr] gap-10 flex-1' {...props}>
       <div className='flex flex-col gap-5 flex-1'>
         <div className='rounded-xl px-4 py-3 shadow-[0_0_15px_-7px_grey] flex justify-between items-center bg-white flex-1'>
           <h4 className='font-sans font-semibold'>Participations</h4>
-          <span className='font-mono text-xl font-light'>{investedProjectLaunches.length}</span>
+          <span className='font-mono text-xl font-light'>
+            {
+              investedProjectLaunches
+                .map(projectLaunch => ({
+                  ...projectLaunch,
+                  allocation:
+                    projectLaunch?.projectLaunchInvestments?.reduce(
+                      (previousValue, currentValue) =>
+                        previousValue +
+                        (currentValue.investor?.id === authenticatedUser?.id
+                          ? Number(currentValue.amount)
+                          : 0),
+                      0,
+                    ) || 0,
+                }))
+                .filter(projectLaunch => projectLaunch.allocation > 0).length
+            }
+          </span>
         </div>
         <h3 className='font-mono'>Latest projects:</h3>
         <div className='flex flex-1 relative min-h-[500px] w-[calc(100%_+_1.5rem_+_15px)] -ms-3'>
@@ -231,6 +273,11 @@ const StartupOrInvestorDashboard: FC<StartupOrInvestorDashboardProps> = ({ ...pr
           </div>
         </div>
       </div>
+    </div>
+  ) : (
+    <div className='max-w-[1440px] flex flex-col items-center justify-center flex-1 gap-5 w-full'>
+      <Spinner className='size-12 text-gray-200 animate-spin fill-zinc-900' />
+      <p className='text-center font-mono'>Loading the dashboard for you</p>
     </div>
   );
 };

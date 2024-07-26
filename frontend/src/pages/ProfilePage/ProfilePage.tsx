@@ -21,17 +21,28 @@ import { UserRoleEnum } from 'types/enums/user-role.enum';
 import { ProposalStatusEnum } from 'types/enums/proposal-status.enum';
 import { CommandType } from 'utils/dao.utils';
 import Image from 'components/atoms/Image/Image';
+import Spinner from 'components/atoms/Spinner/Spinner';
 
 const ProfilePage: FC = () => {
   const { authenticatedUser, fetchLatestAuthInfo, signOut } = useAuth();
   const [isEditProfileModalVisible, setIsEditProfileModalVisible] = useState(false);
   const [proposals, setProposals] = useState<ProposalType[]>([]);
+  const [areProposalsLoaded, setAreProposalsLoaded] = useState(false);
+  const [areProjectLaunchesLoaded, setAreProjectLaunchesLoaded] = useState(false);
   const projects = useAppSelector(selectProjectLaunches);
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     if (authenticatedUser) {
-      dispatch(fetchAllProjectLaunches({ where: { author: { id: authenticatedUser.id } } }));
+      dispatch(
+        fetchAllProjectLaunches(
+          { where: { author: { id: authenticatedUser.id } } },
+          {
+            onError: () => setAreProjectLaunchesLoaded(true),
+            onSuccess: () => setAreProjectLaunchesLoaded(true),
+          },
+        ),
+      );
 
       const request = async () => {
         const query = qs.stringify(
@@ -65,6 +76,8 @@ const ProfilePage: FC = () => {
             ),
           );
         }
+
+        setAreProposalsLoaded(true);
       };
 
       request().catch(console.log);
@@ -72,7 +85,8 @@ const ProfilePage: FC = () => {
   }, [authenticatedUser]);
 
   return (
-    authenticatedUser && (
+    authenticatedUser &&
+    (areProjectLaunchesLoaded && areProposalsLoaded ? (
       <>
         {isEditProfileModalVisible &&
           createPortal(
@@ -372,7 +386,12 @@ const ProfilePage: FC = () => {
           )}
         </div>
       </>
-    )
+    ) : (
+      <div className='max-w-[1440px] flex flex-col items-center justify-center flex-1 gap-5 w-full'>
+        <Spinner className='size-12 text-gray-200 animate-spin fill-zinc-900' />
+        <p className='text-center font-mono'>Loading your profile page</p>
+      </div>
+    ))
   );
 };
 

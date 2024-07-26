@@ -12,18 +12,32 @@ import { fetchUser, selectUser, setUser } from '../../redux/slices/user.slice';
 import NotFoundPage from '../NotFoundPage/NotFoundPage';
 import { AppRoutes } from '../../types/enums/app-routes.enum';
 import { useAuth } from '../../hooks/auth.hooks';
+import Spinner from 'components/atoms/Spinner/Spinner';
 
 const DetailsUserPage: FC = () => {
   const [notFound, setNotFound] = useState(false);
   const projects = useAppSelector(selectProjectLaunches);
   const dispatch = useAppDispatch();
   const user = useAppSelector(selectUser);
+  const [isLoaded, setIsLoaded] = useState(false);
   const navigate = useNavigate();
   const { id } = useParams();
   const { authenticatedUser } = useAuth();
 
   useEffect(() => {
-    if (id) dispatch(fetchUser(id, { onError: () => setNotFound(true) }));
+    if (id)
+      dispatch(
+        fetchUser(
+          id,
+          {},
+          {
+            onSuccess: () => {},
+            onError: () => {
+              setNotFound(true);
+            },
+          },
+        ),
+      );
 
     return () => {
       dispatch(setUser(null));
@@ -32,17 +46,22 @@ const DetailsUserPage: FC = () => {
 
   useEffect(() => {
     if (user) {
-      dispatch(fetchAllProjectLaunches({ where: { author: { id: user.id } } }));
+      dispatch(
+        fetchAllProjectLaunches(
+          { where: { author: { id: user.id } } },
+          { onError: () => setIsLoaded(true), onSuccess: () => setIsLoaded(true) },
+        ),
+      );
     }
   }, [user]);
 
   return notFound ? (
     <NotFoundPage />
-  ) : (
+  ) : isLoaded ? (
     user && (
       <>
         <div className='flex mt-3 px-6 flex-col justify-start align-center'>
-          <h3 className='px-2 text-3xl font-serif mb-10'>User profile</h3>
+          <h3 className='px-2 text-3xl font-serif mb-10'>User details</h3>
           <div className='flex flex-col max-w-[1440px] w-full bg-white shadow-[0_0_15px_-7px_gray] rounded-xl'>
             <div className='flex items-center justify-between px-10 py-5'>
               <div className='flex items-center gap-4'>
@@ -148,6 +167,11 @@ const DetailsUserPage: FC = () => {
         </div>
       </>
     )
+  ) : (
+    <div className='max-w-[1440px] flex flex-col items-center justify-center flex-1 gap-5 w-full'>
+      <Spinner className='size-12 text-gray-200 animate-spin fill-zinc-900' />
+      <p className='text-center font-mono'>Loading the user details page for you</p>
+    </div>
   );
 };
 

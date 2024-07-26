@@ -10,24 +10,36 @@ import {
   selectProjectLaunches,
 } from '../../redux/slices/project-launch.slice';
 import LaunchProjectModal from '../../components/organisms/LaunchProjectModal/LaunchProjectModal';
+import Spinner from 'components/atoms/Spinner/Spinner';
 
 const ProjectsPage: FC = () => {
   const dispatch = useAppDispatch();
   const projects = useAppSelector(selectProjectLaunches);
   const [isLaunchProjectModalVisible, setIsLaunchProjectModalVisible] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const { authenticatedUser } = useAuth();
 
   useEffect(() => {
     if (authenticatedUser) {
       if (authenticatedUser.role.includes(UserRoleEnum.BusinessAnalyst)) {
-        dispatch(fetchAllProjectLaunches());
+        dispatch(
+          fetchAllProjectLaunches(
+            {},
+            { onError: () => setIsLoaded(true), onSuccess: () => setIsLoaded(true) },
+          ),
+        );
       } else {
-        dispatch(fetchAllProjectLaunches({ where: { approver: { id: { not: null } } } }));
+        dispatch(
+          fetchAllProjectLaunches(
+            { where: { approver: { id: { not: null } } } },
+            { onError: () => setIsLoaded(true), onSuccess: () => setIsLoaded(true) },
+          ),
+        );
       }
     }
   }, [authenticatedUser]);
 
-  return (
+  return isLoaded ? (
     <>
       {isLaunchProjectModalVisible &&
         createPortal(
@@ -78,6 +90,11 @@ const ProjectsPage: FC = () => {
         </div>
       </div>
     </>
+  ) : (
+    <div className='max-w-[1440px] flex flex-col items-center justify-center flex-1 gap-5 w-full'>
+      <Spinner className='size-12 text-gray-200 animate-spin fill-zinc-900' />
+      <p className='text-center font-mono'>Loading the home page for you</p>
+    </div>
   );
 };
 
