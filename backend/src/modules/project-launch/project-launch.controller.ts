@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import projectLaunchService from './project-launch.service';
 import { HttpStatusCode } from 'axios';
-import { deleteFolder, uploadMultipleFiles } from '../../utils/file.utils';
+import pinata from '../../utils/file.utils';
 import path from 'path';
 import { v4 as uuid } from 'uuid';
 import { Controller } from '../../decorators/app.decorators';
@@ -9,6 +9,7 @@ import qs from 'qs';
 import { parseObjectStringValuesToPrimitives } from '../../utils/object.utils';
 import _ from 'lodash';
 import { IsNull, Not } from 'typeorm';
+import { Readable } from 'stream';
 
 @Controller()
 export class ProjectLaunchController {
@@ -67,33 +68,50 @@ export class ProjectLaunchController {
 
     const createdProjectLaunch = await projectLaunchService.create(request.body);
 
-    files = files.map(file => ({
-      ...file,
-      originalname: `${uuid()}${path.extname(file.originalname)}`,
-      path: `/uploads/project-launches/${createdProjectLaunch.id}/${file.fieldname}`,
-    }));
+    const logoFile = files.find(file => file.fieldname === 'project-logo') || null;
+    const logo = logoFile
+      ? (
+          await pinata.pinFileToIPFS(Readable.from(logoFile.buffer), {
+            pinataMetadata: { name: logoFile.originalname },
+          })
+        ).IpfsHash
+      : null;
 
-    const teamFiles = files.filter(file => file.fieldname === 'team-images');
+    const teamFiles = await Promise.all(
+      files
+        .filter(file => file.fieldname === 'team-images')
+        .map(async file => ({
+          name: file.originalname,
+          hash: (
+            await pinata.pinFileToIPFS(Readable.from(file.buffer), {
+              pinataMetadata: { name: file.originalname },
+            })
+          ).IpfsHash,
+        })),
+    );
 
-    team = team.map((member: any, index: number) => ({
+    team = team.map((member: any) => ({
       ...member,
-      image: teamFiles[index] ? `${teamFiles[index].path}/${teamFiles[index].originalname}` : null,
+      image: teamFiles?.find(file => file.name === member.image)?.hash || null,
     }));
 
-    const logoFile = files.find(file => file.fieldname === 'project-logo') ?? null;
-
-    const projectDocuments = files
-      .filter(file => file.fieldname === 'project-documents')
-      .map(file => `${file.path}/${file.originalname}`);
-
-    await uploadMultipleFiles(files);
+    const projectDocuments = await Promise.all(
+      files
+        .filter(file => file.fieldname === 'project-documents')
+        .map(
+          async file =>
+            (
+              await pinata.pinFileToIPFS(Readable.from(file.buffer), {
+                pinataMetadata: { name: file.originalname },
+              })
+            ).IpfsHash,
+        ),
+    );
 
     const projectLaunch = await projectLaunchService.update(createdProjectLaunch.id, {
       team,
       projectDocuments,
-      logo: logoFile
-        ? `/uploads/project-launches/${createdProjectLaunch.id}/${logoFile.fieldname}/${logoFile.originalname}`
-        : null,
+      logo: logo || null,
     });
 
     return response.status(HttpStatusCode.Created).json(projectLaunch);
@@ -101,7 +119,7 @@ export class ProjectLaunchController {
 
   async update(request: Request, response: Response) {
     const { id } = request.params;
-    await projectLaunchService.findOne({ where: { id } });
+    const projectLaunchToUpdate = await projectLaunchService.findOne({ where: { id } });
 
     let team = request.body.team ? JSON.parse(request.body.team) : undefined;
     let files: Express.Multer.File[] = [];
@@ -114,46 +132,73 @@ export class ProjectLaunchController {
       }
     }
 
-    files = files.map(file => ({
-      ...file,
-      originalname: `${uuid()}${path.extname(file.originalname)}`,
-      path: `/uploads/project-launches/${id}/${file.fieldname}`,
-    }));
+    const logoFile = files.find(file => file.fieldname === 'project-logo');
+
+    if (logoFile !== undefined && projectLaunchToUpdate.logo) {
+      pinata.unpin(projectLaunchToUpdate.logo).catch(console.log);
+    }
+
+    const logo = logoFile
+      ? (
+          await pinata.pinFileToIPFS(Readable.from(logoFile.buffer), {
+            pinataMetadata: { name: logoFile.originalname },
+          })
+        ).IpfsHash
+      : null;
+
+    const teamFiles = await Promise.all(
+      files
+        .filter(file => file.fieldname === 'team-images')
+        .map(async file => ({
+          name: file.originalname,
+          hash: (
+            await pinata.pinFileToIPFS(Readable.from(file.buffer), {
+              pinataMetadata: { name: file.originalname },
+            })
+          ).IpfsHash,
+        })),
+    );
+
+    if (projectLaunchToUpdate.team) {
+      const projectLaunchToUpdateTeam = JSON.parse((projectLaunchToUpdate.team as any).toString());
+
+      projectLaunchToUpdateTeam.forEach((member: any) => {
+        if (member.image && teamFiles?.find(file => file.name === member.image) !== undefined) {
+          pinata.unpin(member.image).catch(console.log);
+        }
+      });
+    }
 
     if (team) {
-      const teamFiles = files.filter(file => file.fieldname === 'team-images');
-
-      team = team.map((member: any, index: number) => ({
+      team = team.map((member: any) => ({
         ...member,
-        image: teamFiles[index]
-          ? `${teamFiles[index].path}/${teamFiles[index].originalname}`
-          : null,
+        image: teamFiles?.find(file => file.name === member.image)?.hash || null,
       }));
     }
 
-    const projectDocuments = files
-      .filter(file => file.fieldname === 'project-documents')
-      .map(file => `${file.path}/${file.originalname}`);
-
-    if (files.length > 0) {
-      await deleteFolder(`uploads/project-launches/${id}`);
-    }
-
-    await uploadMultipleFiles(files);
-
-    const logoFile = files.find(file => file.fieldname === 'project-logo') ?? null;
+    const projectDocuments = await Promise.all(
+      files
+        .filter(file => file.fieldname === 'project-documents')
+        .map(
+          async file =>
+            (
+              await pinata.pinFileToIPFS(Readable.from(file.buffer), {
+                pinataMetadata: { name: file.originalname },
+              })
+            ).IpfsHash,
+        ),
+    );
 
     let data = { ...request.body };
 
     if (team) data = { ...data, team };
-    if (files.length > 0)
+    if (files.length > 0) {
       data = {
         ...data,
         projectDocuments,
-        logo: logoFile
-          ? `/uploads/project-launches/${id}/${logoFile.fieldname}/${logoFile.originalname}`
-          : null,
+        logo: logo || null,
       };
+    }
 
     const projectLaunch = await projectLaunchService.update(id, data);
 
@@ -163,8 +208,27 @@ export class ProjectLaunchController {
   async remove(request: Request, response: Response) {
     const { id } = request.params;
     await projectLaunchService.findOne({ where: { id } });
-    await deleteFolder(`uploads/project-launches/${id}`);
     const projectLaunch = await projectLaunchService.remove(id);
+
+    if (projectLaunch.logo) {
+      pinata.unpin(projectLaunch.logo).catch(console.log);
+    }
+
+    if (projectLaunch.projectDocuments) {
+      projectLaunch.projectDocuments.forEach((document: any) => {
+        if (document) {
+          pinata.unpin(document).catch(console.log);
+        }
+      });
+    }
+
+    if (projectLaunch.team) {
+      projectLaunch.team.forEach((member: any) => {
+        if (member.image) {
+          pinata.unpin(member.image).catch(console.log);
+        }
+      });
+    }
 
     return response.status(HttpStatusCode.Ok).json(projectLaunch);
   }

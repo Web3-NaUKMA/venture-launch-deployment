@@ -4,10 +4,11 @@ import { HttpStatusCode } from 'axios';
 import { Controller } from '../../decorators/app.decorators';
 import { v4 as uuid } from 'uuid';
 import path from 'path';
-import { deleteFolder, uploadMultipleFiles } from '../../utils/file.utils';
 import { parseObjectStringValuesToPrimitives } from '../../utils/object.utils';
 import qs from 'qs';
 import _ from 'lodash';
+import pinata from '../../utils/file.utils';
+import { Readable } from 'stream';
 
 @Controller()
 export class UserController {
@@ -54,31 +55,24 @@ export class UserController {
       }
     }
 
-    files = files.map(file => ({
-      ...file,
-      originalname: `${uuid()}${path.extname(file.originalname)}`,
-      path: `/uploads/users/${id}/${file.fieldname}`,
-    }));
+    const avatarFile = files.find(file => file.fieldname === 'user-avatar');
 
-    if (files.length > 0) {
-      await deleteFolder(`uploads/users/${id}`);
+    if (currentAvatar && avatarFile !== undefined) {
+      pinata.unpin(currentAvatar).catch(console.log);
     }
 
-    await uploadMultipleFiles(files);
+    const avatar = avatarFile
+      ? (
+          await pinata.pinFileToIPFS(Readable.from(avatarFile.buffer), {
+            pinataMetadata: { name: avatarFile.originalname },
+          })
+        ).IpfsHash
+      : null;
 
-    const avatar = files.find(file => file.fieldname === 'user-avatar');
-
-    let data = { ...request.body };
-
-    if (files.length > 0)
-      data = {
-        ...data,
-        avatar: avatar
-          ? `/uploads/users/${id}/${avatar.fieldname}/${avatar.originalname}`
-          : request.body.avatar === null
-            ? null
-            : currentAvatar,
-      };
+    const data = {
+      ...request.body,
+      avatar: avatar ? avatar : request.body.avatar === '' ? null : currentAvatar,
+    };
 
     const user = await userService.update(id, data);
 
@@ -89,6 +83,10 @@ export class UserController {
     const { id } = request.params as any;
     await userService.findOne({ where: { id } });
     const user = await userService.remove(id);
+
+    if (user.avatar) {
+      pinata.unpin(user.avatar).catch(console.log);
+    }
 
     return response.status(HttpStatusCode.Ok).json(user);
   }

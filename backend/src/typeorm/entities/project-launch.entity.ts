@@ -49,7 +49,7 @@ export class ProjectLaunchEntity implements ProjectLaunch {
   projectDocuments: string[];
 
   @Column({ type: 'jsonb', default: '[]' })
-  team: JSON;
+  team: any;
 
   @Column({ type: 'text' })
   businessModel: string;
@@ -58,7 +58,7 @@ export class ProjectLaunchEntity implements ProjectLaunch {
   tokenomics: string;
 
   @Column({ type: 'jsonb', default: '{}' })
-  roundDetails: JSON;
+  roundDetails: any;
 
   @OneToOne(() => ProjectEntity)
   @JoinColumn({ name: 'projectId', referencedColumnName: 'id' })

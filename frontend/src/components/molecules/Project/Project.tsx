@@ -26,6 +26,7 @@ import ProjectLaunchInfoModal from '../../organisms/ProjectLaunchInfoModal/Proje
 import ProgressBar from '../ProgressBar/ProgressBar';
 import { resolveImage } from '../../../utils/file.utils';
 import ApproveProjectLaunchModal from '../../organisms/ApproveProjectLaunchModal/ApproveProjectLaunchModal';
+import Image from 'components/atoms/Image/Image';
 
 export interface ProjectProps extends HTMLAttributes<HTMLDivElement> {
   project: ProjectLaunch;
@@ -135,13 +136,16 @@ export const Project: FC<ProjectProps> = ({
         <div className='flex flex-col w-full flex-1'>
           <div className='flex justify-between items-start pb-5'>
             <div className='flex w-full'>
-              <img
-                src={resolveImage(projectLaunch.logo || '')}
-                onError={({ currentTarget }) => {
-                  currentTarget.onerror = null;
-                  currentTarget.src = '/logo.png';
-                }}
-                className={`${variant === 'tiny' ? 'w-[3.7em]' : 'w-[6em]'} aspect-square rounded-xl object-cover border`}
+              <Image
+                src={projectLaunch.logo ? resolveImage(projectLaunch.logo) : undefined}
+                emptySrcFallback={
+                  <div
+                    className={`${variant === 'tiny' ? 'max-w-[3.7em]' : 'max-w-[6em]'} w-full aspect-square rounded-xl object-cover border bg-stone-200 flex items-center justify-center`}
+                  >
+                    <EmptyLogoIcon className='size-8' />
+                  </div>
+                }
+                className={`${variant === 'tiny' ? 'max-w-[3.7em]' : 'max-w-[6em]'} w-full aspect-square rounded-xl object-cover border`}
               />
               <div
                 className={`flex self-center flex-col w-full ${variant === 'tiny' ? 'ms-3' : 'ms-5'}`}

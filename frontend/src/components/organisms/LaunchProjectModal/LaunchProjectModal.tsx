@@ -224,7 +224,10 @@ const LaunchProjectModal: FC<LaunchProjectModalProps> = ({ title, onClose, child
         formData.append('project-documents', document);
       });
 
-      Object.entries(state.data).forEach(([key, value]) => {
+      Object.entries({
+        ...state.data,
+        team: state.data.team?.map(member => ({ ...member, image: member.image?.name || '' })),
+      }).forEach(([key, value]) => {
         if (value && !(value instanceof File)) {
           if (value instanceof Date) {
             formData.set(key, new Date(value).toISOString());

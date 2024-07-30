@@ -5,10 +5,10 @@ export interface CreateProjectLaunchDto {
   fundraiseAmount: number;
   fundraiseDeadline: Date;
   projectDocuments: string[];
-  team: JSON;
+  team: any;
   businessModel: string;
   tokenomics: string;
-  roundDetails: JSON;
+  roundDetails: any;
   authorId: string;
   vaultTokenAccount: string;
   cryptoTrackerAccount: string;
@@ -24,10 +24,10 @@ export interface UpdateProjectLaunchDto {
   fundraiseProgress?: number;
   fundraiseDeadline?: Date;
   projectDocuments?: string[];
-  team?: JSON;
+  team?: any;
   businessModel?: string;
   tokenomics?: string;
-  roundDetails?: JSON;
+  roundDetails?: any;
   vaultTokenAccount?: string;
   cryptoTrackerAccount?: string;
   businessAnalystReview?: string | null;
