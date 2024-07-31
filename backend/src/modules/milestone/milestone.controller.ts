@@ -64,10 +64,14 @@ export class MilestoneController {
             receiver: milestoneToFind.project.projectLaunch.author.walletId,
             is_execute: false,
             amount:
-              milestoneToFind.project.projectLaunch.projectLaunchInvestments.reduce(
-                (previousValue, currentValue) => previousValue + Number(currentValue.amount),
-                0,
-              ) / (milestoneToFind?.project?.milestoneNumber || 1),
+              Number(
+                (
+                  milestoneToFind.project.projectLaunch.projectLaunchInvestments.reduce(
+                    (previousValue, currentValue) => previousValue + Number(currentValue.amount),
+                    0,
+                  ) / (milestoneToFind?.project?.milestoneNumber || 1)
+                ).toFixed(6),
+              ) * 1_000_000,
           },
         });
       }

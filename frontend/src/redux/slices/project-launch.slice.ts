@@ -9,7 +9,7 @@ import {
 } from '../../types/redux/project-launch.types';
 import axios from 'axios';
 import { ProjectLaunch } from '../../types/project-launch.types';
-import { createProject } from './project.slice';
+import { createProject, updateProject } from './project.slice';
 import { CreateProjectDto } from '../../types/project.types';
 import {
   CreateProjectLaunchInvestmentDto,
@@ -217,6 +217,11 @@ export const updateProjectLaunch =
     dispatch(projectLaunchSlice.actions.setError({ updateProjectLaunch: null }));
 
     try {
+      const milestoneNumber = Number(formData.get('milestoneNumber')?.toString() || 0);
+      const relatedProjectId = formData.get('relatedProjectId')?.toString() || '';
+      formData.delete('milestoneNumber');
+      formData.delete('relatedProjectId');
+
       const response = await axios.put(`project-launches/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
@@ -225,6 +230,11 @@ export const updateProjectLaunch =
 
       if (response.status === HttpStatusCode.Ok) {
         options?.onSuccess?.(response.data);
+
+        if (relatedProjectId) {
+          dispatch(updateProject(relatedProjectId, { milestoneNumber }));
+        }
+
         return dispatch(projectLaunchSlice.actions.editProjectLaunch(response.data));
       }
     } catch (error) {

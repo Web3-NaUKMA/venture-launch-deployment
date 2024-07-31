@@ -13,10 +13,10 @@ export interface ProjectLaunch {
   fundraiseProgress: number;
   fundraiseDeadline: Date;
   projectDocuments: string[];
-  team: JSON;
+  team: any;
   businessModel: string;
   tokenomics: string;
-  roundDetails: JSON;
+  roundDetails: any;
   project: Project | null;
   author: User;
   approver: User;

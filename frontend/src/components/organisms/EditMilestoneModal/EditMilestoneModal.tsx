@@ -11,6 +11,8 @@ export interface EditMilestoneModalProps extends ModalProps {
 interface EditMilestoneModalState {
   data: {
     mergedPullRequestUrl?: string;
+    description?: string;
+    isFinal: boolean;
   };
   error: string | null;
 }
@@ -18,6 +20,8 @@ interface EditMilestoneModalState {
 const initialState: EditMilestoneModalState = {
   data: {
     mergedPullRequestUrl: undefined,
+    description: undefined,
+    isFinal: false,
   },
   error: null,
 };
@@ -31,7 +35,11 @@ const EditMilestoneModal: FC<EditMilestoneModalProps> = ({
 }) => {
   const [state, setState] = useState({
     ...initialState,
-    data: { ...initialState.data, mergedPullRequestUrl: milestone.mergedPullRequestUrl },
+    data: {
+      ...initialState.data,
+      mergedPullRequestUrl: milestone.mergedPullRequestUrl,
+      description: milestone.description,
+    },
   });
   const formRef = useRef<HTMLFormElement | null>(null);
   const dispatch = useAppDispatch();
@@ -74,26 +82,49 @@ const EditMilestoneModal: FC<EditMilestoneModalProps> = ({
             {state.error}
           </span>
         )}
-        <label
-          htmlFor='edit_milestone_merged_pull_request_url'
-          className='mb-1.5 font-sans font-semibold text-zinc-900 text-lg mx-0.5'
-        >
-          Merged pull request URL
-        </label>
-        <input
-          type='text'
-          id='edit_milestone_merged_pull_request_url'
-          className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
-          placeholder='https://github.com/project/pull/1'
-          defaultValue={state.data.mergedPullRequestUrl}
-          onChange={event =>
-            setState({
-              ...state,
-              data: { ...state.data, mergedPullRequestUrl: event.target.value },
-              error: null,
-            })
-          }
-        />
+        <div className='flex flex-col mb-2'>
+          <label
+            htmlFor='edit_milestone_merged_pull_request_url'
+            className='mb-1.5 font-sans font-semibold text-zinc-900 text-lg mx-0.5'
+          >
+            Merged pull request URL
+          </label>
+          <input
+            type='text'
+            id='edit_milestone_merged_pull_request_url'
+            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono'
+            placeholder='https://github.com/project/pull/1'
+            defaultValue={state.data.mergedPullRequestUrl}
+            onChange={event =>
+              setState({
+                ...state,
+                data: { ...state.data, mergedPullRequestUrl: event.target.value },
+                error: null,
+              })
+            }
+          />
+        </div>
+        <div className='flex flex-col'>
+          <label
+            htmlFor='create_milestone_description'
+            className='mb-1.5 font-sans font-semibold text-zinc-900 text-lg mx-0.5'
+          >
+            Description
+          </label>
+          <textarea
+            id='update_milestone_description'
+            className='border border-stone-400 p-3 rounded-lg text-stone-800 placeholder:text-stone-400 font-mono min-h-[150px] whitespace-pre-wrap'
+            placeholder='Milestone description'
+            defaultValue={state.data.description}
+            onChange={event =>
+              setState({
+                ...state,
+                data: { ...state.data, description: event.target.value },
+                error: null,
+              })
+            }
+          />
+        </div>
         <div className='flex gap-4 mt-10'>
           <button
             type='submit'

@@ -115,6 +115,8 @@ export class MilestoneService {
       await proposalService.update(proposal.id, { status: ProposalStatusEnum.Executing });
     }
 
+    console.log({ ...dto.data, proposal_id: proposal.id });
+
     rabbitMQ.publish(
       'request_exchange',
       { ...dto.data, proposal_id: proposal.id },

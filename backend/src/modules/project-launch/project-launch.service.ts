@@ -15,7 +15,6 @@ import {
 import _ from 'lodash';
 import { rabbitMQ } from '../../utils/rabbitmq.utils';
 import { CommandType } from '../../utils/dao.utils';
-import daoService from '../dao/dao.service';
 import userService from '../user/user.service';
 import { DaoEntity } from '../../typeorm/entities/dao.entity';
 
@@ -96,7 +95,13 @@ export class ProjectLaunchService {
       delete data.approverId;
 
       if (approverId) {
-        rabbitMQ.publish('request_exchange', { project_id: id }, CommandType.CreateDao);
+        const dao = await AppDataSource.getRepository(DaoEntity).findOne({
+          where: { projectLaunch: { id } },
+        });
+
+        if (!dao) {
+          rabbitMQ.publish('request_exchange', { project_id: id }, CommandType.CreateDao);
+        }
       }
 
       await AppDataSource.getRepository(ProjectLaunchEntity).update(

@@ -12,6 +12,7 @@ import {
   PlanetIcon,
   ShareIcon,
   StarIcon,
+  UserCircleIcon,
   UserIcon,
   VideoIcon,
 } from '../../atoms/Icons/Icons';
@@ -19,6 +20,7 @@ import { Link } from 'react-router-dom';
 import { resolveImage } from '../../../utils/file.utils';
 import ProgressBar from '../../molecules/ProgressBar/ProgressBar';
 import { AppRoutes } from '../../../types/enums/app-routes.enum';
+import Image from 'components/atoms/Image/Image';
 
 export interface ProjectLaunchInfoModalProps extends ModalProps {
   projectLaunch: ProjectLaunch;
@@ -90,12 +92,13 @@ const ProjectLaunchInfoModal: FC<ProjectLaunchInfoModalProps> = ({
           <div className='flex flex-col flex-1 justify-between'>
             <div className='flex flex-col'>
               <div className='flex items-center mb-5'>
-                <img
-                  src={resolveImage(projectLaunch.logo || '')}
-                  onError={({ currentTarget }) => {
-                    currentTarget.onerror = null;
-                    currentTarget.src = '/logo.png';
-                  }}
+                <Image
+                  src={projectLaunch.logo ? resolveImage(projectLaunch.logo) : undefined}
+                  emptySrcFallback={
+                    <div className='w-[6em] aspect-square rounded-xl object-cover bg-stone-200 flex items-center justify-center'>
+                      <EmptyLogoIcon className='size-8' />
+                    </div>
+                  }
                   className='w-[6em] aspect-square rounded-xl object-cover'
                 />
                 <div className='flex flex-col ms-5'>
@@ -292,15 +295,16 @@ const ProjectLaunchInfoModal: FC<ProjectLaunchInfoModalProps> = ({
                 <Link to={member.linkedInUrl} className='absolute top-2 left-2'>
                   <LinkedInIcon className='size-4 text-neutral-600' />
                 </Link>
-                <img
-                  src={resolveImage(member.image)}
-                  onError={({ currentTarget }) => {
-                    currentTarget.onerror = null;
-                    currentTarget.src = '/logo.png';
-                  }}
+                <Image
+                  src={member.image ? resolveImage(member.image) : undefined}
+                  emptySrcFallback={
+                    <div className='me-4 rounded-full w-[40%] aspect-square object-cover max-w-[128px] bg-stone-200 flex items-center justify-center'>
+                      <UserCircleIcon className='size-12 text-stone-500' />
+                    </div>
+                  }
                   className='me-4 rounded-full w-[40%] aspect-square object-cover max-w-[128px]'
                 />
-                <div className='flex flex-col w-full'>
+                <div className='flex flex-col flex-1'>
                   <h5 className='font-bold'>{member.name}</h5>
                   <p className='font-semibold text-sm text-zinc-800'>{member.position}</p>
                   <span className='border-b border-black w-full my-2' />
