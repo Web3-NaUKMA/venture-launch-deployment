@@ -4,6 +4,7 @@ import { AppRoutes } from '../../../types/enums/app-routes.enum';
 import Button from '../../atoms/Button/Button';
 import {
   DotsIcon,
+  EditIcon,
   EmptyLogoIcon,
   LockIcon,
   RemoveIcon,
@@ -27,6 +28,7 @@ import ProgressBar from '../ProgressBar/ProgressBar';
 import { resolveImage } from '../../../utils/file.utils';
 import ApproveProjectLaunchModal from '../../organisms/ApproveProjectLaunchModal/ApproveProjectLaunchModal';
 import Image from 'components/atoms/Image/Image';
+import EditProjectLaunchModal from 'components/organisms/EditProjectLaunchModal/EditProjectLaunchModal';
 
 export interface ProjectProps extends HTMLAttributes<HTMLDivElement> {
   project: ProjectLaunch;
@@ -41,6 +43,7 @@ export const Project: FC<ProjectProps> = ({
   const dispatch = useAppDispatch();
   const [isSettingsDropdownVisible, setIsSettingsDropdownVisible] = useState(false);
   const [isRemoveProjectModalVisible, setIsRemoveProjectModalVisible] = useState(false);
+  const [isEditProjectModalVisible, setIsEditProjectModalVisible] = useState(false);
   const [isApproveProjectLaunchModalVisible, setIsApproveProjectLaunchModalVisible] =
     useState(false);
   const [
@@ -129,6 +132,16 @@ export const Project: FC<ProjectProps> = ({
           />,
           document.getElementById('root')!,
         )}
+      {isEditProjectModalVisible &&
+        createPortal(
+          <EditProjectLaunchModal
+            title='Edit project launch'
+            onClose={() => setIsEditProjectModalVisible(false)}
+            onProcess={() => setIsEditProjectModalVisible(false)}
+            projectLaunch={projectLaunch}
+          />,
+          document.getElementById('root')!,
+        )}
       <div
         className='flex flex-col justify-between items-start bg-white py-7 px-14 rounded-xl shadow-[0_0_15px_-7px_gray]'
         {...props}
@@ -211,6 +224,18 @@ export const Project: FC<ProjectProps> = ({
                                 <RemoveIcon className='size-4 me-2' />
                                 Remove
                               </Button>
+                              {!projectLaunch.isFundraised && (
+                                <Button
+                                  className='inline-flex items-center hover:bg-neutral-100 px-2 py-1 rounded-md font-medium'
+                                  onClick={() => {
+                                    setIsEditProjectModalVisible(true);
+                                    setIsSettingsDropdownVisible(false);
+                                  }}
+                                >
+                                  <EditIcon className='size-4 me-2' />
+                                  Edit
+                                </Button>
+                              )}
                             </div>
                           )}
                         </div>
@@ -334,6 +359,18 @@ export const Project: FC<ProjectProps> = ({
                             <RemoveIcon className='size-4 me-2' />
                             Remove
                           </Button>
+                          {!projectLaunch.isFundraised && (
+                            <Button
+                              className='inline-flex items-center hover:bg-neutral-100 px-2 py-1 rounded-md font-medium'
+                              onClick={() => {
+                                setIsEditProjectModalVisible(true);
+                                setIsSettingsDropdownVisible(false);
+                              }}
+                            >
+                              <EditIcon className='size-4 me-2' />
+                              Edit
+                            </Button>
+                          )}
                         </div>
                       )}
                     </div>

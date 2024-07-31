@@ -160,7 +160,7 @@ export class ProjectLaunchController {
     );
 
     if (projectLaunchToUpdate.team) {
-      const projectLaunchToUpdateTeam = JSON.parse((projectLaunchToUpdate.team as any).toString());
+      const projectLaunchToUpdateTeam = projectLaunchToUpdate.team;
 
       projectLaunchToUpdateTeam.forEach((member: any) => {
         if (member.image && teamFiles?.find(file => file.name === member.image) !== undefined) {
@@ -188,6 +188,19 @@ export class ProjectLaunchController {
             ).IpfsHash,
         ),
     );
+
+    delete request.body['team-images'];
+    delete request.body['project-documents'];
+    delete request.body['project-logo'];
+
+    if (request.body.approverId === '' || request.body.approverId === null) {
+      delete request.body['approverId'];
+      request.body.approver = { id: null };
+    }
+
+    if (request.body.businessAnalystReview === '') {
+      request.body.businessAnalystReview = null;
+    }
 
     let data = { ...request.body };
 

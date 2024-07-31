@@ -182,7 +182,7 @@ const Milestone: FC<MilestoneProps> = ({ milestone, projectLaunch }) => {
         )}
       <div className='flex flex-col border rounded-md'>
         <div className='flex p-4 items-start justify-between'>
-          <div className='flex w-full flex-col gap-y-1'>
+          <div className='flex flex-col gap-y-1'>
             <div className='flex gap-1'>
               <span className='font-sans font-semibold'>Milestone ID:</span>
               <span className='font-mono'>{milestone.id}</span>
@@ -205,7 +205,7 @@ const Milestone: FC<MilestoneProps> = ({ milestone, projectLaunch }) => {
               <span className='font-sans font-semibold whitespace-nowrap'>
                 Aproval transaction hash:
               </span>
-              <span className='font-mono overflow-x-auto with-scrollbar-sm whitespace-nowrap'>
+              <span className='font-mono overflow-x-auto with-scrollbar-sm whitespace-nowrap max-w-[600px]'>
                 {milestone.transactionApprovalHash ? (
                   <a
                     href={`https://explorer.solana.com/tx/${milestone.transactionApprovalHash}?cluster=devnet`}
@@ -405,11 +405,15 @@ const Milestone: FC<MilestoneProps> = ({ milestone, projectLaunch }) => {
                                     is_execute: true,
                                     receiver: projectLaunch.author.walletId,
                                     amount:
-                                      (projectLaunch?.projectLaunchInvestments?.reduce(
-                                        (previousValue, currentValue) =>
-                                          previousValue + Number(currentValue.amount),
-                                        0,
-                                      ) || 0) / (projectLaunch?.project?.milestoneNumber || 1),
+                                      Number(
+                                        (
+                                          (projectLaunch?.projectLaunchInvestments?.reduce(
+                                            (previousValue, currentValue) =>
+                                              previousValue + Number(currentValue.amount),
+                                            0,
+                                          ) || 0) / (projectLaunch?.project?.milestoneNumber || 1)
+                                        ).toFixed(6),
+                                      ) * 1_000_000,
                                   },
                                 },
                               );

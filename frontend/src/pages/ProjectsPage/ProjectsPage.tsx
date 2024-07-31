@@ -31,7 +31,7 @@ const ProjectsPage: FC = () => {
       } else {
         dispatch(
           fetchAllProjectLaunches(
-            { where: { approver: { id: { not: null } } } },
+            { where: { approver: { id: { not: null } } }, relations: { project: true } },
             { onError: () => setIsLoaded(true), onSuccess: () => setIsLoaded(true) },
           ),
         );
