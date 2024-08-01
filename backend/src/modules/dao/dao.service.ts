@@ -137,7 +137,7 @@ export class DAOService {
 
       existingUsers.forEach(member => {
         rabbitMQ.publish(
-          'request_exchange',
+          'broker.request',
           {
             multisig_pda: dao.multisigPda,
             pubkey: member.walletId,
@@ -187,7 +187,7 @@ export class DAOService {
 
       existingUsers.forEach(member => {
         rabbitMQ.publish(
-          'request_exchange',
+          'broker.request',
           {
             multisig_pda: dao.multisigPda,
             pubkey: member.walletId,
@@ -197,7 +197,7 @@ export class DAOService {
         );
       });
 
-      rabbitMQ.receive('response_exchange', 'response_exchange', (message, error) => {
+      rabbitMQ.receive('response_queue', 'broker.response', (message, error) => {
         if (message) console.log(message);
         if (error) console.log(error);
       });
@@ -219,23 +219,23 @@ export class DAOService {
 
   async withdraw(withdrawDto: BlockchainWithdrawDto) {
     console.log(withdrawDto);
-    rabbitMQ.publish('request_exchange', withdrawDto, CommandType.Withdraw);
+    rabbitMQ.publish('broker.request', withdrawDto, CommandType.Withdraw);
   }
 
   async executeProposal(proposal: BlockchainExecuteProposalDto) {
     console.log('project ', proposal.multisig_pda);
-    rabbitMQ.publish('request_exchange', proposal, CommandType.ProposalExecute);
+    rabbitMQ.publish('broker.request', proposal, CommandType.ProposalExecute);
   }
 
   async vote(vote: BlockchainVoteDto) {
     console.log('project ', vote.multisig_pda);
     console.log('voting ', vote.vote);
-    rabbitMQ.publish('request_exchange', vote, CommandType.Vote);
+    rabbitMQ.publish('broker.request', vote, CommandType.Vote);
   }
 
   async changeThreshold(threshold: BlockchainChangeThresholdDto) {
     console.log('project ', threshold.multisig_pda);
-    rabbitMQ.publish('request_exchange', threshold, CommandType.ChangeThreshold);
+    rabbitMQ.publish('broker.request', threshold, CommandType.ChangeThreshold);
   }
 }
 

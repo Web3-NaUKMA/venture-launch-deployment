@@ -118,7 +118,7 @@ export class MilestoneService {
     console.log({ ...dto.data, proposal_id: proposal.id });
 
     rabbitMQ.publish(
-      'request_exchange',
+      'broker.request',
       { ...dto.data, proposal_id: proposal.id },
       dto.commandType,
     );

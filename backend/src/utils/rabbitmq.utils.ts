@@ -52,12 +52,12 @@ export class RabbitMQ {
       RabbitMQExchangeNames.Direct,
     );
 
-    await this.requestChannel.assertQueue('request_exchange', { durable: true });
-    await this.requestChannel.bindQueue('request_exchange', 'request_exchange', 'request_exchange');
+    await this.requestChannel.assertQueue('request_queue', { durable: true });
+    await this.requestChannel.bindQueue('request_queue', 'dao_exchange', routingKey);
 
     await this.requestChannel.publish(
       process.env.RABBITMQ_EXCHANGE_NAME,
-      routingKey,
+      'broker.request',
       Buffer.from(JSON.stringify(message)),
       { persistent: true, headers: { command: commandType } },
     );
@@ -113,27 +113,24 @@ export class RabbitMQConsumer {
   public async consume() {
     await this.rabbitMQInstance.connect();
 
-    this.rabbitMQInstance.receive(
-      'response_exchange',
-      'response_exchange',
-      async (message, error) => {
-        if (message.command_type) {
-          switch (message.command_type) {
-            case CommandType.CreateDao:
-              this.executeCreateDaoCommand(message);
-              break;
-            case CommandType.Withdraw:
-              this.executeWithdrawCommand(message);
-            case CommandType.AddMember:
-            case CommandType.RemoveMember:
-            case CommandType.Vote:
-              if (message) console.log(message);
-              if (error) console.log(error);
-              break;
-          }
+    this.rabbitMQInstance.receive('response_queue', 'broker.response', async (message, error) => {
+      console.log(message);
+      if (message.command_type) {
+        switch (message.command_type) {
+          case CommandType.CreateDao:
+            this.executeCreateDaoCommand(message);
+            break;
+          case CommandType.Withdraw:
+            this.executeWithdrawCommand(message);
+          case CommandType.AddMember:
+          case CommandType.RemoveMember:
+          case CommandType.Vote:
+            if (message) console.log(message);
+            if (error) console.log(error);
+            break;
         }
-      },
-    );
+      }
+    });
   }
 
   async executeCreateDaoCommand(message: any) {
@@ -142,6 +139,8 @@ export class RabbitMQConsumer {
       where: { id: project_id },
       relations: { approver: true },
     });
+
+    console.log(projectLaunch);
 
     if (projectLaunch.approver.id) {
       const dao = await daoService.create({

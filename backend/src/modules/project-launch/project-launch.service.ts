@@ -100,7 +100,7 @@ export class ProjectLaunchService {
         });
 
         if (!dao) {
-          rabbitMQ.publish('request_exchange', { project_id: id }, CommandType.CreateDao);
+          rabbitMQ.publish('broker.request', { project_id: id }, CommandType.CreateDao);
         }
       }
 
@@ -198,7 +198,7 @@ export class ProjectLaunchService {
         const investor = await userService.findOne({ where: { id: data.investorId } });
 
         rabbitMQ.publish(
-          'request_exchange',
+          'broker.request',
           {
             multisig_pda: projectLaunch.dao.multisigPda,
             pubkey: investor.walletId,
