@@ -52,12 +52,12 @@ export class RabbitMQ {
       RabbitMQExchangeNames.Direct,
     );
 
-    await this.requestChannel.assertQueue('request_exchange', { durable: true });
-    await this.requestChannel.bindQueue('request_exchange', 'request_exchange', 'request_exchange');
+    await this.requestChannel.assertQueue('request_queue', { durable: true });
+    await this.requestChannel.bindQueue('request_queue', 'dao_exchange', 'broker.request');
 
     await this.requestChannel.publish(
       process.env.RABBITMQ_EXCHANGE_NAME,
-      routingKey,
+      "broker.request",
       Buffer.from(JSON.stringify(message)),
       { persistent: true, headers: { command: commandType } },
     );
@@ -114,9 +114,10 @@ export class RabbitMQConsumer {
     await this.rabbitMQInstance.connect();
 
     this.rabbitMQInstance.receive(
-      'response_exchange',
-      'response_exchange',
+      'dao_exchange',
+      'broker.response',
       async (message, error) => {
+        console.log(message);
         if (message.command_type) {
           switch (message.command_type) {
             case CommandType.CreateDao:
@@ -142,6 +143,8 @@ export class RabbitMQConsumer {
       where: { id: project_id },
       relations: { approver: true },
     });
+
+    console.log(projectLaunch);
 
     if (projectLaunch.approver.id) {
       const dao = await daoService.create({
