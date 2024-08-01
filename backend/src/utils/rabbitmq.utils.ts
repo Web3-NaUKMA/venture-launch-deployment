@@ -53,11 +53,11 @@ export class RabbitMQ {
     );
 
     await this.requestChannel.assertQueue('request_queue', { durable: true });
-    await this.requestChannel.bindQueue('request_queue', 'dao_exchange', 'broker.request');
+    await this.requestChannel.bindQueue('request_queue', 'dao_exchange', routingKey);
 
     await this.requestChannel.publish(
       process.env.RABBITMQ_EXCHANGE_NAME,
-      "broker.request",
+      'broker.request',
       Buffer.from(JSON.stringify(message)),
       { persistent: true, headers: { command: commandType } },
     );
@@ -113,28 +113,24 @@ export class RabbitMQConsumer {
   public async consume() {
     await this.rabbitMQInstance.connect();
 
-    this.rabbitMQInstance.receive(
-      'dao_exchange',
-      'broker.response',
-      async (message, error) => {
-        console.log(message);
-        if (message.command_type) {
-          switch (message.command_type) {
-            case CommandType.CreateDao:
-              this.executeCreateDaoCommand(message);
-              break;
-            case CommandType.Withdraw:
-              this.executeWithdrawCommand(message);
-            case CommandType.AddMember:
-            case CommandType.RemoveMember:
-            case CommandType.Vote:
-              if (message) console.log(message);
-              if (error) console.log(error);
-              break;
-          }
+    this.rabbitMQInstance.receive('response_queue', 'broker.response', async (message, error) => {
+      console.log(message);
+      if (message.command_type) {
+        switch (message.command_type) {
+          case CommandType.CreateDao:
+            this.executeCreateDaoCommand(message);
+            break;
+          case CommandType.Withdraw:
+            this.executeWithdrawCommand(message);
+          case CommandType.AddMember:
+          case CommandType.RemoveMember:
+          case CommandType.Vote:
+            if (message) console.log(message);
+            if (error) console.log(error);
+            break;
         }
-      },
-    );
+      }
+    });
   }
 
   async executeCreateDaoCommand(message: any) {

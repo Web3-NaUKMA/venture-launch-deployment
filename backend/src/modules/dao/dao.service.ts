@@ -197,7 +197,7 @@ export class DAOService {
         );
       });
 
-      rabbitMQ.receive('dao_exchange', 'broker.response', (message, error) => {
+      rabbitMQ.receive('response_queue', 'broker.response', (message, error) => {
         if (message) console.log(message);
         if (error) console.log(error);
       });

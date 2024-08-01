@@ -113,7 +113,12 @@ export const Project: FC<ProjectProps> = ({
             title='Proceed with investment'
             onClose={() => setIsCreateProjectLaunchInvestmentModalVisible(false)}
             onProcess={() => {
-              dispatch(fetchAllProjectLaunches());
+              dispatch(
+                fetchAllProjectLaunches({
+                  where: { approver: { id: { not: null } } },
+                  relations: { project: true },
+                }),
+              );
               setIsCreateProjectLaunchInvestmentModalVisible(false);
             }}
             projectLaunch={projectLaunch}
